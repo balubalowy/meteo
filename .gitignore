@@ -1,0 +1,20 @@
+# Python / IDE
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.idea/
+.vscode/
+
+# Excel / Temporary files
+~$*.xlsx
+
+# Media / Photos binary data
+media/*.jpg
+media/*.jpeg
+media/*.png
+!media/.gitkeep
+
+# Output generated maps (optional ignore or keep track)
+# mapy/wygenerowane/*.png
