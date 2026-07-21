@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Centrum Wiedzy i Analiz Meteorologicznych — Bartek (SOB)</title>
+  <title>Centrum Analiz Meteorologicznych — Bartek (SOB)</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
@@ -21,10 +21,10 @@
   <!-- Sidebar Navigation -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-icon">M</div>
+      <div class="brand-logo">M</div>
       <div>
-        <div class="brand-title">Meteo Hub</div>
-        <div class="brand-subtitle">Centrum Bartka / SOB</div>
+        <div class="brand-name">Meteo Hub</div>
+        <div class="brand-sub">Centrum Bartka / SOB</div>
       </div>
     </div>
 
@@ -64,11 +64,11 @@
   <div class="main-wrapper">
     <header class="header">
       <div class="header-title">
-        <h1>Centrum Wiedzy i Analizy Meteorologicznej</h1>
-        <p>System Mezoanalityczny dla Storm Chasingu w Polsce i Sieci Obserwatorów Burz (SOB)</p>
+        <h1>Centrum Analiz Meteorologicznych</h1>
+        <p>Baza wiedzy i narzędzia prognostyczne Sieci Obserwatorów Burz (SOB)</p>
       </div>
       <div class="badge-sob">
-        <span style="width:8px; height:8px; background:#EF4444; border-radius:50%; display:inline-block"></span>
+        <span style="width:7px; height:7px; background:#EF4444; border-radius:50%; display:inline-block"></span>
         SOB Storm Center
       </div>
     </header>
@@ -77,51 +77,65 @@
     <div id="tab-overview" class="tab-view active">
       <div class="grid-4" style="margin-bottom:1.5rem">
         <div class="card">
-          <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600">CAPE (SBCAPE)</div>
-          <div style="font-size:1.5rem; font-weight:700; color:var(--warning); margin:0.2rem 0">> 1500 J/kg</div>
-          <div style="font-size:0.75rem; color:var(--text-subtle)">Prąd Wstępujący Wmax ~ 55 m/s</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600">SBCAPE</div>
+          <div style="font-size:1.4rem; font-weight:700; color:var(--warning-l1); margin:0.2rem 0">> 1500 J/kg</div>
+          <div style="font-size:0.75rem; color:var(--text-secondary)">Prąd Wstępujący Wmax ~ 55 m/s</div>
         </div>
         <div class="card">
-          <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600">DLS 0-6 km</div>
-          <div style="font-size:1.5rem; font-weight:700; color:var(--danger); margin:0.2rem 0">> 20 m/s (40 kt)</div>
-          <div style="font-size:0.75rem; color:var(--text-subtle)">Ryzyko Superkomórek</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600">DLS 0-6 km</div>
+          <div style="font-size:1.4rem; font-weight:700; color:var(--warning-l3); margin:0.2rem 0">> 20 m/s (40 kt)</div>
+          <div style="font-size:0.75rem; color:var(--text-secondary)">Organizacja Superkomórek</div>
         </div>
         <div class="card">
-          <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600">SRH 0-1 km</div>
-          <div style="font-size:1.5rem; font-weight:700; color:var(--purple); margin:0.2rem 0">> 200 m²/s²</div>
-          <div style="font-size:0.75rem; color:var(--text-subtle)">Wektor Bunkersa (RM)</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600">SRH 0-1 km</div>
+          <div style="font-size:1.4rem; font-weight:700; color:#A855F7; margin:0.2rem 0">> 200 m²/s²</div>
+          <div style="font-size:0.75rem; color:var(--text-secondary)">Wektor Bunkersa RM</div>
         </div>
         <div class="card">
-          <div style="font-size:0.8rem; color:var(--text-muted); font-weight:600">LCL Height</div>
-          <div style="font-size:1.5rem; font-weight:700; color:var(--accent); margin:0.2rem 0">~ 850 m</div>
-          <div style="font-size:0.75rem; color:var(--text-subtle)">Podstawa chmur Espy</div>
+          <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600">Poziom LCL</div>
+          <div style="font-size:1.4rem; font-weight:700; color:var(--accent-cyan); margin:0.2rem 0">~ 850 m</div>
+          <div style="font-size:0.75rem; color:var(--text-secondary)">Podstawa chmur Espy</div>
         </div>
       </div>
 
       <!-- Archiwum Nawałnic w Polsce -->
       <div style="margin-bottom:1.5rem">
-        <h2 style="font-family:'Outfit',sans-serif; font-size:1.25rem; margin-bottom:0.75rem; color:var(--danger)">Archiwum Nawałnic i Derecho w Polsce</h2>
+        <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:0.75rem; color:var(--text-primary)">Archiwum Nawałnic i Derecho w Polsce</h2>
         <div id="historical-cases-grid" class="grid-3"></div>
       </div>
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-title">Mapa Ostrzeżeń Burzowych (Polska)</div>
-          <img src="mapy/wygenerowane/mapa_polski_ostrzezenia.png" alt="Mapa Polski Ostrzeżenia" style="width:100%; border-radius:8px">
+          <div class="card-header-bar">
+            <div class="card-title">Mapa Ostrzeżeń Burzowych (Polska)</div>
+          </div>
+          <div class="map-img-container">
+            <a href="mapy/wygenerowane/mapa_polski_ostrzezenia.png" target="_blank">
+              <img src="mapy/wygenerowane/mapa_polski_ostrzezenia.png" alt="Mapa Polski Ostrzeżenia">
+            </a>
+          </div>
         </div>
         <div class="card">
-          <div class="card-title">Mapa Sytuacji Synoptycznej (Europa)</div>
-          <img src="mapy/wygenerowane/mapa_europy_synoptyczna.png" alt="Mapa Europy Synoptyka" style="width:100%; border-radius:8px">
+          <div class="card-header-bar">
+            <div class="card-title">Mapa Sytuacji Synoptycznej (Europa)</div>
+          </div>
+          <div class="map-img-container">
+            <a href="mapy/wygenerowane/mapa_europy_synoptyczna.png" target="_blank">
+              <img src="mapy/wygenerowane/mapa_europy_synoptyczna.png" alt="Mapa Europy Synoptyka">
+            </a>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- TAB 2: INTERAKTYWNA OCENA SZKÓD (ESSL IF-SCALE) -->
     <div id="tab-if-evaluator" class="tab-view">
-      <div class="card" style="margin-bottom:1.5rem; border-top:3px solid var(--primary)">
-        <div class="card-title">Kalkulator i Oceniasz Zniszczeń ESSL IF-Scale (v1.0e 2025)</div>
-        <p style="font-size:0.875rem; color:var(--text-muted); margin-bottom:1rem">
-          Wybierz wskaźnik zniszczeń (Damage Indicator) oraz stopień uszkodzenia (DoD), aby natychmiast wyliczyć natychmiastową trójwymiarową prędkość wiatru w porywie (*instantaneous 3D wind speed*) według najnowszego standardu ESSL 2025.
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-header-bar">
+          <div class="card-title">Kalkulator i Oceniasz Zniszczeń ESSL IF-Scale (v1.0e 2025)</div>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem">
+          Wybierz wskaźnik zniszczeń (Damage Indicator) oraz stopień uszkodzenia (DoD), aby wyliczyć natychmiastową trójwymiarową prędkość wiatru w porywie (*instantaneous 3D wind speed*) według wytycznych ESSL 2025.
         </p>
 
         <div class="grid-3">
@@ -143,11 +157,13 @@
           </div>
         </div>
 
-        <div id="eval-result-box" style="background:rgba(15,23,42,0.9); padding:1rem; border-radius:8px; margin-top:0.5rem; border:1px solid var(--primary-glow)"></div>
+        <div id="eval-result-box" style="background:var(--bg-input); padding:0.85rem; border-radius:4px; border:1px solid var(--border-color); margin-top:0.5rem"></div>
       </div>
 
       <div class="card">
-        <div class="card-title">Tabela Klas Skali International Fujita (ESSL 2025)</div>
+        <div class="card-header-bar">
+          <div class="card-title">Tabela Klas Skali International Fujita (ESSL 2025)</div>
+        </div>
         <table class="data-table">
           <thead>
             <tr>
@@ -165,10 +181,12 @@
 
     <!-- TAB 3: KALKULATORY NA ŻYWO -->
     <div id="tab-calculators" class="tab-view">
-      <div class="grid-2" style="margin-bottom:1.5rem">
+      <div class="grid-2" style="margin-bottom:1.25rem">
         <!-- Przelicznik Wiatru -->
         <div class="card">
-          <div class="card-title">1. Przelicznik Prędkości Wiatru</div>
+          <div class="card-header-bar">
+            <div class="card-title">1. Przelicznik Prędkości Wiatru</div>
+          </div>
           <div class="form-group">
             <label class="form-label">Wartość wejściowa:</label>
             <input type="number" id="calc-wind-val" class="form-input" value="100">
@@ -181,20 +199,22 @@
               <option value="kt">węzły (kt)</option>
             </select>
           </div>
-          <div style="background:rgba(15,23,42,0.8); padding:0.8rem; border-radius:8px; margin-top:1rem">
-            <div style="font-size:0.8rem; color:var(--text-muted)">Wyniki przeliczenia:</div>
-            <div style="font-size:1.1rem; font-weight:700; color:var(--primary); margin-top:0.2rem" id="res-wind-kmh">100.0 km/h</div>
-            <div style="font-size:1.1rem; font-weight:700; color:var(--accent); margin-top:0.2rem" id="res-wind-ms">27.8 m/s</div>
-            <div style="font-size:1.1rem; font-weight:700; color:var(--warning); margin-top:0.2rem" id="res-wind-kt">54.0 kt</div>
+          <div style="background:var(--bg-input); padding:0.75rem; border-radius:4px; border:1px solid var(--border-color); margin-top:0.75rem">
+            <div style="font-size:0.75rem; color:var(--text-muted)">Wyniki przeliczenia:</div>
+            <div style="font-size:1.1rem; font-weight:700; color:var(--accent-cyan); margin-top:0.2rem" id="res-wind-kmh">100.0 km/h</div>
+            <div style="font-size:1.1rem; font-weight:700; color:var(--accent-green); margin-top:0.2rem" id="res-wind-ms">27.8 m/s</div>
+            <div style="font-size:1.1rem; font-weight:700; color:var(--warning-l1); margin-top:0.2rem" id="res-wind-kt">54.0 kt</div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-subtle); margin-top:0.75rem">
+          <div style="font-size:0.725rem; color:var(--text-muted); margin-top:0.5rem">
             1 kt = 1.852 km/h; 1 m/s = 3.6 km/h (allmetsat)
           </div>
         </div>
 
-        <!-- Kalkulator DCP (Derecho Composite Parameter) -->
-        <div class="card" style="border-top:3px solid var(--danger)">
-          <div class="card-title" style="color:var(--danger)">2. Kalkulator Derecho Composite Parameter (DCP)</div>
+        <!-- Kalkulator DCP -->
+        <div class="card">
+          <div class="card-header-bar">
+            <div class="card-title">2. Kalkulator Derecho Composite Parameter (DCP)</div>
+          </div>
           <div class="grid-2">
             <div class="form-group">
               <label class="form-label">DCAPE [J/kg]:</label>
@@ -213,12 +233,12 @@
               <input type="number" id="calc-dcp-meanwind" class="form-input" value="18" step="1">
             </div>
           </div>
-          <div style="background:rgba(15,23,42,0.8); padding:0.8rem; border-radius:8px; margin-top:0.5rem">
-            <div style="font-size:0.8rem; color:var(--text-muted)">Wyznaczony Indeks DCP:</div>
-            <div style="font-size:1.6rem; font-weight:800; color:var(--danger); margin-top:0.2rem" id="res-dcp-val">4.25</div>
+          <div style="background:var(--bg-input); padding:0.75rem; border-radius:4px; border:1px solid var(--border-color); margin-top:0.25rem">
+            <div style="font-size:0.75rem; color:var(--text-muted)">Wyznaczony Indeks DCP:</div>
+            <div style="font-size:1.5rem; font-weight:700; color:var(--warning-l3); margin-top:0.1rem" id="res-dcp-val">4.25</div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-subtle); margin-top:0.5rem">
-            DCP > 2.0 oznacza wysokie ryzyko derecho. (Źródło: Evans & Doswell / SPC)
+          <div style="font-size:0.725rem; color:var(--text-muted); margin-top:0.5rem">
+            DCP > 2.0 oznacza ryzyko nawałnicy Derecho (Evans & Doswell / SPC).
           </div>
         </div>
       </div>
@@ -226,23 +246,27 @@
       <div class="grid-2">
         <!-- Kalkulator Wmax -->
         <div class="card">
-          <div class="card-title">3. Kalkulator Prądu Wstępującego (Wmax)</div>
+          <div class="card-header-bar">
+            <div class="card-title">3. Kalkulator Prądu Wstępującego (Wmax)</div>
+          </div>
           <div class="form-group">
             <label class="form-label">Energia CAPE [J/kg]:</label>
             <input type="number" id="calc-cape-val" class="form-input" value="2000" step="100">
           </div>
-          <div style="background:rgba(15,23,42,0.8); padding:0.8rem; border-radius:8px; margin-top:1rem">
-            <div style="font-size:0.8rem; color:var(--text-muted)">Maksymalna prędkość prądu (Wmax):</div>
-            <div style="font-size:1.3rem; font-weight:700; color:var(--danger); margin-top:0.2rem" id="res-wmax-val">63.2 m/s (228 km/h)</div>
+          <div style="background:var(--bg-input); padding:0.75rem; border-radius:4px; border:1px solid var(--border-color); margin-top:0.75rem">
+            <div style="font-size:0.75rem; color:var(--text-muted)">Maksymalna prędkość prądu (Wmax):</div>
+            <div style="font-size:1.25rem; font-weight:700; color:var(--warning-l3); margin-top:0.1rem" id="res-wmax-val">63.2 m/s (228 km/h)</div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-subtle); margin-top:0.75rem">
+          <div style="font-size:0.725rem; color:var(--text-muted); margin-top:0.5rem">
             Wzór Zięby: W_max = √(2 * CAPE) [m/s]
           </div>
         </div>
 
         <!-- Kalkulator LCL -->
         <div class="card">
-          <div class="card-title">4. Kalkulator Podstawy Chmur (LCL)</div>
+          <div class="card-header-bar">
+            <div class="card-title">4. Kalkulator Podstawy Chmur (LCL)</div>
+          </div>
           <div class="form-group">
             <label class="form-label">Temperatura (T) [°C]:</label>
             <input type="number" id="calc-lcl-temp" class="form-input" value="25.0" step="0.5">
@@ -251,11 +275,11 @@
             <label class="form-label">Punkt rosy (Td) [°C]:</label>
             <input type="number" id="calc-lcl-td" class="form-input" value="18.0" step="0.5">
           </div>
-          <div style="background:rgba(15,23,42,0.8); padding:0.8rem; border-radius:8px; margin-top:1rem">
-            <div style="font-size:0.8rem; color:var(--text-muted)">Wysokość podstawy LCL:</div>
-            <div style="font-size:1.3rem; font-weight:700; color:var(--accent); margin-top:0.2rem" id="res-lcl-height">875 m n.p.g.</div>
+          <div style="background:var(--bg-input); padding:0.75rem; border-radius:4px; border:1px solid var(--border-color); margin-top:0.75rem">
+            <div style="font-size:0.75rem; color:var(--text-muted)">Wysokość podstawy LCL:</div>
+            <div style="font-size:1.25rem; font-weight:700; color:var(--accent-cyan); margin-top:0.1rem" id="res-lcl-height">875 m n.p.g.</div>
           </div>
-          <div style="font-size:0.75rem; color:var(--text-subtle); margin-top:0.75rem">
+          <div style="font-size:0.725rem; color:var(--text-muted); margin-top:0.5rem">
             Wzór Espy'ego: h_LCL ≈ 125 * (T - Td) [m]
           </div>
         </div>
@@ -264,41 +288,51 @@
 
     <!-- TAB 4: AEROLOGIA & HODOGRAFY -->
     <div id="tab-aerology" class="tab-view">
-      <h2 style="font-family:'Outfit',sans-serif; font-size:1.3rem; margin-bottom:1rem; color:var(--primary)">Pojęcia Aerologiczne i Profile Cząstki (Zięba & Taszarek)</h2>
+      <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:0.75rem; color:var(--text-primary)">Pojęcia Aerologiczne i Profile Cząstki (Zięba & Taszarek)</h2>
       <div id="thermo-concepts-grid" class="grid-2"></div>
     </div>
 
     <!-- TAB 5: SYGNATURY RADAROWE -->
     <div id="tab-radars" class="tab-view">
-      <h2 style="font-family:'Outfit',sans-serif; font-size:1.3rem; margin-bottom:1rem; color:var(--primary)">Atlas Sygnatur Radarowych (Wojciech Pilorz / SOB)</h2>
+      <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:0.75rem; color:var(--text-primary)">Atlas Sygnatur Radarowych (Wojciech Pilorz / SOB)</h2>
       <div id="radar-signatures-grid" class="grid-2"></div>
     </div>
 
     <!-- TAB 6: OSTRZEŻENIA SOB -->
     <div id="tab-sob-rules" class="tab-view">
-      <h2 style="font-family:'Outfit',sans-serif; font-size:1.3rem; margin-bottom:1rem; color:var(--danger)">Progi Wydawania Ostrzeżeń Skywarn Polska / SOB</h2>
+      <h2 style="font-size:1.15rem; font-weight:700; margin-bottom:0.75rem; color:var(--warning-l3)">Progi Wydawania Ostrzeżeń Skywarn Polska / SOB</h2>
       <div id="sob-warnings-grid" class="grid-3"></div>
     </div>
 
     <!-- TAB 7: CENTRUM MAP -->
     <div id="tab-maps" class="tab-view">
       <div class="card" style="margin-bottom:1.5rem">
-        <div class="card-title">Interaktywna Mapa Pogodowa z Ostrzeżeniami (Leaflet / OpenStreetMap)</div>
+        <div class="card-header-bar">
+          <div class="card-title">Interaktywna Mapa Pogodowa z Ostrzeżeniami (Leaflet / OpenStreetMap)</div>
+        </div>
         <div id="leaflet-map"></div>
       </div>
 
       <div class="grid-2">
         <div class="card">
-          <div class="card-title">Pobierz Mapę Polski (300 DPI)</div>
-          <a href="mapy/wygenerowane/mapa_polski_ostrzezenia.png" target="_blank">
-            <img src="mapy/wygenerowane/mapa_polski_ostrzezenia.png" alt="Pobierz Mapę Polski" style="width:100%; border-radius:8px">
-          </a>
+          <div class="card-header-bar">
+            <div class="card-title">Pobierz Mapę Polski (300 DPI)</div>
+          </div>
+          <div class="map-img-container">
+            <a href="mapy/wygenerowane/mapa_polski_ostrzezenia.png" target="_blank">
+              <img src="mapy/wygenerowane/mapa_polski_ostrzezenia.png" alt="Pobierz Mapę Polski">
+            </a>
+          </div>
         </div>
         <div class="card">
-          <div class="card-title">Pobierz Mapę Europy (300 DPI)</div>
-          <a href="mapy/wygenerowane/mapa_europy_synoptyczna.png" target="_blank">
-            <img src="mapy/wygenerowane/mapa_europy_synoptyczna.png" alt="Pobierz Mapę Europy" style="width:100%; border-radius:8px">
-          </a>
+          <div class="card-header-bar">
+            <div class="card-title">Pobierz Mapę Europy (300 DPI)</div>
+          </div>
+          <div class="map-img-container">
+            <a href="mapy/wygenerowane/mapa_europy_synoptyczna.png" target="_blank">
+              <img src="mapy/wygenerowane/mapa_europy_synoptyczna.png" alt="Pobierz Mapę Europy">
+            </a>
+          </div>
         </div>
       </div>
     </div>
