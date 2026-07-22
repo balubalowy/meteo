@@ -2,7 +2,7 @@
 
 ## Cel projektu
 To NIE jest system pobierania danych w czasie rzeczywistym. To baza wiedzy +
-kalkulatory Excel + generator map statycznych do analizy własnej i SOB.
+kalkulatory Excel + generator map statycznych do analizy własnej.
 
 ## Twoja rola (agent)
 - Budujesz pliki referencyjne (Markdown/CSV) i skrypty Python generujące mapy.

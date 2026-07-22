@@ -2,8 +2,8 @@
 
 **Data i czas zjawiska**: YYYY-MM-DD HH:MM CEST  
 **Lokalizacja / Rejon działania**: (np. Kotlina Sandomierska / Wyżyna Śląska / Powiat X)  
-**Obserwator / Storm Chaser**: Bartek (Sieć Obserwatorów Burz)  
-**Stopień Ostrzeżenia SOB**: Stopień 1 / 2 / 3  
+**Obserwator / Storm Chaser**: Bartek (Łowcy Burz)  
+**Stopień Ostrzeżenia**: Stopień 1 / 2 / 3  
 
 ---
 

@@ -1,5 +1,5 @@
 /**
- * BAZA DANYCH WIEDZY METEOROLOGICZNEJ BARTKA (SOB) - WERSJA EKSTREMALNA
+ * BAZA DANYCH WIEDZY METEOROLOGICZNEJ BARTKA (Meteo) - WERSJA EKSTREMALNA
  * Wyekstrahowana z 19 publikacji naukowych (ESSL 2025, Skywarn PL, Taszarek, Zięba, Pilorz, Derecho 2009/2017)
  */
 
@@ -147,7 +147,7 @@ const METEO_DATA = {
     }
   ],
 
-  // 3. RADAROWE SYGNATURY BURZOWE (Wojciech Pilorz / SOB)
+  // 3. RADAROWE SYGNATURY BURZOWE (Wojciech Pilorz / Meteo)
   radarSignatures: [
     {
       name: "Hook Echo (Haczyk Mezocyklonu)",
@@ -175,10 +175,10 @@ const METEO_DATA = {
     }
   ],
 
-  // 4. OFICJALNE PROGI OSTRZEŻEŃ SKYWARN POLSKA / SOB
-  sobWarnings: [
+  // 4. OFICJALNE PROGI OSTRZEŻEŃ SKYWARN POLSKA / Meteo
+  skywarnWarnings: [
     {
-      level: "1 Stopień Ostrzeżenia (SOB)",
+      level: "1 Stopień Ostrzeżenia (Meteo)",
       color: "#FBBF24",
       wind: "70 - 90 km/h",
       hail: "1.5 - 3.0 cm",
@@ -187,7 +187,7 @@ const METEO_DATA = {
       desc: "Umiarkowane burze lokalne, drobny grad, punktowe zalania."
     },
     {
-      level: "2 Stopień Ostrzeżenia (SOB)",
+      level: "2 Stopień Ostrzeżenia (Meteo)",
       color: "#F59E0B",
       wind: "90 - 110 km/h",
       hail: "3.0 - 5.0 cm",
@@ -196,7 +196,7 @@ const METEO_DATA = {
       desc: "Silne burze z niszczycielskimi porywami, duży grad, lokalne podtopienia."
     },
     {
-      level: "3 Stopień Ostrzeżenia (SOB)",
+      level: "3 Stopień Ostrzeżenia (Meteo)",
       color: "#EF4444",
       wind: "> 110 km/h (lub > 130 km/h w Derecho)",
       hail: "> 5.0 cm",

@@ -1,5 +1,5 @@
 /**
- * LOGIKA DASHBOARDU METEO BARTKA (SOB) - EKSTREMALNY UPGRADE v3
+ * LOGIKA DASHBOARDU METEO BARTKA (Meteo) - EKSTREMALNY UPGRADE v3
  * Kalkulatory ESSL IF-Scale, Wmax, LCL, DCP, STP, SCP, Wektor Corfidiego
  * oraz Archiwum Historycznych Nawałnic w Polsce (2002-2017)
  */
@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderDamageEvaluator();
   renderThermoConcepts();
   renderRadarSignatures();
-  renderSOBWarnings();
+  renderSkywarnWarnings();
   renderHistoricalCases();
   initLiveCalculators();
   initLeafletMap();
@@ -172,12 +172,12 @@ function renderRadarSignatures() {
   `).join("");
 }
 
-// 6. Renderowanie Ostrzeżeń SOB / Skywarn PL
-function renderSOBWarnings() {
-  const container = document.getElementById("sob-warnings-grid");
-  if (!container || !METEO_DATA.sobWarnings) return;
+// 6. Renderowanie Ostrzeżeń Meteo / Skywarn PL
+function renderSkywarnWarnings() {
+  const container = document.getElementById("skywarn-warnings-grid");
+  if (!container || !METEO_DATA.skywarnWarnings) return;
 
-  container.innerHTML = METEO_DATA.sobWarnings.map(w => `
+  container.innerHTML = METEO_DATA.skywarnWarnings.map(w => `
     <div class="card" style="border-left:4px solid ${w.color}">
       <div class="card-title" style="color:${w.color}">${w.level}</div>
       <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem">${w.desc}</p>
@@ -314,7 +314,7 @@ function initLeafletMap() {
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
-    attribution: '© OpenStreetMap contributors | Sieć Obserwatorów Burz'
+    attribution: '© OpenStreetMap contributors | Łowcy Burz'
   }).addTo(map);
 
   L.polygon([
@@ -327,10 +327,10 @@ function initLeafletMap() {
     fillColor: "#EF4444",
     fillOpacity: 0.35,
     weight: 2
-  }).addTo(map).bindPopup("<b>Stopień 2 (SOB):</b> Strefa silnych superkomórek burzowych.");
+  }).addTo(map).bindPopup("<b>Stopień 2 (Skywarn PL):</b> Strefa silnych superkomórek burzowych.");
 
   const points = [
-    { lat: 52.23, lon: 21.01, title: "Warszawa", desc: "Stacja Synoptyczna / SOB Center" },
+    { lat: 52.23, lon: 21.01, title: "Warszawa", desc: "Stacja Synoptyczna / Meteo Center" },
     { lat: 50.06, lon: 19.94, title: "Kraków", desc: "Punkt Obserwacji Aerologicznej" },
     { lat: 51.11, lon: 17.03, title: "Wrocław", desc: "Stacja Aerologiczna 12425" }
   ];

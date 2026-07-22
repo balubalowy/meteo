@@ -1,5 +1,5 @@
 /* ----------------------------------------------------
-   PROFESJONALNY PORTAL METEOROLOGICZNY - SOB / BARTKA
+   PROFESJONALNY PORTAL METEOROLOGICZNY - CENTRUM METEO BARTKA
    Czysty, naukowy i elegancki design (Styl ESSL / ESTOFEX / DWD)
 ---------------------------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap');
@@ -161,7 +161,7 @@ body {
   margin-top: 0.2rem;
 }
 
-.badge-sob {
+.badge-storm {
   background: rgba(220, 38, 38, 0.12);
   color: #F87171;
   border: 1px solid rgba(220, 38, 38, 0.3);

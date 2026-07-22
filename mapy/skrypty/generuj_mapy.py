@@ -13,7 +13,7 @@ EUROPE_GEOJSON = os.path.join(GEO_DIR, "europe_countries.json")
 
 def generuj_mape_polski(output_path="e:/meteo/mapy/wygenerowane/mapa_polski_ostrzezenia.png", dpi=300):
     """
-    Generuje profesjonalną, precyzyjną mapę Polski z granicami 16 województw, miastami i strefami SOB.
+    Generuje profesjonalną, precyzyjną mapę Polski z granicami 16 województw, miastami i strefami Meteo.
     """
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     fig, ax = plt.subplots(figsize=(10, 9.5), dpi=dpi)
@@ -28,15 +28,15 @@ def generuj_mape_polski(output_path="e:/meteo/mapy/wygenerowane/mapa_polski_ostr
     gdf_poland.plot(ax=ax, color='#F8F9FA', edgecolor='#666666', linewidth=0.7, zorder=2)
     gdf_poland.boundary.plot(ax=ax, color='#222222', linewidth=1.2, zorder=3)
 
-    # 2. Rejony Ostrzeżeń SOB (Przykładowe strefy o rzeczywistych kształtach)
+    # 2. Rejony Ostrzeżeń Meteo (Przykładowe strefy o rzeczywistych kształtach)
     strefa2_poly = Polygon([(16.2, 51.1), (17.5, 52.8), (19.8, 53.2), (21.5, 52.0), (20.8, 50.4), (17.8, 50.2)])
     strefa3_poly = Polygon([(17.8, 51.2), (19.2, 52.4), (20.5, 51.8), (19.5, 50.8)])
 
     gdf_strefa2 = gpd.GeoDataFrame(geometry=[strefa2_poly], crs="EPSG:4326")
     gdf_strefa3 = gpd.GeoDataFrame(geometry=[strefa3_poly], crs="EPSG:4326")
 
-    gdf_strefa2.plot(ax=ax, color='#FF9800', alpha=0.45, edgecolor='#E65100', linewidth=1.5, zorder=4, label="Stopień 2 (SOB): Silne burze / Grad")
-    gdf_strefa3.plot(ax=ax, color='#E53935', alpha=0.55, edgecolor='#B71C1C', linewidth=2.0, zorder=5, label="Stopień 3 (SOB): Gwałtowne burze / Nawałnica")
+    gdf_strefa2.plot(ax=ax, color='#FF9800', alpha=0.45, edgecolor='#E65100', linewidth=1.5, zorder=4, label="Stopień 2 (Skywarn PL): Silne burze / Grad")
+    gdf_strefa3.plot(ax=ax, color='#E53935', alpha=0.55, edgecolor='#B71C1C', linewidth=2.0, zorder=5, label="Stopień 3 (Skywarn PL): Gwałtowne burze / Nawałnica")
 
     # Wektor ruchu burzy
     ax.annotate("", xy=(20.8, 52.2), xytext=(17.2, 50.8),
@@ -68,7 +68,7 @@ def generuj_mape_polski(output_path="e:/meteo/mapy/wygenerowane/mapa_polski_ostr
     ax.set_xlabel("Długość geograficzna (°E)", fontsize=9)
     ax.set_ylabel("Szerokość geograficzna (°N)", fontsize=9)
 
-    plt.figtext(0.98, 0.015, "Oficjalne kontury państwowe (Natural Earth 1:10m) | Sieć Obserwatorów Burz", horizontalalignment='right', fontsize=8, color='#555555', style='italic')
+    plt.figtext(0.98, 0.015, "Oficjalne kontury państwowe (Natural Earth 1:10m) | Łowcy Burz", horizontalalignment='right', fontsize=8, color='#555555', style='italic')
 
     plt.tight_layout()
     plt.savefig(output_path, dpi=dpi, bbox_inches='tight')

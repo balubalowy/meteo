@@ -20,10 +20,10 @@ Wklejaj tutaj linki do materiałów, artykułów naukowych, przewodników, progn
 
 ---
 
-## 2. Standardy i Dokumentacje SOB / ESTOFEX / ESSL / IMGW
+## 2. Standardy i Dokumentacje Meteo / ESTOFEX / ESSL / IMGW
 
 - **[NOWY]** [Tytuł/Opis źródła](LINK_TUTAJ)  
-  *Notatka/Komentarz*: (np. Aktualne wytyczne klasyfikacji stopni ostrzeżeń SOB)
+  *Notatka/Komentarz*: (np. Aktualne wytyczne klasyfikacji stopni ostrzeżeń Meteo)
 
 ---
 

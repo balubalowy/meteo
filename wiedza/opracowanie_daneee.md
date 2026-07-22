@@ -57,7 +57,7 @@ Syntetyczne omówienie 19 profesjonalnych publikacji, instrukcji i opracowań me
 
 ## 4. Teledetekcja i Sygnatury Radarowe
 **Plik**: `radarowe_pilorz.pdf`  
-*Autor*: Wojciech Pilorz (Sieć Obserwatorów Burz).
+*Autor*: Wojciech Pilorz (Łowcy Burz).
 
 ### Kluczowe sygnatury radarowe:
 - **Hook Echo (Haczyk)**: Klasyczny haczyk na odbiciowości w dolnej części superkomórki, wskazujący na rotację i wnoszenie opadu wokół mezocyklonu.
@@ -67,7 +67,7 @@ Syntetyczne omówienie 19 profesjonalnych publikacji, instrukcji i opracowań me
 
 ---
 
-## 5. Klasyfikacja Ostrzeżeń SOB / Skywarn Polska
+## 5. Klasyfikacja Ostrzeżeń Meteo / Skywarn Polska
 **Plik**: `skywarnpl-zjawiska-2012.pdf`  
 
 ### Kryteria wydawania ostrzeżeń:
