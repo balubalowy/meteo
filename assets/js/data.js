@@ -1,6 +1,6 @@
 /**
  * BAZA DANYCH WIEDZY METEOROLOGICZNEJ BARTKA (Meteo) - WERSJA EKSTREMALNA
- * Wyekstrahowana z 19 publikacji naukowych (ESSL 2025, Skywarn PL, Taszarek, Zięba, Pilorz, Derecho 2009/2017)
+ * Wyekstrahowana z 19 publikacji naukowych (ESSL 2025, Meteo, Taszarek, Zięba, Pilorz, Derecho 2009/2017)
  */
 
 const METEO_DATA = {
@@ -175,8 +175,8 @@ const METEO_DATA = {
     }
   ],
 
-  // 4. OFICJALNE PROGI OSTRZEŻEŃ SKYWARN POLSKA / Meteo
-  skywarnWarnings: [
+  // 4. OFICJALNE PROGI OSTRZEŻEŃ METEO
+  alertWarnings: [
     {
       level: "1 Stopień Ostrzeżenia (Meteo)",
       color: "#FBBF24",

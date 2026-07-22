@@ -35,8 +35,8 @@ def generuj_mape_polski(output_path="e:/meteo/mapy/wygenerowane/mapa_polski_ostr
     gdf_strefa2 = gpd.GeoDataFrame(geometry=[strefa2_poly], crs="EPSG:4326")
     gdf_strefa3 = gpd.GeoDataFrame(geometry=[strefa3_poly], crs="EPSG:4326")
 
-    gdf_strefa2.plot(ax=ax, color='#FF9800', alpha=0.45, edgecolor='#E65100', linewidth=1.5, zorder=4, label="Stopień 2 (Skywarn PL): Silne burze / Grad")
-    gdf_strefa3.plot(ax=ax, color='#E53935', alpha=0.55, edgecolor='#B71C1C', linewidth=2.0, zorder=5, label="Stopień 3 (Skywarn PL): Gwałtowne burze / Nawałnica")
+    gdf_strefa2.plot(ax=ax, color='#FF9800', alpha=0.45, edgecolor='#E65100', linewidth=1.5, zorder=4, label="Stopień 2 (Meteo): Silne burze / Grad")
+    gdf_strefa3.plot(ax=ax, color='#E53935', alpha=0.55, edgecolor='#B71C1C', linewidth=2.0, zorder=5, label="Stopień 3 (Meteo): Gwałtowne burze / Nawałnica")
 
     # Wektor ruchu burzy
     ax.annotate("", xy=(20.8, 52.2), xytext=(17.2, 50.8),

@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderDamageEvaluator();
   renderThermoConcepts();
   renderRadarSignatures();
-  renderSkywarnWarnings();
+  renderMeteoWarnings();
   renderHistoricalCases();
   initLiveCalculators();
   initLeafletMap();
@@ -172,12 +172,12 @@ function renderRadarSignatures() {
   `).join("");
 }
 
-// 6. Renderowanie Ostrzeżeń Meteo / Skywarn PL
-function renderSkywarnWarnings() {
-  const container = document.getElementById("skywarn-warnings-grid");
-  if (!container || !METEO_DATA.skywarnWarnings) return;
+// 6. Renderowanie Ostrzeżeń Meteo / Meteo
+function renderMeteoWarnings() {
+  const container = document.getElementById("alert-warnings-grid");
+  if (!container || !METEO_DATA.alertWarnings) return;
 
-  container.innerHTML = METEO_DATA.skywarnWarnings.map(w => `
+  container.innerHTML = METEO_DATA.alertWarnings.map(w => `
     <div class="card" style="border-left:4px solid ${w.color}">
       <div class="card-title" style="color:${w.color}">${w.level}</div>
       <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem">${w.desc}</p>
@@ -327,7 +327,7 @@ function initLeafletMap() {
     fillColor: "#EF4444",
     fillOpacity: 0.35,
     weight: 2
-  }).addTo(map).bindPopup("<b>Stopień 2 (Skywarn PL):</b> Strefa silnych superkomórek burzowych.");
+  }).addTo(map).bindPopup("<b>Stopień 2 (Meteo):</b> Strefa silnych superkomórek burzowych.");
 
   const points = [
     { lat: 52.23, lon: 21.01, title: "Warszawa", desc: "Stacja Synoptyczna / Meteo Center" },

@@ -20,7 +20,7 @@ kalkulatory Excel + generator map statycznych do analizy własnej.
 
 ## Zasady
 - Wzory fizyczne (CAPE, shear, SRH) — zawsze z jednostkami i źródłem.
-- Skale zagrożeń (IF, Skywarn) — kopiuj z oryginalnej tabeli, nie parafrazuj liczb.
+- Skale zagrożeń (IF, Meteo) — kopiuj z oryginalnej tabeli, nie parafrazuj liczb.
 - Mapy: domyślnie PNG 300dpi, projekcja odpowiednia dla PL (EPSG:2180) i Europy.
 - Excel: każda kolumna z przelicznikiem ma komórkę z linkiem/opisem źródła.
 

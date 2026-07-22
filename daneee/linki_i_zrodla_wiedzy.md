@@ -15,7 +15,7 @@ Wklejaj tutaj linki do materiałów, artykułów naukowych, przewodników, progn
 
 - **[NOWY]** [Tytuł/Opis źródła](LINK_TUTAJ)  
   https://lowcyburz.pl/wiedza/
-  https://lowcyburz.pl/skala-prawdopodobienstwa-wystapienia-burz-i-stopni-zagrozen-uzywana-w-prognozach-sily-i-aktywnosci-burz-skywarn-polska/
+  https://lowcyburz.pl/skala-prawdopodobienstwa-wystapienia-burz/
   https://lowcyburz.pl/objasnienie-skali-ostrzezen/
 
 ---

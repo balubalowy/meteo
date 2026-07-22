@@ -25,7 +25,7 @@ Syntetyczne omówienie 19 profesjonalnych publikacji, instrukcji i opracowań me
 
 ## 2. Diagramy Aerologiczne i Wskaźniki Termodynamiczne
 **Pliki**: `Podstawowe-wskaźniki-termodynamiczne-Zięba.pdf`, `radiosondaze.pdf`, `taszarek_doc_www.pdf`  
-*Autorzy*: dr Marek Zięba (Skywarn Polska), dr hab. Mateusz Taszarek (UAM Poznań).
+*Autorzy*: dr Marek Zięba (Centrum Meteo), dr hab. Mateusz Taszarek (UAM Poznań).
 
 ### Kluczowe ustalenia:
 - **Cząstki początkowe**:
@@ -67,8 +67,8 @@ Syntetyczne omówienie 19 profesjonalnych publikacji, instrukcji i opracowań me
 
 ---
 
-## 5. Klasyfikacja Ostrzeżeń Meteo / Skywarn Polska
-**Plik**: `skywarnpl-zjawiska-2012.pdf`  
+## 5. Klasyfikacja Ostrzeżeń Meteo / Centrum Meteo
+**Plik**: `zjawiska-2012.pdf`  
 
 ### Kryteria wydawania ostrzeżeń:
 - **1 Stopień**: Porywy 70-90 km/h, grad 1.5-3 cm, opad 20-30 mm/h.
