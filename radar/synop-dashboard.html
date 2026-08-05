@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMGW Radar & Synop Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem;
+      --space-12: 3rem; --space-16: 4rem; --space-20: 5rem;
+      --color-bg: #f7f6f2; --color-surface: #f9f8f5; --color-surface-2: #fbfbf9;
+      --color-surface-offset: #f3f0ec; --color-surface-dynamic: #e6e4df; --color-border: #d4d1ca;
+      --color-text: #28251d; --color-text-muted: #7a7974; --color-text-faint: #bab9b4;
+      --color-primary: #01696f; --color-primary-hover: #0c4e54; --color-primary-highlight: #cedcd8;
+      --color-blue: #006494; --color-warning: #964219; --color-success: #437a22; --color-error: #a12c7b;
+      --radius-sm: 0.375rem; --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-xl: 1rem; --radius-full: 9999px;
+      --shadow-sm: 0 1px 2px rgba(20,20,20,.06); --shadow-md: 0 6px 20px rgba(20,20,20,.09); --shadow-lg: 0 16px 40px rgba(20,20,20,.14);
+      --font-body: 'Inter', sans-serif; --font-mono: 'IBM Plex Mono', monospace;
+    }
+    [data-theme="dark"] {
+      --color-bg: #171614; --color-surface: #1c1b19; --color-surface-2: #201f1d; --color-surface-offset: #1d1c1a;
+      --color-surface-dynamic: #2d2c2a; --color-border: #393836; --color-text: #cdccca; --color-text-muted: #979590;
+      --color-text-faint: #666461; --color-primary: #4f98a3; --color-primary-hover: #227f8b; --color-primary-highlight: #313b3b;
+      --color-blue: #5591c7; --color-warning: #bb653b; --color-success: #6daa45; --color-error: #d163a7;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.18); --shadow-md: 0 8px 20px rgba(0,0,0,.28); --shadow-lg: 0 18px 40px rgba(0,0,0,.4);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh; background: radial-gradient(circle at top right, rgba(79,152,163,.12), transparent 28%), var(--color-bg);
+      color: var(--color-text); font-family: var(--font-body); font-size: var(--text-base); line-height: 1.6;
+    }
+    a { color: inherit; }
+    .app { max-width: 1440px; margin: 0 auto; padding: var(--space-6); }
+    .topbar {
+      display:flex; justify-content:space-between; align-items:center; gap:var(--space-4); margin-bottom:var(--space-6);
+      padding:var(--space-4) var(--space-5); background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius-xl);
+      backdrop-filter: blur(18px);
+      position: sticky; top: 12px; z-index: 20;
+    }
+    .brand { display:flex; gap:var(--space-4); align-items:center; }
+    .logo {
+      width:44px; height:44px; border-radius:14px; display:grid; place-items:center;
+      background:linear-gradient(135deg, var(--color-primary), var(--color-blue)); color:white; box-shadow:var(--shadow-md);
+    }
+    .brand h1 { font-size: var(--text-xl); line-height:1.05; letter-spacing:-0.03em; }
+    .brand p { color:var(--color-text-muted); font-size:var(--text-sm); }
+    .actions { display:flex; gap:var(--space-3); flex-wrap:wrap; }
+    button, .button {
+      border:none; cursor:pointer; padding:.8rem 1rem; border-radius:var(--radius-lg); font-weight:700; font-size:var(--text-sm);
+      background:var(--color-surface-offset); color:var(--color-text); border:1px solid rgba(255,255,255,.08); text-decoration:none;
+    }
+    button.primary { background:var(--color-primary); color:white; }
+    button:hover, .button:hover { filter:brightness(1.04); }
+    .layout { display:grid; grid-template-columns: 1.25fr .75fr; gap:var(--space-6); }
+    .stack { display:grid; gap:var(--space-6); }
+    .panel {
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border:1px solid rgba(255,255,255,.08); border-radius:var(--radius-xl); padding:var(--space-5); box-shadow:var(--shadow-sm);
+    }
+    .panel h2 { font-size:var(--text-lg); margin-bottom:var(--space-3); }
+    .panel h3 { font-size:1rem; margin-bottom:var(--space-3); }
+    .muted { color:var(--color-text-muted); }
+    .faint { color:var(--color-text-faint); }
+    .mono { font-family:var(--font-mono); }
+    .grid-2 { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:var(--space-4); }
+    .grid-3 { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:var(--space-4); }
+    .kpi {
+      padding:var(--space-4); border-radius:var(--radius-lg); background:var(--color-surface-2); border:1px solid rgba(255,255,255,.06);
+    }
+    .kpi .label { font-size:var(--text-xs); color:var(--color-text-muted); text-transform:uppercase; letter-spacing:.08em; }
+    .kpi .value { font-size:1.5rem; font-weight:800; letter-spacing:-0.03em; margin-top:.3rem; }
+    .badge { display:inline-flex; align-items:center; gap:.5rem; padding:.4rem .7rem; border-radius:var(--radius-full); font-size:var(--text-xs); font-weight:700; }
+    .ok { background:rgba(109,170,69,.12); color:var(--color-success); }
+    .warn { background:rgba(187,101,59,.14); color:var(--color-warning); }
+    .info { background:rgba(79,152,163,.14); color:var(--color-primary); }
+    .danger { background:rgba(209,99,167,.14); color:var(--color-error); }
+    .toolbar { display:flex; flex-wrap:wrap; gap:var(--space-3); margin:var(--space-4) 0; }
+    .toolbar input, .toolbar select {
+      background:var(--color-surface-offset); color:var(--color-text); border:1px solid rgba(255,255,255,.08);
+      padding:.85rem 1rem; border-radius:var(--radius-lg); min-width:160px;
+    }
+    table { width:100%; border-collapse:collapse; font-size:var(--text-sm); }
+    th, td { text-align:left; padding:.75rem .65rem; border-bottom:1px solid rgba(255,255,255,.06); vertical-align:top; }
+    th { color:var(--color-text-muted); font-weight:700; }
+    tbody tr:hover { background:rgba(255,255,255,.02); }
+    .table-wrap { overflow:auto; max-height:460px; border-radius:var(--radius-lg); }
+    .note {
+      border-left:3px solid var(--color-primary); padding:var(--space-4); background:rgba(79,152,163,.08); border-radius:0 var(--radius-lg) var(--radius-lg) 0;
+    }
+    .map {
+      position:relative; min-height:400px; border-radius:var(--radius-xl); overflow:hidden; background:
+        linear-gradient(180deg, rgba(79,152,163,.08), rgba(85,145,199,.04)),
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,.06) 0 1px, transparent 1px),
+        var(--color-surface-2);
+      background-size:auto, 18px 18px, auto;
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .map svg { position:absolute; inset:0; width:100%; height:100%; }
+    .station {
+      position:absolute; transform:translate(-50%, -50%); width:12px; height:12px; border-radius:999px;
+      background:var(--color-primary); box-shadow:0 0 0 5px rgba(79,152,163,.12);
+      cursor:pointer;
+    }
+    .station:hover { transform:translate(-50%, -50%) scale(1.25); }
+    .station.active { background:var(--color-warning); box-shadow:0 0 0 8px rgba(187,101,59,.18); }
+    .legend { display:flex; flex-wrap:wrap; gap:var(--space-3); margin-top:var(--space-3); font-size:var(--text-xs); color:var(--color-text-muted); }
+    .legend span { display:inline-flex; align-items:center; gap:.45rem; }
+    .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+    .wind-box {
+      min-height:210px; display:grid; place-items:center; border-radius:var(--radius-xl); background:var(--color-surface-2); border:1px solid rgba(255,255,255,.06);
+      margin-top:var(--space-3); padding:var(--space-4);
+    }
+    .wind-box svg { width:min(100%, 320px); height:auto; }
+    .list { display:grid; gap:var(--space-3); }
+    .list-item { padding:var(--space-4); border-radius:var(--radius-lg); background:var(--color-surface-2); border:1px solid rgba(255,255,255,.06); }
+    .footer { margin-top:var(--space-6); color:var(--color-text-muted); font-size:var(--text-sm); }
+    .split { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-4); }
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns:1fr; }
+    }
+    @media (max-width: 700px) {
+      .app { padding:var(--space-4); }
+      .grid-2, .grid-3, .split { grid-template-columns:1fr; }
+      .topbar { position:static; }
+      .brand h1 { font-size:1.35rem; }
+      .toolbar input, .toolbar select, button, .button { width:100%; }
+      .actions { width:100%; }
+      .actions > * { flex:1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 14c1.2-3.8 4.3-6 8.5-6 4.4 0 7.1 2.5 7.5 6"/>
+            <path d="M12 6V3"/>
+            <path d="M10 15l2-4 2 4"/>
+            <path d="M12 11v8"/>
+          </svg>
+        </div>
+        <div>
+          <h1>IMGW Radar & Synop</h1>
+          <p>Dashboard do własnej analizy burz, stacji i dostępności danych radialnych.</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="refreshBtn">Odśwież synop</button>
+        <button id="themeBtn" aria-label="Przełącz motyw">Motyw</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="stack">
+        <article class="panel">
+          <div class="split">
+            <div>
+              <span class="badge info">🛰️ Co dostajesz z API IMGW</span>
+              <h2 style="margin-top:1rem;">Tak — z publicznego API dostajesz wiatr ze stacji, ale nie radial velocity radaru.</h2>
+              <p class="muted">API `synop` zwraca prędkość i kierunek wiatru dla stacji naziemnych. To jest wiatr punktowy przy stacji. To <strong>nie</strong> jest pole prędkości radialnej z radaru Dopplera.</p>
+            </div>
+            <div class="note">
+              <div class="mono" style="font-size:var(--text-xs); margin-bottom:.5rem;">Najważniejsze rozróżnienie</div>
+              <p><strong>Wiatr stacyjny</strong> = pomiar przy gruncie w jednym punkcie.</p>
+              <p><strong>Wiatr radialny</strong> = składowa prędkości hydrometeorów wzdłuż wiązki radaru, piksel po pikselu.</p>
+              <p class="muted">Bez produktu VRAD/velocity z radaru nie zrobisz pełnej analizy inflow/outflow ani coupletu mezocyklonu.</p>
+            </div>
+          </div>
+          <div class="grid-3" style="margin-top:1.25rem;">
+            <div class="kpi"><div class="label">Synop API</div><div class="value">Tak</div><div class="muted">prędkość + kierunek wiatru</div></div>
+            <div class="kpi"><div class="label">Radial velocity</div><div class="value">Nie</div><div class="muted">w tym publicznym endpointcie</div></div>
+            <div class="kpi"><div class="label">Use case</div><div class="value">Ground truth</div><div class="muted">weryfikacja outflow i gradientów</div></div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Live stacje synoptyczne IMGW</h2>
+          <p class="muted">Ładowane z publicznego endpointu JSON. Możesz filtrować stacje, porównywać wiatr i szukać sygnałów przepływu przyziemnego przed burzą i po przejściu gust frontu.</p>
+          <div class="toolbar">
+            <input id="searchInput" type="text" placeholder="Szukaj stacji, np. Wrocław, Legnica, Jelenia" />
+            <select id="sortSelect">
+              <option value="name">Sortuj: nazwa</option>
+              <option value="windDesc">Sortuj: wiatr malejąco</option>
+              <option value="tempDesc">Sortuj: temperatura malejąco</option>
+              <option value="pressureDesc">Sortuj: ciśnienie malejąco</option>
+            </select>
+            <button id="wroBtn">Pokaż Dolny Śląsk</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Stacja</th>
+                  <th>Wiatr</th>
+                  <th>Kierunek</th>
+                  <th>Temp.</th>
+                  <th>Wilgotność</th>
+                  <th>Ciśnienie</th>
+                  <th>Opad</th>
+                </tr>
+              </thead>
+              <tbody id="stationTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Jak używać synopu do łowów</h2>
+          <div class="grid-2">
+            <div class="list">
+              <div class="list-item">
+                <h3>1. Weryfikacja outflow</h3>
+                <p class="muted">Po przejściu gust frontu szukasz skoku prędkości, zmiany kierunku i spadku temperatury między sąsiednimi stacjami. To daje Ci naziemny podpis boundary.</p>
+              </div>
+              <div class="list-item">
+                <h3>2. Inflow quality</h3>
+                <p class="muted">Przed wejściem komórki interesuje Cię, czy na E/SE od burzy utrzymuje się ciepły, wilgotny, uporządkowany napływ. Sieć stacji może potwierdzić, czy inflow nie został już podcięty.</p>
+              </div>
+            </div>
+            <div class="list">
+              <div class="list-item">
+                <h3>3. Boundary hunting</h3>
+                <p class="muted">Jeśli między dwiema stacjami masz wyraźny skręt wiatru i kontrast termiczny, to może być lokalna granica zbieżności albo strefa po outflow. To jest bardzo użyteczne pod nowe inicjacje.</p>
+              </div>
+              <div class="list-item">
+                <h3>4. Czego to nie zastąpi</h3>
+                <p class="muted">Stacje nie pokażą Ci rotacji w objętości burzy, coupletu inbound/outbound ani tight gradientu velocity. Do tego potrzebujesz produktu radarowego Doppler VRAD.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="stack">
+        <article class="panel">
+          <h2>Mapa stacji i przepływu</h2>
+          <p class="muted">Kliknij punkt stacji. Strzałka pokazuje wiatr przyziemny z danych synop. To nie jest przekrój radialny radaru, ale świetny komponent walidacyjny do terenu.</p>
+          <div class="map" id="stationMap">
+            <svg viewBox="0 0 1000 640" preserveAspectRatio="none" aria-hidden="true">
+              <rect x="0" y="0" width="1000" height="640" fill="transparent"></rect>
+              <path d="M225 140C270 210 250 300 292 354C348 428 470 442 557 412C654 379 713 304 804 272" stroke="rgba(79,152,163,.35)" stroke-width="4" fill="none" stroke-dasharray="8 10"/>
+              <path d="M205 480C320 440 425 480 510 535C565 570 648 560 739 514" stroke="rgba(85,145,199,.25)" stroke-width="4" fill="none" stroke-dasharray="10 12"/>
+              <text x="620" y="340" fill="rgba(205,204,202,.35)" font-size="24" font-family="Inter">Polska — orientacyjny szkic roboczy</text>
+            </svg>
+          </div>
+          <div class="legend">
+            <span><i class="dot" style="background:var(--color-primary)"></i> stacja</span>
+            <span><i class="dot" style="background:var(--color-warning)"></i> zaznaczona stacja</span>
+          </div>
+          <div class="wind-box" id="windBox">
+            <div class="muted">Wybierz stację z mapy lub tabeli.</div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Czy będziesz miał dane o wietrze radialnym?</h2>
+          <div class="list">
+            <div class="list-item">
+              <span class="badge warn">❌ Nie z endpointów synop/meteo/hydro</span>
+              <p class="muted" style="margin-top:.75rem;">Te endpointy API IMGW to dane stacyjne i ostrzeżenia. Nie są to wolumetryczne produkty radarowe Dopplera.</p>
+            </div>
+            <div class="list-item">
+              <span class="badge ok">✅ Tak, ale z innych źródeł / innych produktów</span>
+              <p class="muted" style="margin-top:.75rem;">Jeśli dorwiesz pliki radarowe single-site z produktem velocity/VRAD, wtedy masz prawdziwy wiatr radialny pikselowo. To może pochodzić z produktu radarowego, a nie z synopu.</p>
+            </div>
+            <div class="list-item">
+              <span class="badge info">🧠 Praktyka</span>
+              <p class="muted" style="margin-top:.75rem;">Najmocniejszy workflow to połączenie: radar velocity + reflektywność + sieć stacji + obserwacje terenowe. Sama jedna warstwa zawsze ma luki.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel">
+          <h2>Interpretacja pola</h2>
+          <table>
+            <tbody>
+              <tr><th>Źródło</th><td class="mono">/api/data/synop</td></tr>
+              <tr><th>Masz</th><td>prędkość wiatru, kierunek, temperatura, wilgotność, opad, ciśnienie</td></tr>
+              <tr><th>Nie masz</th><td>VRAD, spectrum width, ZDR, KDP, couplet inbound/outbound</td></tr>
+              <tr><th>Najlepsze użycie</th><td>boundary detection, outflow verification, gradient przyziemny, analiza przed/po przejściu burzy</td></tr>
+            </tbody>
+          </table>
+        </article>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      Zrobione jako roboczy pulpit do Twojej analizy burzowej: synop + walidacja terenowa + rozróżnienie stacja vs radar Doppler.
+    </footer>
+  </div>
+
+  <script>
+    const themeBtn = document.getElementById('themeBtn');
+    const root = document.documentElement;
+    let theme = root.getAttribute('data-theme') || 'dark';
+    themeBtn.addEventListener('click', () => {
+      theme = theme === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', theme);
+    });
+
+    const fallbackStations = [
+      { id_stacji:'12424', stacja:'Wrocław', predkosc_wiatru:'4', kierunek_wiatru:'130', temperatura:'-2.5', wilgotnosc_wzgledna:'95.6', suma_opadu:'0.01', cisnienie:'1017.2' },
+      { id_stacji:'12415', stacja:'Legnica', predkosc_wiatru:'1', kierunek_wiatru:'60', temperatura:'-1.1', wilgotnosc_wzgledna:'92.9', suma_opadu:'0', cisnienie:'1016.4' },
+      { id_stacji:'12500', stacja:'Jelenia Góra', predkosc_wiatru:'0', kierunek_wiatru:'0', temperatura:'-0.9', wilgotnosc_wzgledna:'95.7', suma_opadu:'0', cisnienie:'1016.9' },
+      { id_stacji:'12520', stacja:'Kłodzko', predkosc_wiatru:'2', kierunek_wiatru:'140', temperatura:'-2.9', wilgotnosc_wzgledna:'97.0', suma_opadu:'0.01', cisnienie:'1018.5' },
+      { id_stacji:'12330', stacja:'Poznań', predkosc_wiatru:'3', kierunek_wiatru:'150', temperatura:'-0.9', wilgotnosc_wzgledna:'94.3', suma_opadu:'0.01', cisnienie:'1015.8' },
+      { id_stacji:'12530', stacja:'Opole', predkosc_wiatru:'2', kierunek_wiatru:'140', temperatura:'-1.3', wilgotnosc_wzgledna:'94.9', suma_opadu:'0', cisnienie:'1017.6' },
+      { id_stacji:'12418', stacja:'Leszno', predkosc_wiatru:'3', kierunek_wiatru:'160', temperatura:'-0.7', wilgotnosc_wzgledna:'95.0', suma_opadu:'0', cisnienie:'1016' },
+      { id_stacji:'12510', stacja:'Śnieżka', predkosc_wiatru:'6', kierunek_wiatru:'280', temperatura:'1.4', wilgotnosc_wzgledna:'100.0', suma_opadu:'0', cisnienie:'' }
+    ];
+
+    const stationCoords = {
+      'Wrocław': {x: 470, y: 360}, 'Legnica': {x: 400, y: 345}, 'Jelenia Góra': {x: 340, y: 405}, 'Kłodzko': {x: 455, y: 450},
+      'Opole': {x: 560, y: 390}, 'Leszno': {x: 390, y: 290}, 'Poznań': {x: 360, y: 230}, 'Śnieżka': {x: 325, y: 430},
+      'Katowice': {x: 635, y: 470}, 'Kraków': {x: 715, y: 485}, 'Racibórz': {x: 565, y: 485}, 'Zielona Góra': {x: 250, y: 245},
+      'Szczecin': {x: 110, y: 95}, 'Warszawa': {x: 690, y: 265}, 'Lublin': {x: 835, y: 325}, 'Łódź': {x: 565, y: 285}
+    };
+
+    let stations = [];
+    let currentFilter = '';
+
+    const tableBody = document.getElementById('stationTableBody');
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const map = document.getElementById('stationMap');
+    const windBox = document.getElementById('windBox');
+
+    function toNum(v) {
+      const n = parseFloat(v);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function windLabel(dir) {
+      const d = toNum(dir);
+      if (d === null) return 'brak';
+      const dirs = ['N','NE','E','SE','S','SW','W','NW'];
+      return dirs[Math.round(d / 45) % 8];
+    }
+
+    function sortStations(data) {
+      const mode = sortSelect.value;
+      const arr = [...data];
+      if (mode === 'windDesc') arr.sort((a,b)=>(toNum(b.predkosc_wiatru)||-999)-(toNum(a.predkosc_wiatru)||-999));
+      else if (mode === 'tempDesc') arr.sort((a,b)=>(toNum(b.temperatura)||-999)-(toNum(a.temperatura)||-999));
+      else if (mode === 'pressureDesc') arr.sort((a,b)=>(toNum(b.cisnienie)||-999)-(toNum(a.cisnienie)||-999));
+      else arr.sort((a,b)=>a.stacja.localeCompare(b.stacja, 'pl'));
+      return arr;
+    }
+
+    function filterStations() {
+      let data = [...stations];
+      if (currentFilter === 'lower-silesia') {
+        const names = ['Wrocław','Legnica','Jelenia Góra','Kłodzko','Śnieżka'];
+        data = data.filter(s => names.includes(s.stacja));
+      }
+      const q = searchInput.value.trim().toLowerCase();
+      if (q) data = data.filter(s => s.stacja.toLowerCase().includes(q));
+      return sortStations(data);
+    }
+
+    function renderTable() {
+      const data = filterStations();
+      tableBody.innerHTML = data.map(s => `
+        <tr data-station="${s.stacja}">
+          <td><strong>${s.stacja}</strong><div class="faint mono">ID ${s.id_stacji}</div></td>
+          <td>${s.predkosc_wiatru ?? '—'} m/s</td>
+          <td>${s.kierunek_wiatru ?? '—'}° <span class="faint">${windLabel(s.kierunek_wiatru)}</span></td>
+          <td>${s.temperatura ?? '—'}°C</td>
+          <td>${s.wilgotnosc_wzgledna ?? '—'}%</td>
+          <td>${s.cisnienie ?? '—'} hPa</td>
+          <td>${s.suma_opadu ?? '—'} mm</td>
+        </tr>
+      `).join('');
+      [...tableBody.querySelectorAll('tr')].forEach(tr => tr.addEventListener('click', () => selectStation(tr.dataset.station)));
+      renderMap(data);
+    }
+
+    function renderMap(data) {
+      [...map.querySelectorAll('.station')].forEach(el => el.remove());
+      data.forEach(s => {
+        const coords = stationCoords[s.stacja];
+        if (!coords) return;
+        const el = document.createElement('button');
+        el.className = 'station';
+        el.style.left = coords.x + 'px';
+        el.style.top = coords.y + 'px';
+        el.title = s.stacja;
+        el.setAttribute('aria-label', s.stacja);
+        el.addEventListener('click', () => selectStation(s.stacja));
+        map.appendChild(el);
+      });
+    }
+
+    function selectStation(name) {
+      const station = stations.find(s => s.stacja === name);
+      if (!station) return;
+      [...map.querySelectorAll('.station')].forEach(el => {
+        el.classList.toggle('active', el.title === name);
+      });
+      const speed = toNum(station.predkosc_wiatru) || 0;
+      const dir = toNum(station.kierunek_wiatru) || 0;
+      const angleTo = (dir + 180) % 360;
+      const arrowLength = Math.max(34, Math.min(110, speed * 12));
+      windBox.innerHTML = `
+        <div style="width:100%;">
+          <div style="display:flex; justify-content:space-between; gap:1rem; align-items:flex-start; margin-bottom:1rem; flex-wrap:wrap;">
+            <div>
+              <div class="badge info">${station.stacja}</div>
+              <div style="margin-top:.75rem; font-size:1.35rem; font-weight:800; letter-spacing:-0.03em;">${station.predkosc_wiatru ?? '—'} m/s · ${station.kierunek_wiatru ?? '—'}°</div>
+              <div class="muted">Wiatr wieje <strong>z</strong> ${windLabel(dir)}. Strzałka pokazuje kierunek przepływu <strong>do</strong> sektora ${windLabel(angleTo)}.</div>
+            </div>
+            <div class="mono faint">T: ${station.temperatura ?? '—'}°C · RH: ${station.wilgotnosc_wzgledna ?? '—'}% · P: ${station.cisnienie ?? '—'} hPa</div>
+          </div>
+          <svg viewBox="0 0 320 220" role="img" aria-label="Wizualizacja wiatru dla stacji ${station.stacja}">
+            <defs>
+              <marker id="arrowHead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                <path d="M0,0 L10,3 L0,6 Z" fill="currentColor"></path>
+              </marker>
+            </defs>
+            <circle cx="160" cy="110" r="70" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="2"></circle>
+            <circle cx="160" cy="110" r="100" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1.5" stroke-dasharray="6 8"></circle>
+            <text x="156" y="20" fill="currentColor" opacity=".55" font-size="12" font-family="IBM Plex Mono">N</text>
+            <text x="302" y="114" fill="currentColor" opacity=".55" font-size="12" font-family="IBM Plex Mono">E</text>
+            <text x="156" y="210" fill="currentColor" opacity=".55" font-size="12" font-family="IBM Plex Mono">S</text>
+            <text x="18" y="114" fill="currentColor" opacity=".55" font-size="12" font-family="IBM Plex Mono">W</text>
+            <g transform="translate(160 110) rotate(${angleTo})">
+              <line x1="0" y1="0" x2="0" y2="-${arrowLength}" stroke="currentColor" stroke-width="5" stroke-linecap="round" marker-end="url(#arrowHead)"></line>
+            </g>
+            <circle cx="160" cy="110" r="8" fill="currentColor"></circle>
+            <text x="160" y="108" text-anchor="middle" fill="currentColor" opacity=".72" font-size="12" font-family="IBM Plex Mono">${station.stacja}</text>
+          </svg>
+        </div>
+      `;
+    }
+
+    async function loadStations() {
+      const url = 'https://danepubliczne.imgw.pl/api/data/synop';
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        stations = data;
+      } catch (e) {
+        stations = fallbackStations;
+      }
+      renderTable();
+      const preferred = stations.find(s => s.stacja === 'Wrocław')?.stacja || stations[0]?.stacja;
+      if (preferred) selectStation(preferred);
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', loadStations);
+    searchInput.addEventListener('input', renderTable);
+    sortSelect.addEventListener('change', renderTable);
+    document.getElementById('wroBtn').addEventListener('click', () => {
+      currentFilter = currentFilter === 'lower-silesia' ? '' : 'lower-silesia';
+      renderTable();
+    });
+
+    loadStations();
+  </script>
+</body>
+</html>

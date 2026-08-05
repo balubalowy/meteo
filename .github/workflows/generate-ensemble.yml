@@ -1,0 +1,52 @@
+name: Generuj Dashboard Ensemble (Prognoza)
+
+on:
+  workflow_dispatch:
+    inputs:
+      threshold:
+        description: 'Próg temperatury (np. 30 dla T_max > 30°C)'
+        required: true
+        default: '30'
+        type: string
+      days_ahead:
+        description: 'Na ile dni do przodu? (0 = dzisiaj, 1 = jutro, max 14)'
+        required: true
+        default: '1'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  generate-ensemble:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests openpyxl pandas numpy scipy shapely matplotlib plotly
+
+      - name: Prepare inputs and run pobierz_ensemble
+        run: |
+          echo "${{ github.event.inputs.threshold }}" > inputs.txt
+          echo "${{ github.event.inputs.days_ahead }}" >> inputs.txt
+          cd prognoza
+          python pobierz_ensemble.py < ../inputs.txt
+
+      - name: Run generuj_dashboard
+        run: |
+          cd prognoza
+          python generuj_dashboard.py
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "📈 auto: wygenerowano nowy dashboard ensemble"
+          file_pattern: "prognoza/Dashboard_Pogody.html prognoza/dashboard.html prognoza/config.json prognoza/Dane_Mapy_Polska.xlsx"
+          branch: main

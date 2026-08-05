@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⛈️ Pamiętnik Burz — Statystyki Obserwacji</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #F8F9FA;
+            --text-color: #1A1A2E;
+            --accent-blue: #1E40AF;
+            --card-bg: #FFFFFF;
+            --border-color: #E2E8F0;
+            --if0: #10B981;
+            --if1: #F59E0B;
+            --if2: #EF4444;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        header {
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+        }
+
+        .instructions {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #64748B;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #F1F5F9;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        th:hover {
+            background-color: #E2E8F0;
+        }
+
+        .if-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+            display: inline-block;
+        }
+
+        .if0 { background-color: var(--if0); }
+        .if1 { background-color: var(--if1); }
+        .if2 { background-color: var(--if2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="nav-link">← Powrót do Centrum</a>
+        
+        <header>
+            <h1>⛈️ Pamiętnik Burz — Statystyki Obserwacji</h1>
+            <p>Osobisty dziennik obserwacji zjawisk burzowych i ekstremalnej pogody.</p>
+        </header>
+
+        <div class="instructions">
+            <h2>Jak dodać dane</h2>
+            <p>Dane są wprowadzane ręcznie na podstawie arkusza <strong>PASJE_Pamiętnik_burz.xlsx</strong>. Wklej nowe rekordy do zmiennej <code>STORM_DATA</code> w źródle tej strony.</p>
+            <p><em>Uwaga: Poniższe dane to tylko wpisy przykładowe.</em></p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-count">0</div>
+                <div class="stat-label">Liczba Zjawisk</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-cape">0</div>
+                <div class="stat-label">Średnie CAPE (J/kg)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-wind">0</div>
+                <div class="stat-label">Max Poryw (km/h)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-hail">0</div>
+                <div class="stat-label">Max Grad (cm)</div>
+            </div>
+        </div>
+
+        <table id="storm-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Data ↕</th>
+                    <th onclick="sortTable(1)">Lokalizacja ↕</th>
+                    <th onclick="sortTable(2)">Typ ↕</th>
+                    <th onclick="sortTable(3)">CAPE (J/kg) ↕</th>
+                    <th onclick="sortTable(4)">DLS (m/s) ↕</th>
+                    <th onclick="sortTable(5)">SRH (m²/s²) ↕</th>
+                    <th onclick="sortTable(6)">Max Poryw (km/h) ↕</th>
+                    <th onclick="sortTable(7)">Grad (cm) ↕</th>
+                    <th onclick="sortTable(8)">Ocena IF ↕</th>
+                    <th>Notatki</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- Data populated by JS -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const STORM_DATA = [
+            { date: '2024-07-15', location: 'Wrocław', type: 'Superkomórka', cape: 2500, dls: 25, srh: 180, maxGust: 95, hail: 3.0, ifRating: 'IF1', notes: 'Przykładowy wpis' },
+            { date: '2024-06-20', location: 'Kraków', type: 'Układ MCS', cape: 1500, dls: 15, srh: 100, maxGust: 80, hail: 1.0, ifRating: 'IF0', notes: 'Ulewny deszcz' },
+            { date: '2024-08-05', location: 'Warszawa', type: 'Superkomórka', cape: 3200, dls: 30, srh: 250, maxGust: 120, hail: 5.5, ifRating: 'IF2', notes: 'Poważne szkody' }
+        ];
+
+        function getIfBadgeClass(rating) {
+            if (!rating) return '';
+            if (rating.includes('0')) return 'if0';
+            if (rating.includes('1')) return 'if1';
+            if (rating.includes('2') || rating.includes('3') || rating.includes('4')) return 'if2';
+            return '';
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.date}</td>
+                    <td>${row.location}</td>
+                    <td>${row.type}</td>
+                    <td>${row.cape || '-'}</td>
+                    <td>${row.dls || '-'}</td>
+                    <td>${row.srh || '-'}</td>
+                    <td>${row.maxGust || '-'}</td>
+                    <td>${row.hail || '-'}</td>
+                    <td><span class="if-badge ${getIfBadgeClass(row.ifRating)}">${row.ifRating}</span></td>
+                    <td>${row.notes}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateStats(data);
+        }
+
+        function updateStats(data) {
+            if (data.length === 0) return;
+            
+            document.getElementById('stat-count').innerText = data.length;
+            
+            const capes = data.filter(d => d.cape).map(d => d.cape);
+            const avgCape = capes.length ? Math.round(capes.reduce((a, b) => a + b, 0) / capes.length) : 0;
+            document.getElementById('stat-cape').innerText = avgCape;
+            
+            const gusts = data.filter(d => d.maxGust).map(d => d.maxGust);
+            const maxGust = gusts.length ? Math.max(...gusts) : 0;
+            document.getElementById('stat-wind').innerText = maxGust;
+            
+            const hailes = data.filter(d => d.hail).map(d => d.hail);
+            const maxHail = hailes.length ? Math.max(...hailes) : 0;
+            document.getElementById('stat-hail').innerText = maxHail;
+        }
+
+        let sortCol = -1;
+        let sortAsc = true;
+        function sortTable(colIdx) {
+            if (sortCol === colIdx) {
+                sortAsc = !sortAsc;
+            } else {
+                sortCol = colIdx;
+                sortAsc = true;
+            }
+            
+            const keys = ['date', 'location', 'type', 'cape', 'dls', 'srh', 'maxGust', 'hail', 'ifRating'];
+            const key = keys[colIdx];
+            
+            const sorted = [...STORM_DATA].sort((a, b) => {
+                let valA = a[key];
+                let valB = b[key];
+                
+                if (typeof valA === 'string') valA = valA.toLowerCase();
+                if (typeof valB === 'string') valB = valB.toLowerCase();
+                
+                if (valA < valB) return sortAsc ? -1 : 1;
+                if (valA > valB) return sortAsc ? 1 : -1;
+                return 0;
+            });
+            
+            renderTable(sorted);
+        }
+
+        renderTable(STORM_DATA);
+    </script>
+</body>
+</html>

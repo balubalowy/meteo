@@ -1,7 +1,8 @@
 /**
- * LOGIKA DASHBOARDU METEO BARTKA (Meteo) - EKSTREMALNY UPGRADE v3
- * Kalkulatory ESSL IF-Scale, Wmax, LCL, DCP, STP, SCP, Wektor Corfidiego
- * oraz Archiwum Historycznych Nawałnic w Polsce (2002-2017)
+ * LOGIKA CENTRUM METEO BARTKA — v4 (Light Scientific Theme)
+ * Kalkulatory ESSL IF-Scale, Wmax, LCL, DCP
+ * Archiwum Nawałnic w Polsce (2002–2017)
+ * Źródła: ESSL 2025, dr M. Zięba, dr hab. M. Taszarek, W. Pilorz
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -16,27 +17,38 @@ document.addEventListener("DOMContentLoaded", () => {
   initLeafletMap();
 });
 
-// 1. Nawigacja Zakładek
+// ─── 1. Nawigacja (top-nav + module cards) ───
 function initNavigation() {
-  const navItems = document.querySelectorAll(".nav-item");
+  const navLinks = document.querySelectorAll(".nav-link");
   const tabViews = document.querySelectorAll(".tab-view");
 
-  navItems.forEach(item => {
-    item.addEventListener("click", (e) => {
+  navLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
       e.preventDefault();
-      const targetTab = item.getAttribute("data-tab");
+      const targetTab = link.getAttribute("data-tab");
+      if (!targetTab) return;
 
-      navItems.forEach(n => n.classList.remove("active"));
+      navLinks.forEach(n => n.classList.remove("active"));
       tabViews.forEach(v => v.classList.remove("active"));
 
-      item.classList.add("active");
+      link.classList.add("active");
       const activeView = document.getElementById(`tab-${targetTab}`);
       if (activeView) activeView.classList.add("active");
     });
   });
+
+  // Module cards that switch tabs
+  document.querySelectorAll("[data-tab-link]").forEach(card => {
+    card.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetTab = card.getAttribute("data-tab-link");
+      const navLink = document.querySelector(`.nav-link[data-tab="${targetTab}"]`);
+      if (navLink) navLink.click();
+    });
+  });
 }
 
-// 2. Tabela Klas IF-Scale ESSL 2025
+// ─── 2. Tabela Klas IF-Scale ESSL 2025 ───
 function renderIFClassesTable() {
   const container = document.getElementById("if-classes-table-body");
   if (!container || !METEO_DATA.ifScaleClasses) return;
@@ -47,8 +59,8 @@ function renderIFClassesTable() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><span class="if-badge" style="background:${getIFBadgeColor(item.code)}">${item.code}</span></td>
-      <td><strong>${item.centralSpeedKmh} km/h</strong> <br><span style="font-size:0.75rem; color:var(--text-subtle)">(${item.rangeKmh})</span></td>
-      <td><strong>${item.centralSpeedMs} m/s</strong> <br><span style="font-size:0.75rem; color:var(--text-subtle)">(${item.rangeMs})</span></td>
+      <td><strong>${item.centralSpeedKmh} km/h</strong><br><span style="font-size:0.75rem; color:var(--text-subtle)">(${item.rangeKmh})</span></td>
+      <td><strong>${item.centralSpeedMs} m/s</strong><br><span style="font-size:0.75rem; color:var(--text-subtle)">(${item.rangeMs})</span></td>
       <td>${item.centralSpeedKt} kt</td>
       <td>${item.desc}</td>
     `;
@@ -60,18 +72,18 @@ function getIFBadgeColor(code) {
   const colors = {
     "IF0": "#10B981",
     "IF0.5": "#34D399",
-    "IF1": "#FBBF24",
-    "IF1.5": "#F59E0B",
+    "IF1": "#F59E0B",
+    "IF1.5": "#D97706",
     "IF2": "#EF4444",
     "IF2.5": "#DC2626",
     "IF3": "#B91C1C",
-    "IF4": "#8B5CF6",
+    "IF4": "#7C3AED",
     "IF5": "#6D28D9"
   };
-  return colors[code] || "#38BDF8";
+  return colors[code] || "#3B82F6";
 }
 
-// 3. Interaktywny Kalkulator Zniszczeń ESSL (Damage Evaluator)
+// ─── 3. Kalkulator Zniszczeń ESSL (Damage Evaluator) ───
 function renderDamageEvaluator() {
   const selectDi = document.getElementById("eval-di-select");
   const selectSub = document.getElementById("eval-sub-select");
@@ -80,18 +92,18 @@ function renderDamageEvaluator() {
 
   if (!selectDi || !selectSub || !selectDod) return;
 
-  selectDi.innerHTML = METEO_DATA.damageIndicators.map(di => `
-    <option value="${di.id}">${di.name}</option>
-  `).join("");
+  selectDi.innerHTML = METEO_DATA.damageIndicators.map(di =>
+    `<option value="${di.id}">${di.name}</option>`
+  ).join("");
 
   function updateSubclasses() {
     const currentDiId = selectDi.value;
     const diObj = METEO_DATA.damageIndicators.find(d => d.id === currentDiId);
     if (!diObj) return;
 
-    selectSub.innerHTML = diObj.subclasses.map(s => `
-      <option value="${s.code}">${s.label}</option>
-    `).join("");
+    selectSub.innerHTML = diObj.subclasses.map(s =>
+      `<option value="${s.code}">${s.label}</option>`
+    ).join("");
 
     calculateIFRating();
   }
@@ -121,11 +133,11 @@ function renderDamageEvaluator() {
       <div style="display:flex; align-items:center; gap:0.75rem; margin:0.4rem 0">
         <span class="if-badge" style="background:${getIFBadgeColor(classObj.code)}; font-size:1.4rem; padding:0.4rem 0.8rem">${classObj.code}</span>
         <div>
-          <div style="font-size:1.3rem; font-weight:700; color:var(--text-main)">~ ${classObj.centralSpeedKmh} km/h (${classObj.centralSpeedMs} m/s)</div>
-          <div style="font-size:0.8rem; color:var(--text-subtle)">Zakres prędkości: ${classObj.rangeKmh} km/h (${classObj.centralSpeedKt} kt)</div>
+          <div style="font-size:1.3rem; font-weight:700; color:var(--text-primary)">~ ${classObj.centralSpeedKmh} km/h (${classObj.centralSpeedMs} m/s)</div>
+          <div style="font-size:0.8rem; color:var(--text-subtle)">Zakres: ${classObj.rangeKmh} km/h (${classObj.centralSpeedKt} kt)</div>
         </div>
       </div>
-      <div style="font-size:0.8rem; color:var(--text-muted); border-top:1px solid var(--border-card); padding-top:0.4rem; margin-top:0.4rem">
+      <div style="font-size:0.8rem; color:var(--text-muted); border-top:1px solid var(--border-color); padding-top:0.4rem; margin-top:0.4rem">
         <strong>Interpretacja ESSL:</strong> ${classObj.desc}
       </div>
     `;
@@ -138,24 +150,24 @@ function renderDamageEvaluator() {
   updateSubclasses();
 }
 
-// 4. Renderowanie Termodynamiki Zięby & Taszarka
+// ─── 4. Termodynamika (Zięba & Taszarek) ───
 function renderThermoConcepts() {
   const container = document.getElementById("thermo-concepts-grid");
   if (!container || !METEO_DATA.thermoConcepts) return;
 
   container.innerHTML = METEO_DATA.thermoConcepts.map(c => `
     <div class="card">
-      <div class="card-title" style="color:var(--primary)">${c.name}</div>
+      <div class="card-title" style="color:var(--primary); margin-bottom:0.25rem">${c.name}</div>
       <div style="font-size:0.75rem; color:var(--purple); font-weight:700; margin-bottom:0.4rem">${c.type}</div>
-      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.6rem">${c.desc}</p>
-      <div style="background:rgba(15,23,42,0.8); padding:0.4rem 0.6rem; border-radius:6px; font-family:monospace; font-size:0.8rem; color:var(--accent)">
+      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem">${c.desc}</p>
+      <div class="formula-block">
         Wzór: ${c.formula}
       </div>
     </div>
   `).join("");
 }
 
-// 5. Renderowanie Sygnatur Radarowych Pilorza
+// ─── 5. Sygnatury Radarowe (Pilorz) ───
 function renderRadarSignatures() {
   const container = document.getElementById("radar-signatures-grid");
   if (!container || !METEO_DATA.radarSignatures) return;
@@ -164,23 +176,23 @@ function renderRadarSignatures() {
     <div class="card" style="border-top:3px solid var(--primary)">
       <div class="card-title">${r.name}</div>
       <div style="font-size:0.75rem; color:var(--primary); font-weight:700; margin-bottom:0.4rem">Typ: ${r.type}</div>
-      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.6rem">${r.desc}</p>
-      <div style="font-size:0.8rem; color:var(--danger)">
+      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem">${r.desc}</p>
+      <div style="font-size:0.8rem; color:var(--warning-l3)">
         <strong>Główne ryzyko:</strong> ${r.risk}
       </div>
     </div>
   `).join("");
 }
 
-// 6. Renderowanie Ostrzeżeń Meteo / Meteo
+// ─── 6. Ostrzeżenia Meteo ───
 function renderMeteoWarnings() {
   const container = document.getElementById("alert-warnings-grid");
   if (!container || !METEO_DATA.alertWarnings) return;
 
   container.innerHTML = METEO_DATA.alertWarnings.map(w => `
-    <div class="card" style="border-left:4px solid ${w.color}">
+    <div class="card alert-card" style="border-left:4px solid ${w.color}">
       <div class="card-title" style="color:${w.color}">${w.level}</div>
-      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.75rem">${w.desc}</p>
+      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.75rem">${w.desc}</p>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.8rem">
         <div><strong>Porywy wiatru:</strong> ${w.wind}</div>
         <div><strong>Średnica gradu:</strong> ${w.hail}</div>
@@ -191,28 +203,29 @@ function renderMeteoWarnings() {
   `).join("");
 }
 
-// 7. Archiwum Przypadków Historycznych (Derecho, Tornado, Grad)
+// ─── 7. Archiwum Przypadków Historycznych ───
 function renderHistoricalCases() {
   const container = document.getElementById("historical-cases-grid");
   if (!container || !METEO_DATA.historicalCases) return;
 
   container.innerHTML = METEO_DATA.historicalCases.map(hc => `
-    <div class="card" style="border:1px solid rgba(239,68,68,0.25); background:rgba(239,68,68,0.03)">
-      <div class="card-title" style="color:var(--danger)">${hc.title}</div>
-      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.6rem">${hc.desc}</p>
-      <div style="font-size:0.8rem; display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; border-top:1px solid var(--border-card); padding-top:0.5rem">
+    <div class="case-card">
+      <div class="case-card-title">${hc.title}</div>
+      <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem">${hc.desc}</p>
+      <div style="font-size:0.8rem; display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; border-top:1px solid var(--border-color); padding-top:0.5rem">
         <div><strong>Porywy max:</strong> ${hc.maxGust}</div>
         <div><strong>Parametr DCP:</strong> ${hc.dcp}</div>
-        <div style="grid-column: span 2"><strong>Zasięg i Ścieżka:</strong> ${hc.track}</div>
-        <div style="grid-column: span 2; color:var(--text-subtle)"><strong>Skutki:</strong> ${hc.impact}</div>
+        <div style="grid-column: span 2"><strong>Ścieżka:</strong> ${hc.track}</div>
+        <div style="grid-column: span 2; color:var(--text-muted)"><strong>Skutki:</strong> ${hc.impact}</div>
       </div>
     </div>
   `).join("");
 }
 
-// 8. Kalkulatory Na Żywo (Ww, Wmax, LCL, DCP, STP, SCP)
+// ─── 8. Kalkulatory Na Żywo ───
 function initLiveCalculators() {
   // A. Kalkulator Wiatru
+  // Źródło: 1 kt = 1.852 km/h; 1 m/s = 3.6 km/h (allmetsat)
   const windVal = document.getElementById("calc-wind-val");
   const windUnit = document.getElementById("calc-wind-unit");
   const resKmh = document.getElementById("res-wind-kmh");
@@ -240,6 +253,7 @@ function initLiveCalculators() {
   }
 
   // B. Kalkulator Wmax
+  // Źródło: Wzór Zięby — W_max = √(2 * CAPE) [m/s]
   const capeInput = document.getElementById("calc-cape-val");
   const wmaxResult = document.getElementById("res-wmax-val");
 
@@ -259,6 +273,7 @@ function initLiveCalculators() {
   }
 
   // C. Kalkulator LCL
+  // Źródło: Wzór Espy'ego — h_LCL = 125 * (T - Td) [m]
   const tempInput = document.getElementById("calc-lcl-temp");
   const tdInput = document.getElementById("calc-lcl-td");
   const lclResult = document.getElementById("res-lcl-height");
@@ -279,6 +294,8 @@ function initLiveCalculators() {
   }
 
   // D. Kalkulator DCP (Derecho Composite Parameter)
+  // Źródło: Evans & Doswell / SPC
+  // DCP = (DCAPE/980) * (MUCAPE/2000) * (DLS_kts/20) * (MeanWind_kts/16)
   const dcapeIn = document.getElementById("calc-dcp-dcape");
   const mucapeIn = document.getElementById("calc-dcp-mucape");
   const dlsIn = document.getElementById("calc-dcp-dls");
@@ -289,14 +306,14 @@ function initLiveCalculators() {
     if (!dcapeIn || !mucapeIn || !dlsIn || !meanwindIn || !dcpRes) return;
     let dcape = parseFloat(dcapeIn.value) || 0;
     let mucape = parseFloat(mucapeIn.value) || 0;
-    let dlsKts = (parseFloat(dlsIn.value) || 0) * 1.94384; // m/s to kts
+    let dlsKts = (parseFloat(dlsIn.value) || 0) * 1.94384; // m/s → kts
     let meanwindKts = (parseFloat(meanwindIn.value) || 0) * 1.94384;
 
     let dcp = (dcape / 980) * (mucape / 2000) * (dlsKts / 20) * (meanwindKts / 16);
     dcpRes.textContent = dcp.toFixed(2);
-    if (dcp > 2) dcpRes.style.color = "var(--danger)";
-    else if (dcp > 1) dcpRes.style.color = "var(--warning)";
-    else dcpRes.style.color = "var(--accent)";
+    if (dcp > 2) dcpRes.style.color = "var(--warning-l3)";
+    else if (dcp > 1) dcpRes.style.color = "var(--warning-l1)";
+    else dcpRes.style.color = "var(--accent-green)";
   }
 
   if (dcapeIn) {
@@ -305,7 +322,7 @@ function initLiveCalculators() {
   }
 }
 
-// 9. Interaktywna Mapa Leaflet
+// ─── 9. Interaktywna Mapa Leaflet ───
 function initLeafletMap() {
   const mapElement = document.getElementById("leaflet-map");
   if (!mapElement || typeof L === "undefined") return;
@@ -314,9 +331,10 @@ function initLeafletMap() {
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
-    attribution: '© OpenStreetMap contributors | Łowcy Burz'
+    attribution: '© OpenStreetMap contributors'
   }).addTo(map);
 
+  // Przykładowa strefa ostrzeżenia
   L.polygon([
     [51.0, 16.5],
     [52.8, 18.2],
@@ -325,12 +343,12 @@ function initLeafletMap() {
   ], {
     color: "#EF4444",
     fillColor: "#EF4444",
-    fillOpacity: 0.35,
+    fillOpacity: 0.15,
     weight: 2
-  }).addTo(map).bindPopup("<b>Stopień 2 (Meteo):</b> Strefa silnych superkomórek burzowych.");
+  }).addTo(map).bindPopup("<b>Stopień 2:</b> Strefa silnych superkomórek burzowych.");
 
   const points = [
-    { lat: 52.23, lon: 21.01, title: "Warszawa", desc: "Stacja Synoptyczna / Meteo Center" },
+    { lat: 52.23, lon: 21.01, title: "Warszawa", desc: "Stacja Synoptyczna" },
     { lat: 50.06, lon: 19.94, title: "Kraków", desc: "Punkt Obserwacji Aerologicznej" },
     { lat: 51.11, lon: 17.03, title: "Wrocław", desc: "Stacja Aerologiczna 12425" }
   ];

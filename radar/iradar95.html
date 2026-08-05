@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iRadar 95 — IMGW Dual View</title>
+  <link rel="stylesheet" href="https://unpkg.com/98.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    *{box-sizing:border-box}
+    body{background:#008080;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;overflow:hidden}
+    .window{width:98vw;height:98vh;display:flex;flex-direction:column}
+    .window-body{flex:1;display:flex;gap:0;overflow:hidden;margin:0;padding:3px}
+
+    /* SIDEBAR */
+    #sidebar{width:230px;min-width:180px;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+    .panel-label{font-weight:bold;font-size:11px;padding:1px 4px;background:#c0c0c0;border-bottom:1px solid #808080;user-select:none;cursor:pointer}
+    .panel-label:hover{background:#d0d0d0}
+    .panel-box{border:inset 2px;background:#fff;overflow-y:auto;font-size:11px}
+
+    /* MAIN */
+    #main-area{flex:1;display:flex;flex-direction:column;margin-left:3px}
+
+    /* DUAL MAPS */
+    #maps-container{flex:1;display:flex;gap:2px}
+    .map-pane{flex:1;display:flex;flex-direction:column;border:inset 2px}
+    .map-pane .map-header{font-size:10px;font-weight:bold;padding:1px 4px;background:#000080;color:#fff;text-align:center;user-select:none}
+    .map-pane .map-div{flex:1}
+    .leaflet-tile-pane{filter:var(--map-filter,none)}
+
+    /* SINGLE MAP MODE */
+    .map-pane.hidden{display:none}
+
+    /* LIST ITEMS */
+    .list-item{cursor:pointer;padding:1px 4px;display:flex;align-items:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;line-height:15px}
+    .list-item:hover{background:#000080;color:#fff}
+    .list-item.active{background:#000080;color:#fff}
+    .icon{margin-right:3px;font-size:11px}
+
+    /* CONTROLS */
+    .controls{display:flex;align-items:center;gap:3px;padding:3px;background:#c0c0c0;border-top:ridge 2px}
+    .controls button{min-width:24px;font-size:11px}
+
+    /* QUICK BUTTONS */
+    .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:2px}
+    .quick-btn{font-size:10px;padding:2px;text-align:center;cursor:pointer}
+    .quick-btn:active{border-style:inset}
+
+    /* SETTINGS */
+    .setting-row{display:flex;align-items:center;gap:3px;padding:1px 4px;font-size:11px}
+    .setting-row label{min-width:55px}
+    .setting-row select,.setting-row input[type=range]{flex:1;font-size:11px}
+
+    /* PROGRESS */
+    #progress-bar{width:100%;height:14px;background:#fff;border:inset 2px;display:none}
+    #progress-fill{height:100%;background:#000080;width:0%;transition:width 0.2s}
+    #progress-text{font-size:10px;text-align:center;display:none}
+
+    /* STATUS */
+    .status-bar{margin:0}.status-bar p{font-size:11px}
+
+    /* COLLAPSIBLE */
+    .collapsible{overflow:hidden;transition:max-height 0.2s}
+    .collapsed{max-height:0!important;padding:0!important;border:none!important}
+
+    /* TAB */
+    .tab-row{display:flex;gap:0;background:#c0c0c0}
+    .tab-btn{font-size:10px;padding:2px 6px;border:outset 2px;border-bottom:none;background:#c0c0c0;cursor:pointer}
+    .tab-btn.active{background:#fff;border-bottom:1px solid #fff;font-weight:bold;position:relative;top:1px}
+    .tab-page{display:none;flex:1;flex-direction:column;overflow:hidden}
+    .tab-page.active{display:flex}
+
+    /* LEGEND */
+    .legend{position:absolute;bottom:6px;right:6px;z-index:1000;background:rgba(255,255,255,0.9);border:outset 2px;padding:3px;font-size:9px}
+    .legend canvas{display:block;margin:1px 0}
+    .legend-labels{display:flex;justify-content:space-between}
+    .pixelated { image-rendering: pixelated; image-rendering: crisp-edges; }
+  </style>
+</head>
+<body>
+<div class="window">
+  <div class="title-bar">
+    <div class="title-bar-text">📡 iRadar 95 — IMGW Dual-View Radar</div>
+    <div class="title-bar-controls">
+      <button aria-label="Minimize"></button>
+      <button aria-label="Maximize"></button>
+      <button aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div style="display:flex;gap:4px;padding:2px 4px;background:#c0c0c0;border-bottom:1px solid #808080;align-items:center;flex-wrap:wrap;">
+    <fieldset style="padding:0 6px;display:flex;gap:4px;align-items:center">
+      <legend style="font-size:10px">Widok</legend>
+      <label style="font-size:11px"><input type="radio" name="viewMode" value="dual" checked> Podwójny</label>
+      <label style="font-size:11px"><input type="radio" name="viewMode" value="single"> Pojedynczy</label>
+    </fieldset>
+    <fieldset style="padding:0 6px;display:flex;gap:4px;align-items:center">
+      <legend style="font-size:10px">Klatki</legend>
+      <select id="selFrameCount" style="font-size:11px">
+        <option value="6">6 (30 min)</option>
+        <option value="12" selected>12 (1h)</option>
+        <option value="24">24 (2h)</option>
+        <option value="48">48 (4h)</option>
+      </select>
+    </fieldset>
+    <span style="flex:1"></span>
+    <button id="btnRainViewer" style="font-size:11px" title="RainViewer — globalny radar">🌧️ RainViewer</button>
+    <button id="btnClear" style="font-size:11px">🗑️ Wyczyść</button>
+  </div>
+
+  <div class="window-body">
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+      <!-- QUICK RADAR -->
+      <div class="panel-label" onclick="toggleSection('quick-section')">⚡ Szybki Radar (1-klik)</div>
+      <div id="quick-section" class="panel-box" style="max-height:none;padding:2px">
+        <div style="font-size:10px;padding:2px;color:#808080;border-bottom:1px solid #e0e0e0">Kompozyty krajowe:</div>
+        <div class="quick-grid">
+          <button class="quick-btn" onclick="quickLoad('/Oper/Polrad/Produkty/POLCOMP/COMPO_CAPPI.comp.cappi','dBZ','CAPPI')">CAPPI dBZ</button>
+          <button class="quick-btn" onclick="quickLoad('/Oper/Polrad/Produkty/POLCOMP/COMPO_CMAX_250.comp.cmax','dBZ','CMAX')">CMAX dBZ</button>
+          <button class="quick-btn" onclick="quickLoad('/Oper/Polrad/Produkty/POLCOMP/COMPO_SRI.comp.sri','sri','SRI')">SRI opady</button>
+          <button class="quick-btn" onclick="quickLoad('/Oper/Polrad/Produkty/POLCOMP/COMPO_DPSRI.comp.sri','dpsri','DPSRI')">DPSRI opady</button>
+          <button class="quick-btn" onclick="quickLoad('/Oper/Polrad/Produkty/POLCOMP/COMPO_EHT.comp.eht','Height','EHT')">Echo Top</button>
+          <button class="quick-btn" onclick="quickLoad('/Oper/Polrad/Produkty/POLCOMP/COMPO_ZHAIL.comp.zhail','dBZ','Z-HAIL')">Z-Hail %</button>
+        </div>
+        <div style="font-size:10px;padding:2px;color:#808080;border-bottom:1px solid #e0e0e0;margin-top:4px">Stacja + elewacja:</div>
+        <div style="display:flex;gap:2px;padding:2px;align-items:center">
+          <select id="selStation" style="font-size:11px;flex:1">
+            <option value="brz">Brzuchania</option>
+            <option value="gdy">Gdańsk</option>
+            <option value="gsa">Poznań</option>
+            <option value="leg">Legionowo</option>
+            <option value="pas">Pastewnik</option>
+            <option value="ram">Ramża</option>
+            <option value="rzs">Rzeszów</option>
+            <option value="swd">Świdwin</option>
+          </select>
+        </div>
+        <div class="quick-grid">
+          <button class="quick-btn" onclick="quickStation('0_5.ppi','dBZ')">PPI 0.5°</button>
+          <button class="quick-btn" onclick="quickStation('125.cappi','dBZ')">CAPPI 1.25</button>
+          <button class="quick-btn" onclick="quickStation('200.dpsri','dpsri')">DPSRI</button>
+          <button class="quick-btn" onclick="quickStation('200_elz.eht','Height')">ETH</button>
+          <button class="quick-btn" onclick="quickStation('250.max','dBZ')">MAX 250</button>
+          <button class="quick-btn" onclick="quickStation('compo_pcz.cappi','dBZ')">PCZ</button>
+          <button class="quick-btn" onclick="quickStation('leads.sri','sri')">SRI</button>
+        </div>
+        <div style="font-size:10px;padding:2px;color:#808080;border-bottom:1px solid #e0e0e0;margin-top:4px">Dual — dBZ + V jednocześnie:</div>
+        <div class="quick-grid">
+          <button class="quick-btn" style="grid-column:span 2;background:#ffffcc" onclick="quickDual()">⚡ Załaduj dBZ + V (dual)</button>
+        </div>
+      </div>
+
+      <!-- IMGW EXPLORER -->
+      <div class="panel-label" onclick="toggleSection('explorer-section')">📋 Eksplorator IMGW</div>
+      <div id="explorer-section" class="panel-box" style="flex:1;min-height:0">
+        <div class="tab-row">
+          <div class="tab-btn active" data-tab="tab-products">Produkty</div>
+          <div class="tab-btn" data-tab="tab-files">Pliki</div>
+        </div>
+        <div class="tab-page active" id="tab-products">
+          <div style="display:flex;gap:2px;padding:2px">
+            <label style="font-size:10px"><input type="radio" name="pt" value="oper" checked> Oper</label>
+            <label style="font-size:10px"><input type="radio" name="pt" value="arch"> Arch</label>
+            <button onclick="fetchProducts()" style="font-size:10px;margin-left:auto">🔄</button>
+          </div>
+          <div id="product-list" class="panel-box" style="flex:1">Ładowanie...</div>
+        </div>
+        <div class="tab-page" id="tab-files">
+          <div id="breadcrumbs" style="font-size:10px;padding:1px 4px;background:#fff;border:inset 2px">/</div>
+          <div id="file-list" class="panel-box" style="flex:1">Wybierz produkt...</div>
+        </div>
+      </div>
+
+      <!-- PROGRESS -->
+      <div id="progress-bar"><div id="progress-fill"></div></div>
+      <div id="progress-text"></div>
+
+      <!-- SETTINGS -->
+      <div class="panel-label" onclick="toggleSection('settings-section')">⚙️ Ustawienia</div>
+      <div id="settings-section" class="panel-box" style="max-height:none;padding:3px">
+        <div class="setting-row"><label>Mapa:</label><select id="selBase"><option value="osm">OSM</option><option value="topo">Topo</option><option value="carto-dark">Dark</option><option value="carto-light">Light</option></select></div>
+        <div class="setting-row"><label>Filtr:</label><select id="selFilter"><option value="none">Brak</option><option value="retro">Retro</option><option value="gray">Szarość</option><option value="dark">Ciemny</option></select></div>
+        <div class="setting-row"><label>Krycie:</label><input type="range" id="slOpacity" min="10" max="100" value="75"><span id="valOpacity">75%</span></div>
+        <div class="setting-row"><label>FPS:</label><input type="range" id="slFps" min="1" max="8" value="2"><span id="valFps">2</span></div>
+        <div class="setting-row"><label>Paleta:</label><select id="selPalette"><option value="nws">NWS</option><option value="viridis">Viridis</option><option value="turbo">Turbo</option></select></div>
+      </div>
+    </div>
+
+    <!-- MAIN AREA -->
+    <div id="main-area">
+      <!-- DUAL MAPS -->
+      <div id="maps-container">
+        <div class="map-pane" id="pane-left" style="position:relative">
+          <div class="map-header" id="header-left">Lewa mapa — dBZ</div>
+          <div class="map-div" id="map-left"></div>
+          <div class="legend" id="legend-box">
+            <div style="font-weight:bold; margin-bottom:2px;">dBZ</div>
+            <canvas id="legend-bar" width="150" height="12"></canvas>
+            <div class="legend-labels"><span>0</span><span>20</span><span>40</span><span>60</span><span>80</span></div>
+          </div>
+        </div>
+        <div class="map-pane" id="pane-right">
+          <div class="map-header" id="header-right">Prawa mapa — V</div>
+          <div class="map-div" id="map-right"></div>
+        </div>
+      </div>
+
+      <!-- PLAYER -->
+      <div class="controls">
+        <button id="btnPrev">⏮</button>
+        <button id="btnPlay" style="width:60px">▶ Play</button>
+        <button id="btnNext">⏭</button>
+        <input type="range" id="timeSlider" min="0" max="0" value="0" style="flex:1">
+        <span id="timeLabel" style="min-width:150px;text-align:center;font-size:11px">--:--:--</span>
+        <span id="frameCounter" style="font-size:10px;color:#808080;min-width:40px">0/0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <p class="status-bar-field" id="statusText">Gotowy</p>
+    <p class="status-bar-field" id="statusCoords" style="width:180px;text-align:center">—</p>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module">
+import h5wasm from "https://cdn.jsdelivr.net/npm/h5wasm@0.7.5/dist/esm/hdf5_hl.js";
+const H5Ready = h5wasm.ready;
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let mapL, mapR, baseL, baseR;
+let framesL = [], framesR = [];  // left & right pane frames
+let rainViewerLayers = [];
+let curIdx = 0, isPlaying = false, playTimer = null;
+let fps = 2, opacity = 0.75, palette = 'nws';
+let dualMode = true;
+let syncingMaps = false;
+
+const BASEMAPS = {
+  osm:  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  topo: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+  'carto-dark': 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  'carto-light':'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+};
+const FILTERS = { none:'none', retro:'sepia(0.3) brightness(0.9)', gray:'grayscale(1)', dark:'brightness(0.55) contrast(1.2)' };
+
+function setStatus(t) { document.getElementById('statusText').innerText = t; }
+function getFrameCount() { return parseInt(document.getElementById('selFrameCount').value) || 12; }
+
+// ═══════════════════════════════════════════════
+// MAP INIT
+// ═══════════════════════════════════════════════
+function initMaps() {
+  mapL = L.map('map-left', { center:[51.9,19.1], zoom:6, zoomControl:true, preferCanvas:true });
+  mapR = L.map('map-right', { center:[51.9,19.1], zoom:6, zoomControl:false, preferCanvas:true });
+  setBase('osm');
+  
+  // Sync maps
+  mapL.on('move', () => { if(!syncingMaps){syncingMaps=true; mapR.setView(mapL.getCenter(), mapL.getZoom(), {animate:false}); syncingMaps=false;} });
+  mapR.on('move', () => { if(!syncingMaps){syncingMaps=true; mapL.setView(mapR.getCenter(), mapR.getZoom(), {animate:false}); syncingMaps=false;} });
+  
+  mapL.on('mousemove', e => { document.getElementById('statusCoords').innerText = `${e.latlng.lat.toFixed(4)}°N  ${e.latlng.lng.toFixed(4)}°E`; });
+  mapR.on('mousemove', e => { document.getElementById('statusCoords').innerText = `${e.latlng.lat.toFixed(4)}°N  ${e.latlng.lng.toFixed(4)}°E`; });
+}
+
+function setBase(key) {
+  const url = BASEMAPS[key] || BASEMAPS.osm;
+  if(baseL) mapL.removeLayer(baseL);
+  if(baseR) mapR.removeLayer(baseR);
+  baseL = L.tileLayer(url, {maxZoom:18}).addTo(mapL);
+  baseR = L.tileLayer(url, {maxZoom:18}).addTo(mapR);
+}
+
+// ═══════════════════════════════════════════════
+// VIEW MODE
+// ═══════════════════════════════════════════════
+function updateViewMode() {
+  const pR = document.getElementById('pane-right');
+  if(dualMode) { pR.classList.remove('hidden'); } else { pR.classList.add('hidden'); }
+  setTimeout(() => { mapL.invalidateSize(); mapR.invalidateSize(); }, 100);
+}
+
+document.querySelectorAll('input[name="viewMode"]').forEach(r => r.addEventListener('change', () => {
+  dualMode = r.value === 'dual';
+  updateViewMode();
+}));
+
+// ═══════════════════════════════════════════════
+// PROGRESS BAR
+// ═══════════════════════════════════════════════
+function showProgress(current, total) {
+  const bar = document.getElementById('progress-bar');
+  const fill = document.getElementById('progress-fill');
+  const txt = document.getElementById('progress-text');
+  bar.style.display = 'block'; txt.style.display = 'block';
+  fill.style.width = Math.round((current/total)*100) + '%';
+  txt.innerText = `${current}/${total}`;
+}
+function hideProgress() {
+  document.getElementById('progress-bar').style.display = 'none';
+  document.getElementById('progress-text').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════
+// FETCH IMGW FILE LIST
+// ═══════════════════════════════════════════════
+async function fetchFileListForPath(path) {
+  const res = await fetch("/api/files", { method:"POST", headers:{"Content-Type":"application/x-www-form-urlencoded"}, body:`productType=oper&path=${encodeURIComponent(path)}` });
+  const html = await res.text();
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const links = [...doc.querySelectorAll('a[href*="getfiledown"]')];
+  return links.map(a => ({ href: '/' + a.getAttribute('href'), name: a.textContent.trim() }))
+    .filter(f => f.name.endsWith('.h5'));
+}
+
+// ═══════════════════════════════════════════════
+// AUTO-DOWNLOAD N FRAMES
+// ═══════════════════════════════════════════════
+async function autoLoadProduct(path, productHint, label, targetPane) {
+  setStatus(`📡 Pobieranie listy: ${label}...`);
+  try {
+    const files = await fetchFileListForPath(path);
+    if(files.length === 0) { setStatus("Brak plików .h5 w tym produkcie"); return; }
+    
+    const count = getFrameCount();
+    const toDownload = files.slice(-count); // last N files
+    
+    setStatus(`⬇️ Pobieranie ${toDownload.length} klatek (${label})...`);
+    showProgress(0, toDownload.length);
+    
+    const frames = [];
+    for(let i = 0; i < toDownload.length; i++) {
+      try {
+        const res = await fetch(toDownload[i].href);
+        if(!res.ok) { showProgress(i+1, toDownload.length); continue; }
+        const ab = await res.arrayBuffer();
+        const frame = await decodeHDF5(ab, toDownload[i].name, productHint);
+        if(frame) frames.push(frame);
+      } catch(e) { console.warn('Skip:', toDownload[i].name, e); }
+      showProgress(i+1, toDownload.length);
+    }
+    
+    hideProgress();
+    
+    if(frames.length === 0) { setStatus("Nie udało się zdekodować żadnej klatki"); return; }
+    
+    // Assign to pane
+    if(targetPane === 'left' || targetPane === 'both') {
+      // Clear old
+      framesL.forEach(f => { if(mapL.hasLayer(f.overlay)) mapL.removeLayer(f.overlay); });
+      framesL = frames.map(f => ({ ...f, overlay: L.imageOverlay(f.dataUrl, f.bounds, {opacity:0, className:'pixelated'}) }));
+      document.getElementById('header-left').innerText = `Lewa — ${label}`;
+    }
+    if(targetPane === 'right') {
+      framesR.forEach(f => { if(mapR.hasLayer(f.overlay)) mapR.removeLayer(f.overlay); });
+      framesR = frames.map(f => ({ ...f, overlay: L.imageOverlay(f.dataUrl, f.bounds, {opacity:0, className:'pixelated'}) }));
+      document.getElementById('header-right').innerText = `Prawa — ${label}`;
+    }
+    
+    // Setup timeline
+    updateTimeline();
+    if(frames[0]?.bounds) mapL.fitBounds(frames[0].bounds);
+    setStatus(`✅ ${label}: ${frames.length} klatek załadowanych`);
+  } catch(e) {
+    hideProgress();
+    setStatus(`❌ ${e.message}`);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// QUICK LOAD BUTTONS
+// ═══════════════════════════════════════════════
+window.quickLoad = (path, product, label) => autoLoadProduct(path, product, label, dualMode ? 'left' : 'both');
+
+window.quickStation = (suffix, product) => {
+  const station = document.getElementById('selStation').value;
+  const path = `/Oper/Polrad/Produkty/HVD/HVD_${station}_${suffix}`;
+  const label = `${station.toUpperCase()} ${suffix}`;
+  autoLoadProduct(path, product, label, dualMode ? 'left' : 'both');
+};
+
+window.quickDual = async () => {
+  const station = document.getElementById('selStation').value;
+  const pathDBZ = `/Oper/Polrad/Produkty/HVD/HVD_${station}_0_5.ppi`;
+  const pathV = `/Oper/Polrad/Produkty/HVD/HVD_${station}_125.cappi`;
+  
+  setStatus(`⚡ Dual load: ${station.toUpperCase()} dBZ (0.5°) + V (1.25)...`);
+  
+  try {
+    const filesDBZ = await fetchFileListForPath(pathDBZ);
+    const dbzFiles = filesDBZ.filter(f => /dBZ/i.test(f.name));
+    
+    const filesV = await fetchFileListForPath(pathV);
+    const vFiles = filesV.filter(f => /V\./i.test(f.name) || /(?<![dBZ])V\./i.test(f.name) || /^\d{14}V\./i.test(f.name));
+    
+    const count = getFrameCount();
+    
+    // Load dBZ to left
+    if(dbzFiles.length > 0) {
+      const toLoad = dbzFiles.slice(-count);
+      showProgress(0, toLoad.length * 2);
+      
+      const framesDbz = [];
+      for(let i = 0; i < toLoad.length; i++) {
+        try {
+          const res = await fetch(toLoad[i].href);
+          if(res.ok) {
+            const frame = await decodeHDF5(await res.arrayBuffer(), toLoad[i].name, 'dBZ');
+            if(frame) framesDbz.push(frame);
+          }
+        } catch(e) {}
+        showProgress(i+1, toLoad.length * 2);
+      }
+      
+      framesL.forEach(f => { if(mapL.hasLayer(f.overlay)) mapL.removeLayer(f.overlay); });
+      framesL = framesDbz.map(f => ({ ...f, overlay: L.imageOverlay(f.dataUrl, f.bounds, {opacity:0, className:'pixelated'}) }));
+      document.getElementById('header-left').innerText = `Lewa — ${station.toUpperCase()} dBZ PPI 0.5°`;
+      
+      // Load V to right
+      if(vFiles.length > 0) {
+        const toLoadV = vFiles.slice(-count);
+        const framesV = [];
+        for(let i = 0; i < toLoadV.length; i++) {
+          try {
+            const res = await fetch(toLoadV[i].href);
+            if(res.ok) {
+              const frame = await decodeHDF5(await res.arrayBuffer(), toLoadV[i].name, 'V');
+              if(frame) framesV.push(frame);
+            }
+          } catch(e) {}
+          showProgress(toLoad.length + i + 1, toLoad.length * 2);
+        }
+        
+        framesR.forEach(f => { if(mapR.hasLayer(f.overlay)) mapR.removeLayer(f.overlay); });
+        framesR = framesV.map(f => ({ ...f, overlay: L.imageOverlay(f.dataUrl, f.bounds, {opacity:0, className:'pixelated'}) }));
+        document.getElementById('header-right').innerText = `Prawa — ${station.toUpperCase()} V PPI 0.5°`;
+      }
+      
+      hideProgress();
+      updateTimeline();
+      if(framesDbz[0]?.bounds) mapL.fitBounds(framesDbz[0].bounds);
+      setStatus(`✅ Dual: ${framesDbz.length} dBZ + ${framesR.length} V klatek`);
+    } else {
+      hideProgress();
+      setStatus("Brak plików dBZ w tym produkcie");
+    }
+  } catch(e) {
+    hideProgress();
+    setStatus(`❌ ${e.message}`);
+  }
+};
+
+// ═══════════════════════════════════════════════
+// HDF5 DECODE
+// ═══════════════════════════════════════════════
+function getAttrValue(g, n) {
+  try { let v=g?.attrs?.[n]; if(v==null)return null; if(typeof v==='object'&&v.value!==undefined)v=v.value;
+    if(v instanceof Uint8Array||v instanceof Int8Array) return new TextDecoder().decode(v).replace(/\0/g,'').trim();
+    if(ArrayBuffer.isView(v)&&v.length===1)return v[0]; if(Array.isArray(v)&&v.length===1)return v[0];
+    if(ArrayBuffer.isView(v)&&v.length>1)return Array.from(v); return v;
+  } catch(e){return null;}
+}
+
+function detectProduct(fn) {
+  if(/V\.cappi|V\.ppi/i.test(fn)) return 'V';
+  if(/ZDR/i.test(fn)) return 'ZDR'; if(/KDP/i.test(fn)) return 'KDP';
+  if(/RhoHV/i.test(fn)) return 'RhoHV'; if(/Height|eht/i.test(fn)) return 'Height';
+  if(/sri|dpsri/i.test(fn)) return 'sri'; return 'dBZ';
+}
+
+function parseTS(fn) {
+  const m=fn.match(/(\d{14})/); if(!m)return null;
+  const s=m[1]; return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)} ${s.slice(8,10)}:${s.slice(10,12)} UTC`;
+}
+
+// Color palettes
+function nws(v){const S=[[0,[0,0,0,0]],[3,[4,5,147,20]],[8,[4,5,147,100]],[10,[31,72,216,180]],[12,[58,126,231,230]],[14,[86,181,247,255]],[16,[109,201,252,255]],[17,[121,211,248,255]],[20,[174,233,251,255]],[23,[231,248,255,255]],[25,[253,252,224,255]],[27,[253,246,158,255]],[28,[254,241,136,255]],[30,[249,232,90,255]],[32,[245,206,77,255]],[34,[239,151,54,255]],[36,[233,98,43,255]],[37,[236,73,38,255]],[40,[184,37,29,255]],[43,[159,30,34,255]],[44,[149,29,39,255]],[46,[142,28,51,255]],[47,[159,31,79,255]],[50,[187,42,135,255]],[53,[210,55,172,255]],[55,[219,72,189,255]],[56,[221,79,197,255]],[59,[203,144,198,255]],[65,[180,100,180,255]],[100,[0,0,0,255]],[101,[0,0,0,0]],[255,[0,0,0,0]]];return interp(S,v);}
+function viridis(v){const t=Math.max(0,Math.min(1,(v+10)/80));const S=[[0,[68,1,84,200]],[0.25,[59,82,139,220]],[0.5,[33,145,140,230]],[0.75,[94,201,98,230]],[1,[253,231,37,240]]];return interp01(S,t);}
+function turbo(v){const t=Math.max(0,Math.min(1,(v+10)/80));const S=[[0,[48,18,59,200]],[0.2,[70,130,180,220]],[0.4,[40,200,130,230]],[0.6,[230,220,50,230]],[0.8,[250,120,30,240]],[1,[122,4,3,240]]];return interp01(S,t);}
+function velColor(v){const S=[[-40,[237,0,134,230]],[-20,[120,0,255,230]],[0,[140,140,140,160]],[20,[0,180,0,230]],[40,[103,6,2,240]]];return interp(S,v);}
+
+function interp(S,v){if(v<S[0][0])return[0,0,0,0];for(let i=1;i<S.length;i++){if(v<=S[i][0]){const t=(v-S[i-1][0])/(S[i][0]-S[i-1][0]);return S[i-1][1].map((c,j)=>Math.round(c+t*(S[i][1][j]-c)));}}return S[S.length-1][1];}
+function interp01(S,t){if(t<=S[0][0])return S[0][1];for(let i=1;i<S.length;i++){if(t<=S[i][0]){const f=(t-S[i-1][0])/(S[i][0]-S[i-1][0]);return S[i-1][1].map((c,j)=>Math.round(c+f*(S[i][1][j]-c)));}}return S[S.length-1][1];}
+
+function getColor(product, v) {
+  if(isNaN(v)) return [0,0,0,0];
+  if(product === 'V') return velColor(v);
+  switch(palette) { case 'viridis':return viridis(v); case 'turbo':return turbo(v); default:return nws(v); }
+}
+
+async function decodeHDF5(ab, filename, productHint) {
+  const { FS } = await H5Ready;
+  const vfs = 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2,6) + '.h5';
+  FS.writeFile(vfs, new Uint8Array(ab));
+  const h5 = new h5wasm.File(vfs, 'r');
+  try {
+    const rw=h5.get('/where'), dw=h5.get('/dataset1/where');
+    const LL_lat=getAttrValue(rw,'LL_lat')||getAttrValue(dw,'LL_lat');
+    const LL_lon=getAttrValue(rw,'LL_lon')||getAttrValue(dw,'LL_lon');
+    const UR_lat=getAttrValue(rw,'UR_lat')||getAttrValue(dw,'UR_lat');
+    const UR_lon=getAttrValue(rw,'UR_lon')||getAttrValue(dw,'UR_lon');
+    if(!LL_lat||!UR_lat) return null;
+
+    const dWhat=h5.get('/dataset1/what')||h5.get('/dataset1/data1/what');
+    const gain=dWhat?Number(getAttrValue(dWhat,'gain'))||1:1;
+    const off=dWhat?Number(getAttrValue(dWhat,'offset'))||0:0;
+    const nd=dWhat?Number(getAttrValue(dWhat,'nodata')):NaN;
+    const ud=dWhat?Number(getAttrValue(dWhat,'undetect')):NaN;
+
+    const rawDs=h5.get('/dataset1/data1/data'); if(!rawDs)return null;
+    const raw=rawDs.value, sh=rawDs.shape, nR=sh[0], nC=sh[1];
+    const product = productHint || detectProduct(filename);
+    const ts = parseTS(filename);
+
+    const canvas=document.createElement('canvas'); canvas.width=nC; canvas.height=nR;
+    const ctx=canvas.getContext('2d'), img=ctx.createImageData(nC,nR), px=img.data;
+    for(let i=0;i<raw.length;i++){
+      const v=(raw[i]===nd||raw[i]===ud)?NaN:raw[i]*gain+off;
+      const c=getColor(product,v);
+      px[i*4]=c[0];px[i*4+1]=c[1];px[i*4+2]=c[2];px[i*4+3]=c[3];
+    }
+    ctx.putImageData(img,0,0);
+    return { filename, dataUrl:canvas.toDataURL('image/png'), bounds:[[LL_lat,LL_lon],[UR_lat,UR_lon]], timestamp:ts, product };
+  } finally {
+    try{h5.close();}catch(e){} try{FS.unlink(vfs);}catch(e){}
+  }
+}
+
+// ═══════════════════════════════════════════════
+// RAINVIEWER
+// ═══════════════════════════════════════════════
+async function loadRainViewer() {
+  setStatus("🌧️ RainViewer...");
+  try {
+    const data = await (await fetch("/api/rainviewer/public/weather-maps.json")).json();
+    // Clear old
+    rainViewerLayers.forEach(l => { mapL.removeLayer(l.layer); mapR.removeLayer(l.layer); });
+    rainViewerLayers = [];
+    framesL.forEach(f=>{if(mapL.hasLayer(f.overlay))mapL.removeLayer(f.overlay);}); framesL=[];
+    framesR.forEach(f=>{if(mapR.hasLayer(f.overlay))mapR.removeLayer(f.overlay);}); framesR=[];
+
+    const allF = [...(data.radar?.past||[]), ...(data.radar?.nowcast||[])];
+    allF.forEach(fr => {
+      const lL = L.tileLayer(data.host+fr.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,zIndex:5});
+      const lR = L.tileLayer(data.host+fr.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,zIndex:5});
+      lL.addTo(mapL); lR.addTo(mapR);
+      const dt=new Date(fr.time*1000);
+      const ts=dt.toISOString().slice(0,16).replace('T',' ')+' UTC';
+      framesL.push({overlay:lL, timestamp:ts, product:'RainViewer', isRV:true});
+      framesR.push({overlay:lR, timestamp:ts, product:'RainViewer', isRV:true});
+    });
+    document.getElementById('header-left').innerText='Lewa — RainViewer Radar';
+    document.getElementById('header-right').innerText='Prawa — RainViewer Radar';
+    updateTimeline();
+    setStatus(`🌧️ RainViewer: ${framesL.length} ramek`);
+  } catch(e) { setStatus(`❌ ${e.message}`); }
+}
+
+// ═══════════════════════════════════════════════
+// TIMELINE & PLAYER
+// ═══════════════════════════════════════════════
+function updateTimeline() {
+  const maxF = Math.max(framesL.length, framesR.length);
+  document.getElementById('timeSlider').max = Math.max(0, maxF - 1);
+  showFrame(maxF - 1);
+}
+
+function showFrame(idx) {
+  const maxF = Math.max(framesL.length, framesR.length);
+  if(idx < 0 || idx >= maxF) return;
+  curIdx = idx;
+  document.getElementById('timeSlider').value = idx;
+  document.getElementById('frameCounter').innerText = `${idx+1}/${maxF}`;
+
+  // Left pane
+  framesL.forEach((f,i) => {
+    if(f.isRV) f.overlay.setOpacity(i===idx ? opacity : 0);
+    else { if(i===idx){f.overlay.setOpacity(opacity);if(!mapL.hasLayer(f.overlay))f.overlay.addTo(mapL);}else{if(mapL.hasLayer(f.overlay))mapL.removeLayer(f.overlay);} }
+  });
+
+  // Right pane
+  if(dualMode) {
+    framesR.forEach((f,i) => {
+      if(f.isRV) f.overlay.setOpacity(i===idx ? opacity : 0);
+      else { if(i===idx){f.overlay.setOpacity(opacity);if(!mapR.hasLayer(f.overlay))f.overlay.addTo(mapR);}else{if(mapR.hasLayer(f.overlay))mapR.removeLayer(f.overlay);} }
+    });
+  }
+
+  // Timestamp
+  const ts = framesL[idx]?.timestamp || framesR[idx]?.timestamp || '—';
+  document.getElementById('timeLabel').innerText = ts;
+}
+
+document.getElementById('timeSlider').addEventListener('input', e => showFrame(parseInt(e.target.value)));
+document.getElementById('btnPrev').addEventListener('click', () => { const m=Math.max(framesL.length,framesR.length); showFrame(curIdx>0?curIdx-1:m-1); });
+document.getElementById('btnNext').addEventListener('click', () => { const m=Math.max(framesL.length,framesR.length); showFrame(curIdx<m-1?curIdx+1:0); });
+document.getElementById('btnPlay').addEventListener('click', () => {
+  if(isPlaying){clearInterval(playTimer);isPlaying=false;document.getElementById('btnPlay').innerText='▶ Play';}
+  else{const m=Math.max(framesL.length,framesR.length);if(m<=1)return;isPlaying=true;document.getElementById('btnPlay').innerText='⏸ Stop';
+    playTimer=setInterval(()=>{const m2=Math.max(framesL.length,framesR.length);showFrame(curIdx<m2-1?curIdx+1:0);},1000/fps);}
+});
+
+// ═══════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════
+document.getElementById('selBase').addEventListener('change', e => setBase(e.target.value));
+document.getElementById('selFilter').addEventListener('change', e => document.documentElement.style.setProperty('--map-filter', FILTERS[e.target.value]||'none'));
+document.getElementById('slOpacity').addEventListener('input', e => { opacity=parseInt(e.target.value)/100; document.getElementById('valOpacity').innerText=e.target.value+'%'; showFrame(curIdx); });
+document.getElementById('slFps').addEventListener('input', e => { fps=parseInt(e.target.value); document.getElementById('valFps').innerText=fps; if(isPlaying){clearInterval(playTimer);playTimer=setInterval(()=>{const m=Math.max(framesL.length,framesR.length);showFrame(curIdx<m-1?curIdx+1:0);},1000/fps);} });
+document.getElementById('selPalette').addEventListener('change', e => { palette=e.target.value; drawLegend(); showFrame(curIdx); });
+
+function drawLegend() {
+  const canvas = document.getElementById('legend-bar');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  for(let x=0; x<150; x++) {
+    const v = (x/150)*80; // range 0 to 80
+    let c;
+    if(palette === 'viridis') c = viridis(v);
+    else if(palette === 'turbo') c = turbo(v);
+    else c = nws(v);
+    ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${c[3]/255})`;
+    ctx.fillRect(x, 0, 1, 12);
+  }
+}
+drawLegend();
+
+// ═══════════════════════════════════════════════
+// IMGW EXPLORER
+// ═══════════════════════════════════════════════
+let explorerPT = 'oper';
+
+window.fetchProducts = async () => {
+  explorerPT = document.querySelector('input[name="pt"]:checked').value;
+  document.getElementById('product-list').innerHTML = '⏳...';
+  try {
+    const html = await (await fetch("/api/products",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:`productType=${explorerPT}`})).text();
+    const doc = new DOMParser().parseFromString(html,'text/html');
+    const cont = document.getElementById('product-list'); cont.innerHTML='';
+    doc.querySelectorAll('.product-item').forEach(item => {
+      const name=item.getAttribute('data-name')||item.id, path=item.getAttribute('data-path')||'';
+      const div=document.createElement('div'); div.className='list-item';
+      div.innerHTML=`<span class="icon">${/polrad|hvd|compo/i.test(path)?'📡':'📄'}</span>${name}`;
+      div.addEventListener('click', () => {
+        cont.querySelectorAll('.list-item').forEach(e=>e.classList.remove('active')); div.classList.add('active');
+        fetchExplorerFiles(explorerPT, path, name);
+        // Switch to files tab
+        document.querySelectorAll('#explorer-section .tab-btn').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('#explorer-section .tab-page').forEach(p=>p.classList.remove('active'));
+        document.querySelector('[data-tab="tab-files"]').classList.add('active');
+        document.getElementById('tab-files').classList.add('active');
+      });
+      cont.appendChild(div);
+    });
+  } catch(e) { document.getElementById('product-list').innerHTML=`<span style="color:red">${e.message}</span>`; }
+};
+
+async function fetchExplorerFiles(pt, path, name) {
+  const fl=document.getElementById('file-list'); fl.innerHTML='⏳...';
+  document.getElementById('breadcrumbs').innerText=name||path;
+  try {
+    const html=await(await fetch("/api/files",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:`productType=${pt}&path=${encodeURIComponent(path)}`})).text();
+    const doc=new DOMParser().parseFromString(html,'text/html');
+    fl.innerHTML='';
+    doc.querySelectorAll('.folder-item').forEach(item=>{
+      const n=item.getAttribute('data-name')||item.textContent.trim(), p=item.getAttribute('data-path')||'';
+      const d=document.createElement('div');d.className='list-item';d.innerHTML=`<span class="icon">📁</span>${n}`;
+      d.addEventListener('click',()=>fetchExplorerFiles('arch',p,n));fl.appendChild(d);
+    });
+    doc.querySelectorAll('a[href*="getfiledown"]').forEach(a=>{
+      const href=a.getAttribute('href')||'',n=a.textContent.trim();
+      if(!n.endsWith('.h5'))return;
+      const d=document.createElement('div');d.className='list-item';d.innerHTML=`<span class="icon">📊</span>${n}`;
+      d.title='Podwójne kliknięcie = załaduj';
+      d.addEventListener('dblclick',async()=>{
+        setStatus(`⬇️ ${n}...`);
+        try{const r=await fetch('/'+href);if(!r.ok)throw new Error(`HTTP ${r.status}`);
+          const frame=await decodeHDF5(await r.arrayBuffer(),n);
+          if(frame){framesL.forEach(f=>{if(mapL.hasLayer(f.overlay))mapL.removeLayer(f.overlay);});
+            framesL=[{...frame,overlay:L.imageOverlay(frame.dataUrl,frame.bounds,{opacity, className:'pixelated'})}];
+            framesL[0].overlay.addTo(mapL);mapL.fitBounds(frame.bounds);
+            updateTimeline();setStatus(`✅ ${n}`);}
+        }catch(e){setStatus(`❌ ${e.message}`);}
+      });
+      fl.appendChild(d);
+    });
+    if(fl.children.length===0)fl.innerHTML='<i>Pusty</i>';
+  }catch(e){fl.innerHTML=`<span style="color:red">${e.message}</span>`;}
+}
+
+document.querySelectorAll('input[name="pt"]').forEach(r=>r.addEventListener('change',()=>fetchProducts()));
+
+// Explorer tabs
+document.querySelectorAll('#explorer-section .tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#explorer-section .tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('#explorer-section .tab-page').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ═══════════════════════════════════════════════
+// TOOLBAR BUTTONS
+// ═══════════════════════════════════════════════
+document.getElementById('btnRainViewer').addEventListener('click', loadRainViewer);
+document.getElementById('btnClear').addEventListener('click', () => {
+  framesL.forEach(f=>{try{mapL.removeLayer(f.overlay);}catch(e){}});
+  framesR.forEach(f=>{try{mapR.removeLayer(f.overlay);}catch(e){}});
+  framesL=[]; framesR=[]; curIdx=0;
+  document.getElementById('timeSlider').max=0; document.getElementById('timeSlider').value=0;
+  document.getElementById('timeLabel').innerText='--:--:--'; document.getElementById('frameCounter').innerText='0/0';
+  document.getElementById('header-left').innerText='Lewa mapa'; document.getElementById('header-right').innerText='Prawa mapa';
+  setStatus("Wyczyszczono");
+});
+
+// ═══════════════════════════════════════════════
+// COLLAPSIBLE SECTIONS
+// ═══════════════════════════════════════════════
+window.toggleSection = id => document.getElementById(id).classList.toggle('collapsed');
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+initMaps();
+fetchProducts();
+</script>
+</body>
+</html>

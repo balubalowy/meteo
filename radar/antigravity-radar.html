@@ -1,0 +1,2493 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AntiGravity Radar — Analiza Radarowa IMGW</title>
+  <meta name="description" content="Zaawansowana aplikacja do analizy danych radarowych IMGW w formacie ODIM HDF5. Wizualizacja reflektywności, velocity, ZDR, Echo Top na mapie Leaflet.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       DESIGN SYSTEM — Dark Meteorological Theme
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-primary: #0a0e14;
+      --bg-secondary: #0f1319;
+      --bg-surface: #141920;
+      --bg-surface-2: #1a2028;
+      --bg-surface-hover: #1e2530;
+      --border: rgba(79, 152, 163, 0.15);
+      --border-strong: rgba(79, 152, 163, 0.3);
+      --accent: #4f98a3;
+      --accent-dim: rgba(79, 152, 163, 0.12);
+      --accent-glow: rgba(79, 152, 163, 0.25);
+      --warn: #e8b931;
+      --warn-dim: rgba(232, 185, 49, 0.12);
+      --danger: #e05555;
+      --danger-dim: rgba(224, 85, 85, 0.12);
+      --success: #5cb85c;
+      --success-dim: rgba(92, 184, 92, 0.12);
+      --text: #c8cdd5;
+      --text-bright: #e8ecf1;
+      --text-muted: #6b7280;
+      --text-faint: #3d4550;
+      --font-ui: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Consolas', monospace;
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* ─── APP LAYOUT ─── */
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: 100vh;
+    }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      z-index: 1000;
+    }
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-right: auto;
+    }
+    .topbar-logo {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #2d6a7a);
+      display: grid; place-items: center;
+      color: white; font-weight: 800; font-size: 14px;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+    .topbar-title {
+      font-size: 15px; font-weight: 700;
+      color: var(--text-bright);
+      letter-spacing: -0.02em;
+    }
+    .topbar-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-surface);
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: 12px; font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:hover { background: var(--bg-surface-hover); border-color: var(--border-strong); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn-primary:hover { background: #3d8591; }
+    .btn-warn { background: var(--warn-dim); color: var(--warn); border-color: rgba(232,185,49,0.3); }
+    .btn-danger { background: var(--danger-dim); color: var(--danger); border-color: rgba(224,85,85,0.3); }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
+
+    /* ─── MAIN CONTENT ─── */
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      overflow: hidden;
+    }
+
+    /* ─── MAP AREA ─── */
+    .map-area {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    #map {
+      flex: 1;
+      background: var(--bg-primary);
+    }
+    .leaflet-container { background: var(--bg-primary) !important; }
+    .leaflet-tile-pane { filter: brightness(0.7) contrast(1.1) saturate(0.3); }
+
+    /* ─── CURSOR TOOLTIP ─── */
+    .cursor-tooltip {
+      position: absolute;
+      top: 12px; left: 12px;
+      padding: 8px 12px;
+      background: rgba(10, 14, 20, 0.92);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-bright);
+      pointer-events: none;
+      z-index: 800;
+      white-space: pre-line;
+      display: none;
+      backdrop-filter: blur(8px);
+      max-width: 400px;
+    }
+    .cursor-tooltip .tt-row { display: flex; gap: 8px; align-items: center; }
+    .cursor-tooltip .tt-label { color: var(--text-muted); min-width: 40px; }
+    .cursor-tooltip .tt-value { color: var(--text-bright); font-weight: 600; }
+
+    /* ─── TIME LOOP BAR ─── */
+    .time-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+    }
+    .time-bar .time-controls {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .time-bar .time-slider-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .time-bar input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: var(--bg-surface);
+      border-radius: 2px;
+      outline: none;
+    }
+    .time-bar input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: 0 0 6px var(--accent-glow);
+    }
+    .time-bar .time-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      min-width: 120px;
+    }
+    .time-bar .fps-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      min-width: 60px;
+    }
+    .time-bar .fps-slider {
+      width: 60px;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar::-webkit-scrollbar { width: 6px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ─── SIDEBAR PANELS ─── */
+    .panel {
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .panel-header:hover { background: var(--bg-surface); }
+    .panel-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+    .panel-toggle {
+      font-size: 10px;
+      color: var(--text-faint);
+      transition: transform 0.2s;
+    }
+    .panel.collapsed .panel-body { display: none; }
+    .panel.collapsed .panel-toggle { transform: rotate(-90deg); }
+    .panel-body {
+      padding: 0 14px 14px;
+    }
+
+    /* ─── FILE LIST ─── */
+    .file-drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 10px;
+    }
+    .file-drop-zone:hover, .file-drop-zone.dragover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+    .file-drop-zone .drop-icon { font-size: 24px; margin-bottom: 6px; }
+    .file-drop-zone .drop-text { font-size: 12px; color: var(--text-muted); }
+    .file-list { max-height: 200px; overflow-y: auto; }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: var(--radius);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      cursor: pointer;
+    }
+    .file-item:hover { background: var(--bg-surface); }
+    .file-item.active { background: var(--accent-dim); border-left: 2px solid var(--accent); }
+    .file-item .fi-product {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .fi-product.dbz { background: rgba(46,204,113,0.15); color: #2ecc71; }
+    .fi-product.v { background: rgba(52,152,219,0.15); color: #3498db; }
+    .fi-product.zdr { background: rgba(155,89,182,0.15); color: #9b59b6; }
+    .fi-product.eth { background: rgba(230,126,34,0.15); color: #e67e22; }
+    .fi-product.sri { background: rgba(231,76,60,0.15); color: #e74c3c; }
+    .file-item .fi-time { color: var(--text-muted); }
+    .file-item .fi-status { margin-left: auto; }
+    .fi-status.ok { color: var(--success); }
+    .fi-status.err { color: var(--danger); }
+
+    /* ─── LAYER CONTROLS ─── */
+    .layer-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .layer-item:last-child { border-bottom: none; }
+    .layer-check { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+    .layer-name { font-size: 12px; font-weight: 600; flex: 1; }
+    .layer-opacity {
+      width: 60px;
+      -webkit-appearance: none;
+      height: 3px;
+      background: var(--bg-surface);
+      border-radius: 2px;
+    }
+    .layer-opacity::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+    .layer-opacity-val {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      min-width: 28px;
+      text-align: right;
+    }
+
+    /* ─── ANALYSIS PANEL ─── */
+    .analysis-section {
+      margin-bottom: 12px;
+    }
+    .analysis-section h4 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .kpi {
+      padding: 8px 10px;
+      background: var(--bg-surface);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .kpi-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .kpi-value {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-bright);
+      letter-spacing: -0.02em;
+    }
+    .kpi-unit {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .kpi-sub {
+      font-size: 10px;
+      color: var(--text-faint);
+      font-family: var(--font-mono);
+      margin-top: 2px;
+    }
+    .kpi.wide { grid-column: 1 / -1; }
+
+    /* ─── SCORE BADGE ─── */
+    .score-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+    }
+    .score-circle {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .score-low { background: var(--success-dim); color: var(--success); border: 2px solid var(--success); }
+    .score-mid { background: var(--warn-dim); color: var(--warn); border: 2px solid var(--warn); }
+    .score-high { background: var(--danger-dim); color: var(--danger); border: 2px solid var(--danger); }
+    .score-label { font-size: 13px; font-weight: 700; }
+    .score-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* ─── MARKERS ON MAP ─── */
+    .radar-marker {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+    .marker-vrot-yellow { background: rgba(232,185,49,0.85); color: #000; }
+    .marker-vrot-red { background: rgba(224,85,85,0.85); color: #fff; }
+    .marker-hail { background: rgba(155,89,182,0.85); color: #fff; }
+    .marker-zdr-col { background: rgba(46,204,113,0.85); color: #000; }
+    .marker-zmax { background: rgba(79,152,163,0.85); color: #fff; }
+
+    /* ─── METADATA TABLE ─── */
+    .meta-table { width: 100%; }
+    .meta-table tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .meta-table td { padding: 4px 0; font-size: 12px; vertical-align: top; }
+    .meta-table td:first-child {
+      color: var(--text-muted);
+      font-weight: 600;
+      width: 100px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding-right: 8px;
+    }
+    .meta-table td:last-child { font-family: var(--font-mono); color: var(--text-bright); }
+
+    /* ─── CHART CONTAINER ─── */
+    .chart-container {
+      width: 100%;
+      height: 180px;
+      background: var(--bg-surface);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.04);
+      overflow: hidden;
+    }
+
+    /* ─── COLOR BAR / LEGEND ─── */
+    .colorbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .colorbar-gradient {
+      flex: 1;
+      height: 10px;
+      border-radius: 3px;
+    }
+    .colorbar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ─── ALERTS / WARNINGS ─── */
+    .alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .alert-warn { background: var(--warn-dim); color: var(--warn); border: 1px solid rgba(232,185,49,0.2); }
+    .alert-danger { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(224,85,85,0.2); }
+    .alert-info { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(79,152,163,0.2); }
+    .alert-icon { font-size: 14px; flex-shrink: 0; }
+
+    /* ─── STATUS BAR ─── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 4px 16px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+    .status-bar .status-item { display: flex; align-items: center; gap: 4px; }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+    .status-dot.loading { background: var(--warn); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* ─── LEAFLET OVERRIDES ─── */
+    .leaflet-control-zoom a {
+      background: var(--bg-surface) !important;
+      color: var(--text) !important;
+      border-color: var(--border) !important;
+    }
+    .leaflet-control-zoom a:hover { background: var(--bg-surface-hover) !important; }
+    .leaflet-control-attribution { display: none !important; }
+
+    /* Hidden file input */
+    #fileInput { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ════════ TOPBAR ════════ -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">AG</div>
+      <div>
+        <div class="topbar-title">AntiGravity Radar</div>
+        <div class="topbar-subtitle">Analiza radarowa IMGW · ODIM HDF5</div>
+      </div>
+    </div>
+    <input type="file" id="fileInput" multiple accept=".h5,.hdf5">
+    <button class="btn btn-primary" id="loadBtn">📂 Wczytaj pliki .h5</button>
+    <button class="btn" id="exportPngBtn" disabled>📸 PNG</button>
+    <button class="btn" id="exportCsvBtn" disabled>📊 CSV</button>
+  </header>
+
+  <!-- ════════ MAIN ════════ -->
+  <main class="main-content">
+    <!-- ──── MAP ──── -->
+    <div class="map-area">
+      <div id="map"></div>
+      <div class="cursor-tooltip" id="cursorTooltip"></div>
+
+      <!-- ──── TIME BAR ──── -->
+      <div class="time-bar" id="timeBar" style="display:none;">
+        <div class="time-controls">
+          <button class="btn btn-sm" id="timeStepBack" title="Krok wstecz">◀</button>
+          <button class="btn btn-sm btn-primary" id="timePlayBtn" title="Play/Pause">▶</button>
+          <button class="btn btn-sm" id="timeStepFwd" title="Krok naprzód">▶</button>
+        </div>
+        <div class="time-slider-wrap">
+          <input type="range" id="timeSlider" min="0" max="0" value="0" step="1">
+        </div>
+        <div class="time-label" id="timeLabel">--:--:-- UTC</div>
+        <div class="fps-label" id="fpsLabel">5 fps</div>
+        <input type="range" class="fps-slider" id="fpsSlider" min="1" max="15" value="5" title="Prędkość animacji">
+      </div>
+    </div>
+
+    <!-- ──── SIDEBAR ──── -->
+    <aside class="sidebar" id="sidebar">
+
+      <!-- Panel: Pliki -->
+      <div class="panel" id="panelFiles">
+        <div class="panel-header" onclick="togglePanel('panelFiles')">
+          <span class="panel-title">📂 Pliki</span>
+          <span class="panel-toggle">▼</span>
+        </div>
+        <div class="panel-body">
+          <div class="file-drop-zone" id="dropZone">
+            <div class="drop-icon">📡</div>
+            <div class="drop-text">Przeciągnij pliki .h5 lub kliknij</div>
+          </div>
+          <div class="file-list" id="fileList"></div>
+        </div>
+      </div>
+
+      <!-- Panel: Warstwy -->
+      <div class="panel" id="panelLayers">
+        <div class="panel-header" onclick="togglePanel('panelLayers')">
+          <span class="panel-title">🗂️ Warstwy</span>
+          <span class="panel-toggle">▼</span>
+        </div>
+        <div class="panel-body" id="layersList">
+          <div style="color:var(--text-faint); font-size:12px;">Wczytaj pliki aby zobaczyć warstwy</div>
+        </div>
+      </div>
+
+      <!-- Panel: Analiza -->
+      <div class="panel" id="panelAnalysis">
+        <div class="panel-header" onclick="togglePanel('panelAnalysis')">
+          <span class="panel-title">🔬 Analiza</span>
+          <span class="panel-toggle">▼</span>
+        </div>
+        <div class="panel-body" id="analysisBody">
+          <div style="color:var(--text-faint); font-size:12px;">Wczytaj dane radarowe</div>
+        </div>
+      </div>
+
+      <!-- Panel: Metadane -->
+      <div class="panel" id="panelMeta">
+        <div class="panel-header" onclick="togglePanel('panelMeta')">
+          <span class="panel-title">ℹ️ Metadane</span>
+          <span class="panel-toggle">▼</span>
+        </div>
+        <div class="panel-body" id="metaBody">
+          <div style="color:var(--text-faint); font-size:12px;">Wybierz plik</div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- ════════ STATUS BAR ════════ -->
+  <footer class="status-bar" id="statusBar">
+    <div class="status-item">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Gotowy — wczytaj pliki .h5</span>
+    </div>
+    <div class="status-item" id="statusCoords" style="margin-left:auto;">
+      <span id="coordsText"></span>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     SCRIPTS
+     ════════════════════════════════════════════════════════════════ -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js" charset="utf-8"></script>
+
+<script type="module">
+// ═══════════════════════════════════════════════════════════════════
+// h5wasm import + init
+// ═══════════════════════════════════════════════════════════════════
+import h5wasm from "https://cdn.jsdelivr.net/npm/h5wasm@0.7.5/dist/esm/hdf5_hl.js";
+
+const H5Ready = h5wasm.ready;
+let H5 = null;
+
+// ═══════════════════════════════════════════════════════════════════
+// GLOBALS
+// ═══════════════════════════════════════════════════════════════════
+let map;
+let radarLat = 51.1, radarLon = 17.0; // default (Wrocław area)
+const loadedFiles = []; // { filename, product, type, timestamp, data, meta, layer }
+const activeLayers = new Map(); // productType -> { visible, opacity, leafletLayer, data, meta }
+const analysisMarkers = []; // Leaflet markers for analysis overlays
+let currentTimeIndex = 0;
+let timeSeriesKeys = []; // sorted timestamps
+let isPlaying = false;
+let playIntervalId = null;
+let fps = 5;
+
+// ═══════════════════════════════════════════════════════════════════
+// PRODUCT DEFINITIONS
+// ═══════════════════════════════════════════════════════════════════
+const PRODUCTS = {
+  dBZ:    { label: 'dBZ',    unit: 'dBZ',  min: -10, max: 70,  cssClass: 'dbz' },
+  V:      { label: 'V',      unit: 'm/s',  min: -40, max: 40,  cssClass: 'v' },
+  ZDR:    { label: 'ZDR',    unit: 'dB',   min: -2,  max: 6,   cssClass: 'zdr' },
+  KDP:    { label: 'KDP',    unit: '°/km', min: -2,  max: 7,   cssClass: 'v' },
+  RhoHV:  { label: 'RhoHV',  unit: '',     min: 0.5, max: 1.05,cssClass: 'eth' },
+  Height: { label: 'ETH',    unit: 'km',   min: 0,   max: 16,  cssClass: 'eth' },
+  sri:    { label: 'SRI',    unit: 'mm/h', min: 0,   max: 100, cssClass: 'sri' },
+  dpsri:  { label: 'DPSRI',  unit: 'mm/h', min: 0,   max: 100, cssClass: 'sri' },
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// COLOR SCALES
+// ═══════════════════════════════════════════════════════════════════
+
+function nwsReflectivity(v) {
+  // IMGW reflectivity scale: -10 to 70 dBZ
+  // Sampled from IMGW hex color scale: dark blue → blue → cyan → white → yellow → orange → red → crimson → purple → magenta
+  const stops = [
+    [-10, [7,7,200,230]],
+    [-7,  [3,29,212,230]],
+    [-4,  [1,44,234,230]],
+    [-1,  [7,83,245,230]],
+    [0,   [0,102,255,230]],
+    [3,   [0,131,255,230]],
+    [5,   [0,148,255,230]],
+    [8,   [0,180,255,230]],
+    [10,  [2,181,255,230]],
+    [12,  [24,192,255,230]],
+    [14,  [67,214,255,230]],
+    [16,  [128,232,255,230]],
+    [18,  [175,237,240,230]],
+    [19,  [210,247,255,225]],
+    [20,  [236,251,255,220]],
+    [21,  [252,254,255,210]],
+    [22,  [255,255,255,200]],
+    [23,  [255,254,245,210]],
+    [24,  [255,253,225,215]],
+    [25,  [255,250,190,220]],
+    [26,  [255,247,149,225]],
+    [27,  [255,244,115,225]],
+    [28,  [255,241,88,230]],
+    [29,  [255,238,65,230]],
+    [30,  [255,240,77,230]],
+    [31,  [255,236,51,230]],
+    [32,  [255,228,39,230]],
+    [33,  [255,216,31,235]],
+    [34,  [255,212,31,235]],
+    [35,  [255,199,15,235]],
+    [36,  [255,186,3,235]],
+    [37,  [255,172,0,235]],
+    [38,  [255,158,0,240]],
+    [39,  [255,146,0,240]],
+    [40,  [255,132,0,240]],
+    [41,  [255,112,0,240]],
+    [42,  [255,100,0,240]],
+    [43,  [255,83,0,240]],
+    [44,  [255,67,0,240]],
+    [45,  [255,51,0,240]],
+    [46,  [255,30,0,240]],
+    [47,  [238,22,0,240]],
+    [48,  [225,15,0,240]],
+    [49,  [211,10,0,240]],
+    [50,  [200,0,0,240]],
+    [52,  [186,0,5,240]],
+    [54,  [168,0,17,240]],
+    [56,  [153,0,36,240]],
+    [58,  [153,0,40,240]],
+    [60,  [163,0,57,240]],
+    [62,  [193,3,128,240]],
+    [64,  [211,14,149,240]],
+    [66,  [232,24,173,240]],
+    [68,  [248,33,193,240]],
+    [70,  [255,103,229,240]],
+  ];
+  if (v < stops[0][0]) return [0,0,0,0];
+  for (let i = 1; i < stops.length; i++) {
+    if (v <= stops[i][0]) {
+      const t = (v - stops[i-1][0]) / (stops[i][0] - stops[i-1][0]);
+      return stops[i-1][1].map((c, j) => Math.round(c + t * (stops[i][1][j] - c)));
+    }
+  }
+  return stops[stops.length-1][1];
+}
+
+function velocityColor(v) {
+  // IMGW velocity scale: magenta (inbound) → purple → blue → cyan → green → grey → red → pink → orange → brown (outbound)
+  // Range: -40 to +40 m/s
+  const t = (v + 40) / 80; // 0 to 1
+  const stops = [
+    [0.000, [237,0,134,230]],    // -40 m/s — magenta
+    [0.043, [175,2,142,230]],    // -36.5 — dark magenta
+    [0.087, [114,4,151,230]],    // -33 — purple
+    [0.130, [22,2,153,230]],     // -29.6 — dark purple
+    [0.152, [24,34,163,230]],    // -27.8 — dark blue-purple
+    [0.174, [26,55,170,230]],    // -26.1 — dark blue
+    [0.196, [30,98,184,230]],    // -24.3 — blue
+    [0.217, [33,130,195,230]],   // -22.6 — medium blue
+    [0.230, [40,204,220,230]],   // -21.6 — cyan
+    [0.250, [65,225,228,230]],   // -20 — light cyan
+    [0.270, [97,229,232,225]],   // -18.4
+    [0.296, [149,234,237,220]],  // -16.3 — pale cyan
+    [0.313, [182,238,241,215]],  // -14.9
+    [0.322, [167,241,218,220]],  // -14.2 — cyan-green
+    [0.335, [140,243,181,225]],  // -13.2 — light green
+    [0.348, [113,246,144,230]],  // -12.2 — green
+    [0.361, [73,250,89,230]],    // -11.1 — bright green
+    [0.374, [33,253,34,230]],    // -10.1 — vivid green
+    [0.387, [3,250,3,230]],      // -9 — pure green
+    [0.413, [3,219,3,230]],      // -7 — medium green
+    [0.435, [3,192,3,230]],      // -5.2
+    [0.457, [2,161,2,230]],      // -3.4 — dark green
+    [0.478, [2,108,2,230]],      // -1.8 — very dark green
+    [0.483, [5,102,3,220]],      // -1.4
+    [0.490, [78,121,76,200]],    // -0.8 — grey-green
+    [0.500, [114,133,112,180]],  // 0 m/s — grey (neutral)
+    [0.509, [110,132,108,200]],  // +0.7
+    [0.517, [138,118,118,210]],  // +1.4 — grey-mauve
+    [0.530, [138,108,122,220]],  // +2.4
+    [0.543, [136,89,101,225]],   // +3.4 — brick-mauve
+    [0.557, [133,63,72,230]],    // +4.5 — dark brick
+    [0.565, [110,0,0,230]],      // +5.2 — dark red
+    [0.587, [143,0,1,230]],      // +7 — medium dark red
+    [0.609, [176,0,3,235]],      // +8.7 — red
+    [0.630, [210,0,5,235]],      // +10.4 — bright red
+    [0.652, [243,0,7,240]],      // +12.2
+    [0.661, [250,55,81,240]],    // +12.9 — red-pink
+    [0.683, [251,87,130,235]],   // +14.6 — pink
+    [0.700, [252,109,163,230]],  // +16 — medium pink
+    [0.722, [254,137,204,225]],  // +17.8
+    [0.739, [255,149,208,220]],  // +19.1 — light pink
+    [0.757, [255,178,193,215]],  // +20.5 — light pink-peach
+    [0.774, [255,206,178,215]],  // +21.9 — peach
+    [0.787, [255,225,168,220]],  // +23 — light yellow
+    [0.800, [255,224,155,225]],  // +24 — yellow-peach
+    [0.822, [255,206,138,230]],  // +25.7 — light orange
+    [0.843, [255,189,121,230]],  // +27.4 — orange
+    [0.865, [255,167,100,235]],  // +29.2
+    [0.887, [255,149,83,235]],   // +30.9 — darker orange
+    [0.909, [234,120,69,235]],   // +32.7
+    [0.930, [209,98,56,240]],    // +34.4 — dark orange
+    [0.952, [177,70,40,240]],    // +36.2 — brown-orange
+    [0.974, [142,40,22,240]],    // +37.9 — dark brown
+    [1.000, [103,6,2,240]],      // +40 m/s — very dark brown
+  ];
+  if (t <= 0) return stops[0][1];
+  if (t >= 1) return stops[stops.length-1][1];
+  for (let i = 1; i < stops.length; i++) {
+    if (t <= stops[i][0]) {
+      const f = (t - stops[i-1][0]) / (stops[i][0] - stops[i-1][0]);
+      return stops[i-1][1].map((c, j) => Math.round(c + f * (stops[i][1][j] - c)));
+    }
+  }
+  return stops[stops.length-1][1];
+}
+
+function zdrColor(v) {
+  // PiYG: purple → white → green. Range: -2 to +6
+  const t = (v + 2) / 8; // 0 to 1
+  const stops = [
+    [0,   [142, 1, 82, 230]],
+    [0.15,[197, 27, 125, 220]],
+    [0.3, [222, 119, 174, 210]],
+    [0.4, [241, 182, 218, 200]],
+    [0.5, [230, 230, 230, 160]],
+    [0.6, [184, 225, 134, 200]],
+    [0.7, [127, 188, 65, 210]],
+    [0.85,[77, 146, 33, 220]],
+    [1,   [39, 100, 25, 230]],
+  ];
+  if (t <= 0) return stops[0][1];
+  if (t >= 1) return stops[stops.length-1][1];
+  for (let i = 1; i < stops.length; i++) {
+    if (t <= stops[i][0]) {
+      const f = (t - stops[i-1][0]) / (stops[i][0] - stops[i-1][0]);
+      return stops[i-1][1].map((c, j) => Math.round(c + f * (stops[i][1][j] - c)));
+    }
+  }
+  return stops[stops.length-1][1];
+}
+
+function plasmaColor(v) {
+  // plasma: 0 to 16 km
+  const t = Math.max(0, Math.min(1, v / 16));
+  const stops = [
+    [0,   [13, 8, 135, 220]],
+    [0.15,[75, 3, 161, 220]],
+    [0.3, [137, 8, 165, 220]],
+    [0.45,[192, 58, 131, 220]],
+    [0.6, [232, 111, 78, 230]],
+    [0.75,[251, 170, 29, 240]],
+    [0.9, [248, 230, 32, 240]],
+    [1,   [240, 249, 33, 240]],
+  ];
+  if (t <= 0) return stops[0][1];
+  if (t >= 1) return stops[stops.length-1][1];
+  for (let i = 1; i < stops.length; i++) {
+    if (t <= stops[i][0]) {
+      const f = (t - stops[i-1][0]) / (stops[i][0] - stops[i-1][0]);
+      return stops[i-1][1].map((c, j) => Math.round(c + f * (stops[i][1][j] - c)));
+    }
+  }
+  return stops[stops.length-1][1];
+}
+
+function sriColor(v) {
+  // YlOrRd: 0 to 100 mm/h
+  const t = Math.max(0, Math.min(1, v / 100));
+  const stops = [
+    [0,    [255, 255, 204, 180]],
+    [0.15, [255, 237, 160, 200]],
+    [0.3,  [254, 217, 118, 210]],
+    [0.45, [254, 178, 76, 220]],
+    [0.6,  [253, 141, 60, 230]],
+    [0.75, [252, 78, 42, 235]],
+    [0.9,  [227, 26, 28, 240]],
+    [1,    [177, 0, 38, 240]],
+  ];
+  if (t <= 0) return stops[0][1];
+  if (t >= 1) return stops[stops.length-1][1];
+  for (let i = 1; i < stops.length; i++) {
+    if (t <= stops[i][0]) {
+      const f = (t - stops[i-1][0]) / (stops[i][0] - stops[i-1][0]);
+      return stops[i-1][1].map((c, j) => Math.round(c + f * (stops[i][1][j] - c)));
+    }
+  }
+  return stops[stops.length-1][1];
+}
+
+function kdpColor(v) {
+  // -2 to 7 deg/km
+  const stops = [
+    [-2.0, [180, 180, 180, 220]],
+    [-0.5, [130, 180, 255, 230]],
+    [0.0,  [0, 100, 255, 230]],
+    [0.5,  [0, 255, 255, 230]],
+    [1.5,  [0, 255, 0, 230]],
+    [3.0,  [255, 255, 0, 230]],
+    [5.0,  [255, 0, 0, 240]],
+    [7.0,  [255, 0, 255, 240]],
+  ];
+  if (v <= stops[0][0]) return stops[0][1];
+  if (v >= stops[stops.length-1][0]) return stops[stops.length-1][1];
+  for (let i = 1; i < stops.length; i++) {
+    if (v <= stops[i][0]) {
+      const f = (v - stops[i-1][0]) / (stops[i][0] - stops[i-1][0]);
+      return stops[i-1][1].map((c, j) => Math.round(c + f * (stops[i][1][j] - c)));
+    }
+  }
+  return stops[stops.length-1][1];
+}
+
+function rhohvColor(v) {
+  if (v < 0.5) return [0,0,0,0];
+  const stops = [
+    [0.50, [255, 0, 255, 220]],  // magenta
+    [0.70, [0, 0, 255, 220]],    // blue
+    [0.85, [0, 255, 255, 220]],  // cyan
+    [0.90, [0, 255, 0, 220]],    // green
+    [0.95, [255, 255, 0, 230]],  // yellow
+    [0.98, [255, 128, 0, 230]],  // orange
+    [1.00, [255, 0, 0, 240]],    // red
+    [1.05, [128, 0, 0, 240]],    // dark red
+  ];
+  if (v <= stops[0][0]) return stops[0][1];
+  if (v >= stops[stops.length-1][0]) return stops[stops.length-1][1];
+  for (let i = 1; i < stops.length; i++) {
+    if (v <= stops[i][0]) {
+      const f = (v - stops[i-1][0]) / (stops[i][0] - stops[i-1][0]);
+      return stops[i-1][1].map((c, j) => Math.round(c + f * (stops[i][1][j] - c)));
+    }
+  }
+  return stops[stops.length-1][1];
+}
+
+function getColorForProduct(product, value) {
+  if (isNaN(value)) return [0, 0, 0, 0];
+  switch (product) {
+    case 'dBZ': return nwsReflectivity(value);
+    case 'V': return velocityColor(value);
+    case 'ZDR': return zdrColor(value);
+    case 'KDP': return kdpColor(value);
+    case 'RhoHV': return rhohvColor(value);
+    case 'Height': return plasmaColor(value);
+    case 'sri': case 'dpsri': return sriColor(value);
+    default: return nwsReflectivity(value);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LEAFLET MAP INIT
+// ═══════════════════════════════════════════════════════════════════
+function initMap() {
+  map = L.map('map', {
+    center: [radarLat, radarLon],
+    zoom: 7,
+    zoomControl: true,
+    preferCanvas: true,
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: '© OSM'
+  }).addTo(map);
+
+  // Mouse move → coords + tooltip
+  map.on('mousemove', onMapMouseMove);
+  map.on('mouseout', () => {
+    document.getElementById('cursorTooltip').style.display = 'none';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HDF5 READER
+// ═══════════════════════════════════════════════════════════════════
+
+function detectProduct(filename) {
+  // Match product type from filename
+  if (/dBZ\.ppi/i.test(filename))    return { product: 'dBZ', grid: 'ppi' };
+  if (/dBZ\.cappi/i.test(filename))  return { product: 'dBZ', grid: 'cappi' };
+  if (/V\.cappi/i.test(filename))    return { product: 'V',   grid: 'cappi' };
+  if (/ZDR\.max/i.test(filename))    return { product: 'ZDR', grid: 'cappi' };
+  if (/Height\.eht/i.test(filename)) return { product: 'Height', grid: 'cappi' };
+  if (/dBR\.dpsri|BR\.dpsri/i.test(filename))  return { product: 'dpsri', grid: 'cappi' };
+  if (/dBR\.sri|BR\.sri/i.test(filename))      return { product: 'sri',   grid: 'cappi' };
+  if (/dBZ/i.test(filename))         return { product: 'dBZ', grid: 'cappi' };
+  if (/V\./i.test(filename))         return { product: 'V',   grid: 'cappi' };
+  if (/ZDR/i.test(filename))         return { product: 'ZDR', grid: 'cappi' };
+  if (/KDP/i.test(filename))         return { product: 'KDP', grid: 'cappi' };
+  if (/RhoHV/i.test(filename))       return { product: 'RhoHV', grid: 'cappi' };
+  if (/cmax/i.test(filename))        return { product: 'dBZ', grid: 'cappi' };
+  if (/cappi/i.test(filename))       return { product: 'dBZ', grid: 'cappi' };
+  if (/ppi/i.test(filename))         return { product: 'dBZ', grid: 'ppi' };
+  return { product: 'unknown', grid: 'cappi' };
+}
+
+function parseTimestamp(filename) {
+  const m = filename.match(/^(\d{14})/);
+  if (!m) return null;
+  const s = m[1];
+  return {
+    full: s,
+    date: s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8),
+    timeUTC: s.slice(8,10)+':'+s.slice(10,12)+':'+s.slice(12,14),
+    dateObj: new Date(
+      parseInt(s.slice(0,4)), parseInt(s.slice(4,6))-1, parseInt(s.slice(6,8)),
+      parseInt(s.slice(8,10)), parseInt(s.slice(10,12)), parseInt(s.slice(12,14))
+    )
+  };
+}
+
+function getAttrValue(group, name) {
+  try {
+    const a = group.attrs[name];
+    if (a === undefined || a === null) return null;
+    let v = a;
+    // h5wasm may return {value:...} wrapper
+    if (v !== null && typeof v === 'object' && v.value !== undefined) {
+      v = v.value;
+    }
+    
+    // Decode typed arrays representing strings (like quantity or projdef)
+    if (v instanceof Uint8Array || v instanceof Int8Array || v instanceof Uint16Array || v instanceof Int16Array) {
+      try {
+        const decoded = new TextDecoder('utf-8').decode(v);
+        return decoded.replace(/\0/g, '').trim();
+      } catch(e) {}
+    }
+    
+    // Decode regular arrays of character codes
+    if (Array.isArray(v) && v.length > 0 && typeof v[0] === 'number') {
+      const allAscii = v.every(c => c >= 0 && c <= 255);
+      if (allAscii && (name === 'quantity' || name === 'product' || name === 'date' || name === 'time' || name === 'object' || name === 'version' || name === 'projdef' || name === 'nodes' || name === 'system' || name === 'sw_version' || name === 'source')) {
+        try {
+          const decoded = String.fromCharCode(...v);
+          return decoded.replace(/\0/g, '').trim();
+        } catch(e) {}
+      }
+    }
+
+    // Unwrap typed arrays / regular arrays with single element
+    if (ArrayBuffer.isView(v) && v.length === 1) return v[0];
+    if (Array.isArray(v) && v.length === 1) return v[0];
+    // If it's a typed array with multiple elements, convert to regular array
+    if (ArrayBuffer.isView(v) && v.length > 1) return Array.from(v);
+    return v;
+  } catch(e) { return null; }
+}
+
+async function readHDF5File(file) {
+  const { FS } = await H5Ready;
+  const arrayBuffer = await file.arrayBuffer();
+  const vfsName = 'radar_' + Date.now() + '_' + Math.random().toString(36).slice(2) + '.h5';
+
+  FS.writeFile(vfsName, new Uint8Array(arrayBuffer));
+  const h5 = new h5wasm.File(vfsName, 'r');
+
+  const result = { filename: file.name };
+
+  try {
+    // Root /what
+    const rootWhat = h5.get('/what');
+    if (rootWhat) {
+      result.date = getAttrValue(rootWhat, 'date');
+      result.time = getAttrValue(rootWhat, 'time');
+      result.object = getAttrValue(rootWhat, 'object');
+      result.version = getAttrValue(rootWhat, 'version');
+    }
+
+    // Root /where and /dataset1/where
+    const rootWhere = h5.get('/where');
+    const ds1Where = h5.get('/dataset1/where');
+
+    result.lat = getAttrValue(rootWhere, 'lat') || getAttrValue(ds1Where, 'lat');
+    result.lon = getAttrValue(rootWhere, 'lon') || getAttrValue(ds1Where, 'lon');
+    result.alt = getAttrValue(rootWhere, 'height') || getAttrValue(rootWhere, 'alt') || getAttrValue(ds1Where, 'height') || getAttrValue(ds1Where, 'alt');
+
+    // CAPPI bounds
+    result.LL_lat = getAttrValue(rootWhere, 'LL_lat') || getAttrValue(ds1Where, 'LL_lat');
+    result.LL_lon = getAttrValue(rootWhere, 'LL_lon') || getAttrValue(ds1Where, 'LL_lon');
+    result.UR_lat = getAttrValue(rootWhere, 'UR_lat') || getAttrValue(ds1Where, 'UR_lat');
+    result.UR_lon = getAttrValue(rootWhere, 'UR_lon') || getAttrValue(ds1Where, 'UR_lon');
+
+    // Projection info
+    result.projdef = getAttrValue(rootWhere, 'projdef') || getAttrValue(ds1Where, 'projdef');
+    result.xsize = getAttrValue(rootWhere, 'xsize') || getAttrValue(ds1Where, 'xsize');
+    result.ysize = getAttrValue(rootWhere, 'ysize') || getAttrValue(ds1Where, 'ysize');
+    result.xscale = getAttrValue(rootWhere, 'xscale') || getAttrValue(ds1Where, 'xscale');
+    result.yscale = getAttrValue(rootWhere, 'yscale') || getAttrValue(ds1Where, 'yscale');
+
+    if (ds1Where) {
+      result.elangle = getAttrValue(ds1Where, 'elangle');
+      result.nbins = getAttrValue(ds1Where, 'nbins');
+      result.nrays = getAttrValue(ds1Where, 'nrays');
+      result.rscale = getAttrValue(ds1Where, 'rscale');
+      result.startaz = getAttrValue(ds1Where, 'startaz');
+      result.a1gate = getAttrValue(ds1Where, 'a1gate');
+    }
+
+    // Try reading dataset1/what or dataset1/data1/what
+    const dataWhat = h5.get('/dataset1/what') || h5.get('/dataset1/data1/what');
+    if (dataWhat) {
+      result.quantity = getAttrValue(dataWhat, 'quantity');
+      result.gain = getAttrValue(dataWhat, 'gain');
+      result.offset = getAttrValue(dataWhat, 'offset');
+      result.nodata = getAttrValue(dataWhat, 'nodata');
+      result.undetect = getAttrValue(dataWhat, 'undetect');
+      console.log(`[HDF5 Attrs] quantity=${result.quantity}, gain=${result.gain} (${typeof result.gain}), offset=${result.offset} (${typeof result.offset}), nodata=${result.nodata} (${typeof result.nodata}), undetect=${result.undetect} (${typeof result.undetect})`);
+    } else {
+      console.warn('[HDF5] /dataset1/what or /dataset1/data1/what not found!');
+    }
+
+    // /dataset1/data1/data — raw matrix
+    const rawDataset = h5.get('/dataset1/data1/data');
+    if (rawDataset) {
+      const rawData = rawDataset.value;
+      const shape = rawDataset.shape;
+      result.shape = shape;
+      result.rawDtype = rawDataset.dtype;
+
+      // Decode to physical values
+      const gainRaw = result.gain;
+      const offsetRaw = result.offset;
+      const gain = (gainRaw !== null && gainRaw !== undefined && !isNaN(Number(gainRaw))) ? Number(gainRaw) : 1;
+      const offset = (offsetRaw !== null && offsetRaw !== undefined && !isNaN(Number(offsetRaw))) ? Number(offsetRaw) : 0;
+      const ndVal = result.nodata !== null && result.nodata !== undefined ? Number(result.nodata) : null;
+      const udVal = result.undetect !== null && result.undetect !== undefined ? Number(result.undetect) : null;
+      const nRows = shape[0];
+      const nCols = shape[1];
+      const decoded = new Float32Array(nRows * nCols);
+
+      console.log(`[HDF5 Decode] gain=${gain}, offset=${offset}, nodata=${ndVal}, undetect=${udVal}, dtype=${rawDataset.dtype}, shape=${JSON.stringify(shape)}`);
+      console.log(`[HDF5 Decode] first 10 raw values:`, Array.from(rawData.slice(0, 10)));
+
+      let maskedCount = 0;
+      for (let i = 0; i < rawData.length; i++) {
+        const rv = rawData[i];
+        if ((ndVal !== null && rv === ndVal) || (udVal !== null && rv === udVal)) {
+          decoded[i] = NaN;
+          maskedCount++;
+        } else {
+          decoded[i] = rv * gain + offset;
+        }
+      }
+
+      console.log(`[HDF5 Decode] total=${rawData.length}, masked=${maskedCount}, valid=${rawData.length - maskedCount}`);
+
+      result.data = decoded;
+      result.nRows = nRows;
+      result.nCols = nCols;
+    }
+
+  } catch (err) {
+    result.error = err.message;
+    console.error('HDF5 read error:', err);
+  } finally {
+    try { h5.close(); } catch(e) {}
+    try { FS.unlink(vfsName); } catch(e) {}
+  }
+
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RADAR RENDERER
+// ═══════════════════════════════════════════════════════════════════
+
+function renderCAPPI(fileData, product) {
+  // CAPPI/composite: data on cartesian grid with known LL/UR bounds
+  const { data, nRows, nCols, LL_lat, LL_lon, UR_lat, UR_lon } = fileData;
+
+  if (!LL_lat || !LL_lon || !UR_lat || !UR_lon) {
+    console.warn('Missing CAPPI bounds, cannot render');
+    return null;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = nCols;
+  canvas.height = nRows;
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.createImageData(nCols, nRows);
+  const px = imgData.data;
+
+  for (let row = 0; row < nRows; row++) {
+    for (let col = 0; col < nCols; col++) {
+      const idx = row * nCols + col;
+      const v = data[idx];
+      const color = getColorForProduct(product, v);
+      const pi = idx * 4;
+      px[pi]   = color[0];
+      px[pi+1] = color[1];
+      px[pi+2] = color[2];
+      px[pi+3] = color[3];
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+  const dataUrl = canvas.toDataURL('image/png');
+
+  const bounds = [[LL_lat, LL_lon], [UR_lat, UR_lon]];
+  const overlay = L.imageOverlay(dataUrl, bounds, { opacity: 0.8, interactive: false });
+
+  return { overlay, canvas, bounds };
+}
+
+function renderPPI(fileData, product) {
+  // PPI: polar data → convert to cartesian
+  const { data, nRows, nCols, lat, lon, rscale, nrays, nbins } = fileData;
+  const actualNrays = nrays || nRows;
+  const actualNbins = nbins || nCols;
+  const actualRscale = rscale || 500; // meters per bin
+
+  if (!lat || !lon) {
+    console.warn('Missing radar position for PPI');
+    return null;
+  }
+
+  const maxRange_m = actualNbins * actualRscale;
+  // Create a square cartesian grid covering the full range
+  const gridSize = 800; // pixels
+  const pixelScale = (2 * maxRange_m) / gridSize; // meters per pixel
+
+  const canvas = document.createElement('canvas');
+  canvas.width = gridSize;
+  canvas.height = gridSize;
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.createImageData(gridSize, gridSize);
+  const px = imgData.data;
+
+  const centerX = gridSize / 2;
+  const centerY = gridSize / 2;
+
+  for (let py = 0; py < gridSize; py++) {
+    for (let px_x = 0; px_x < gridSize; px_x++) {
+      const dx_m = (px_x - centerX) * pixelScale;
+      const dy_m = (centerY - py) * pixelScale; // y-axis inverted
+
+      const range_m = Math.sqrt(dx_m * dx_m + dy_m * dy_m);
+      if (range_m > maxRange_m || range_m < actualRscale) continue;
+
+      // Calculate azimuth (0=N, clockwise)
+      let az_deg = Math.atan2(dx_m, dy_m) * 180 / Math.PI;
+      if (az_deg < 0) az_deg += 360;
+
+      // Find nearest ray and bin
+      const bin = Math.round(range_m / actualRscale);
+      const ray = Math.round((az_deg / 360) * actualNrays) % actualNrays;
+
+      if (bin < 0 || bin >= actualNbins || ray < 0 || ray >= actualNrays) continue;
+
+      const dataIdx = ray * actualNbins + bin;
+      const v = data[dataIdx];
+      const color = getColorForProduct(product, v);
+
+      const pixelIdx = (py * gridSize + px_x) * 4;
+      px[pixelIdx]   = color[0];
+      px[pixelIdx+1] = color[1];
+      px[pixelIdx+2] = color[2];
+      px[pixelIdx+3] = color[3];
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+  const dataUrl = canvas.toDataURL('image/png');
+
+  // Calculate bounds in lat/lon
+  const dLat = (maxRange_m / 111320);
+  const dLon = (maxRange_m / (111320 * Math.cos(lat * Math.PI / 180)));
+
+  const bounds = [
+    [lat - dLat, lon - dLon],
+    [lat + dLat, lon + dLon]
+  ];
+
+  const overlay = L.imageOverlay(dataUrl, bounds, { opacity: 0.8, interactive: false });
+
+  return { overlay, canvas, bounds };
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FILE HANDLING & UI
+// ═══════════════════════════════════════════════════════════════════
+
+function setStatus(text, loading = false) {
+  document.getElementById('statusText').textContent = text;
+  const dot = document.getElementById('statusDot');
+  dot.className = loading ? 'status-dot loading' : 'status-dot';
+}
+
+function togglePanel(id) {
+  document.getElementById(id).classList.toggle('collapsed');
+}
+
+function updateFileList() {
+  const container = document.getElementById('fileList');
+  container.innerHTML = loadedFiles.map((f, i) => {
+    const p = PRODUCTS[f.product] || { label: f.product, cssClass: 'dbz' };
+    const ts = f.timestamp ? f.timestamp.timeUTC : '--:--:--';
+    const status = f.error ? '✗' : '✓';
+    const statusClass = f.error ? 'err' : 'ok';
+    return `
+      <div class="file-item ${i === currentTimeIndex ? 'active' : ''}" data-index="${i}" onclick="window._selectFile(${i})">
+        <span class="fi-product ${p.cssClass}">${p.label}</span>
+        <span class="fi-time">${ts} UTC</span>
+        <span class="fi-name" style="color:var(--text-muted); font-size:10px;">${f.filename.slice(0,20)}…</span>
+        <span class="fi-status ${statusClass}">${status}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateLayersPanel() {
+  const productTypes = [...new Set(loadedFiles.filter(f => !f.error).map(f => f.product))];
+  const container = document.getElementById('layersList');
+
+  if (productTypes.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-faint); font-size:12px;">Brak warstw</div>';
+    return;
+  }
+
+  container.innerHTML = productTypes.map(pt => {
+    const p = PRODUCTS[pt] || { label: pt, unit: '', cssClass: 'dbz' };
+    const layerState = activeLayers.get(pt);
+    const checked = layerState ? layerState.visible : true;
+    const opacity = layerState ? Math.round(layerState.opacity * 100) : 80;
+    return `
+      <div class="layer-item">
+        <input type="checkbox" class="layer-check" data-product="${pt}" ${checked ? 'checked' : ''} onchange="window._toggleLayer('${pt}', this.checked)">
+        <span class="layer-name"><span class="fi-product ${p.cssClass}" style="margin-right:4px;">${p.label}</span> ${p.unit}</span>
+        <input type="range" class="layer-opacity" min="0" max="100" value="${opacity}" data-product="${pt}" oninput="window._setOpacity('${pt}', this.value)">
+        <span class="layer-opacity-val" id="opacity-val-${pt}">${opacity}%</span>
+      </div>
+    `;
+  }).join('');
+}
+
+async function handleFiles(files) {
+  setStatus(`Wczytywanie ${files.length} plików…`, true);
+
+  for (const file of files) {
+    const { product, grid } = detectProduct(file.name);
+    const timestamp = parseTimestamp(file.name);
+
+    try {
+      const fileData = await readHDF5File(file);
+      fileData.product = product;
+      fileData.gridType = grid;
+      fileData.timestamp = timestamp;
+
+      // Update radar position from file
+      if (fileData.lat && fileData.lon) {
+        radarLat = fileData.lat;
+        radarLon = fileData.lon;
+      }
+
+      // Render
+      let rendered = null;
+      // Determine actual grid type based on attributes rather than just filename
+      if (fileData.rscale && !fileData.LL_lat) {
+        rendered = renderPPI(fileData, product);
+        fileData.gridType = 'ppi';
+      } else {
+        rendered = renderCAPPI(fileData, product);
+        fileData.gridType = 'cappi';
+      }
+
+      if (rendered) {
+        fileData.leafletOverlay = rendered.overlay;
+        fileData.renderCanvas = rendered.canvas;
+        fileData.renderBounds = rendered.bounds;
+
+        // Add to map if it's the first of this product type or same timestamp
+        if (!activeLayers.has(product)) {
+          rendered.overlay.addTo(map);
+          activeLayers.set(product, {
+            visible: true,
+            opacity: 0.8,
+            leafletLayer: rendered.overlay,
+            data: fileData.data,
+            meta: fileData,
+            nRows: fileData.nRows,
+            nCols: fileData.nCols,
+          });
+        }
+      }
+
+      loadedFiles.push(fileData);
+
+    } catch (err) {
+      console.error('Error processing file:', file.name, err);
+      loadedFiles.push({
+        filename: file.name, product, gridType: grid, timestamp,
+        error: err.message
+      });
+    }
+  }
+
+  // Center map on radar
+  map.setView([radarLat, radarLon], 7);
+
+  // Update UI
+  updateFileList();
+  updateLayersPanel();
+  updateTimeSeries();
+  runAnalysis();
+  updateMetadataPanel(loadedFiles[loadedFiles.length - 1]);
+
+  // Enable export buttons
+  document.getElementById('exportPngBtn').disabled = false;
+  document.getElementById('exportCsvBtn').disabled = false;
+
+  setStatus(`Wczytano ${loadedFiles.length} plików — ${activeLayers.size} warstw aktywnych`);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TIME SERIES / LOOP PLAYER
+// ═══════════════════════════════════════════════════════════════════
+
+function updateTimeSeries() {
+  // Collect unique timestamps
+  const timestamps = new Set();
+  loadedFiles.forEach(f => {
+    if (f.timestamp && !f.error) timestamps.add(f.timestamp.full);
+  });
+
+  timeSeriesKeys = [...timestamps].sort();
+
+  if (timeSeriesKeys.length <= 1) {
+    document.getElementById('timeBar').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('timeBar').style.display = 'flex';
+  const slider = document.getElementById('timeSlider');
+  slider.max = timeSeriesKeys.length - 1;
+  slider.value = currentTimeIndex;
+  updateTimeLabel();
+}
+
+function updateTimeLabel() {
+  if (timeSeriesKeys.length === 0) return;
+  const ts = timeSeriesKeys[currentTimeIndex];
+  if (!ts) return;
+  const time = ts.slice(8,10)+':'+ts.slice(10,12)+':'+ts.slice(12,14);
+  const date = ts.slice(0,4)+'-'+ts.slice(4,6)+'-'+ts.slice(6,8);
+  document.getElementById('timeLabel').textContent = `${date} ${time} UTC`;
+}
+
+function goToTimeIndex(idx) {
+  if (idx < 0 || idx >= timeSeriesKeys.length) return;
+  currentTimeIndex = idx;
+  document.getElementById('timeSlider').value = idx;
+  updateTimeLabel();
+
+  const ts = timeSeriesKeys[idx];
+
+  // For each product type, find the file matching this timestamp and show it
+  const productTypes = [...new Set(loadedFiles.filter(f => !f.error).map(f => f.product))];
+
+  productTypes.forEach(pt => {
+    const layerState = activeLayers.get(pt);
+    if (!layerState || !layerState.visible) return;
+
+    // Find file matching this timestamp and product
+    const matchingFile = loadedFiles.find(f => f.product === pt && f.timestamp && f.timestamp.full === ts && !f.error);
+    if (!matchingFile || !matchingFile.leafletOverlay) return;
+
+    // Remove old layer, add new
+    if (layerState.leafletLayer && map.hasLayer(layerState.leafletLayer)) {
+      map.removeLayer(layerState.leafletLayer);
+    }
+
+    matchingFile.leafletOverlay.setOpacity(layerState.opacity);
+    matchingFile.leafletOverlay.addTo(map);
+    layerState.leafletLayer = matchingFile.leafletOverlay;
+    layerState.data = matchingFile.data;
+    layerState.meta = matchingFile;
+    layerState.nRows = matchingFile.nRows;
+    layerState.nCols = matchingFile.nCols;
+  });
+
+  updateFileList();
+}
+
+function togglePlay() {
+  if (isPlaying) {
+    stopPlay();
+  } else {
+    startPlay();
+  }
+}
+
+function startPlay() {
+  if (timeSeriesKeys.length <= 1) return;
+  isPlaying = true;
+  document.getElementById('timePlayBtn').textContent = '⏸';
+  playIntervalId = setInterval(() => {
+    let next = currentTimeIndex + 1;
+    if (next >= timeSeriesKeys.length) next = 0;
+    goToTimeIndex(next);
+  }, 1000 / fps);
+}
+
+function stopPlay() {
+  isPlaying = false;
+  document.getElementById('timePlayBtn').textContent = '▶';
+  if (playIntervalId) {
+    clearInterval(playIntervalId);
+    playIntervalId = null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// CURSOR INSPECTOR (TOOLTIP)
+// ═══════════════════════════════════════════════════════════════════
+
+function onMapMouseMove(e) {
+  const { lat, lng } = e.latlng;
+  document.getElementById('coordsText').textContent = `${lat.toFixed(4)}°N  ${lng.toFixed(4)}°E`;
+
+  const tooltip = document.getElementById('cursorTooltip');
+  const values = [];
+
+  activeLayers.forEach((layerState, productKey) => {
+    if (!layerState.visible || !layerState.meta) return;
+
+    const meta = layerState.meta;
+    const data = layerState.data;
+    if (!data) return;
+
+    let val = NaN;
+
+    if (meta.LL_lat && meta.LL_lon && meta.UR_lat && meta.UR_lon) {
+      // CAPPI: map lat/lon to grid index
+      const fracY = 1 - (lat - meta.LL_lat) / (meta.UR_lat - meta.LL_lat);
+      const fracX = (lng - meta.LL_lon) / (meta.UR_lon - meta.LL_lon);
+      if (fracX >= 0 && fracX <= 1 && fracY >= 0 && fracY <= 1) {
+        const row = Math.floor(fracY * meta.nRows);
+        const col = Math.floor(fracX * meta.nCols);
+        if (row >= 0 && row < meta.nRows && col >= 0 && col < meta.nCols) {
+          val = data[row * meta.nCols + col];
+        }
+      }
+    } else if (meta.lat && meta.lon && meta.rscale) {
+      // PPI: convert lat/lon to range/azimuth
+      const dlat = lat - meta.lat;
+      const dlng = lng - meta.lon;
+      const dy_m = dlat * 111320;
+      const dx_m = dlng * 111320 * Math.cos(meta.lat * Math.PI / 180);
+      const range_m = Math.sqrt(dx_m * dx_m + dy_m * dy_m);
+      let az_deg = Math.atan2(dx_m, dy_m) * 180 / Math.PI;
+      if (az_deg < 0) az_deg += 360;
+
+      const bin = Math.round(range_m / meta.rscale);
+      const actualNrays = meta.nrays || meta.nRows;
+      const actualNbins = meta.nbins || meta.nCols;
+      const ray = Math.round((az_deg / 360) * actualNrays) % actualNrays;
+
+      if (bin >= 0 && bin < actualNbins && ray >= 0 && ray < actualNrays) {
+        val = data[ray * actualNbins + bin];
+      }
+    }
+
+    const p = PRODUCTS[productKey] || { label: productKey, unit: '' };
+    if (!isNaN(val)) {
+      values.push(`<div class="tt-row"><span class="tt-label">${p.label}:</span><span class="tt-value">${val.toFixed(1)} ${p.unit}</span></div>`);
+    }
+  });
+
+  if (values.length > 0) {
+    tooltip.innerHTML = values.join('');
+    tooltip.style.display = 'block';
+  } else {
+    tooltip.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// METADATA PANEL
+// ═══════════════════════════════════════════════════════════════════
+
+function updateMetadataPanel(fileData) {
+  if (!fileData) return;
+  const container = document.getElementById('metaBody');
+
+  const timeUTC = fileData.timestamp ? `${fileData.timestamp.date} ${fileData.timestamp.timeUTC} UTC` : (fileData.date && fileData.time ? `${fileData.date} ${fileData.time} UTC` : '—');
+
+  // CEST = UTC + 2
+  let timeCEST = '—';
+  if (fileData.timestamp && fileData.timestamp.dateObj) {
+    const cest = new Date(fileData.timestamp.dateObj.getTime() + 2 * 3600000);
+    timeCEST = cest.toISOString().slice(0,19).replace('T',' ') + ' CEST';
+  }
+
+  const range_km = fileData.rscale && fileData.nbins
+    ? ((fileData.rscale * fileData.nbins) / 1000).toFixed(0) + ' km'
+    : (fileData.xsize && fileData.xscale ? ((fileData.xsize * fileData.xscale) / 1000).toFixed(0) + ' km' : '—');
+
+  const resolution = fileData.rscale
+    ? (fileData.rscale).toFixed(0) + ' m'
+    : (fileData.xscale ? (fileData.xscale).toFixed(0) + ' m' : '—');
+
+  container.innerHTML = `
+    <table class="meta-table">
+      <tr><td>Plik</td><td>${fileData.filename}</td></tr>
+      <tr><td>Czas UTC</td><td>${timeUTC}</td></tr>
+      <tr><td>Czas CEST</td><td>${timeCEST}</td></tr>
+      <tr><td>Radar</td><td>${fileData.lat?.toFixed(4) || '—'}°N, ${fileData.lon?.toFixed(4) || '—'}°E, ${fileData.alt || '—'} m</td></tr>
+      <tr><td>Produkt</td><td>${fileData.quantity || fileData.product || '—'}</td></tr>
+      <tr><td>Siatka</td><td>${fileData.gridType?.toUpperCase() || '—'} [${fileData.nRows}×${fileData.nCols}]</td></tr>
+      <tr><td>Gain/Offset</td><td>${fileData.gain ?? '—'} / ${fileData.offset ?? '—'}</td></tr>
+      <tr><td>Nodata</td><td>${fileData.nodata ?? '—'}</td></tr>
+      <tr><td>Undetect</td><td>${fileData.undetect ?? '—'}</td></tr>
+      <tr><td>Zasięg</td><td>${range_km}</td></tr>
+      <tr><td>Rozdzielczość</td><td>${resolution}</td></tr>
+      <tr><td>Format</td><td>ODIM HDF5 v${fileData.version || '2.x'}</td></tr>
+    </table>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ANALYSIS ENGINE
+// ═══════════════════════════════════════════════════════════════════
+
+function runAnalysis() {
+  // Clear previous analysis markers
+  analysisMarkers.forEach(m => { if (map.hasLayer(m)) map.removeLayer(m); });
+  analysisMarkers.length = 0;
+
+  const container = document.getElementById('analysisBody');
+  let html = '';
+
+  const dbzLayer = activeLayers.get('dBZ');
+  const vLayer = activeLayers.get('V');
+  const zdrLayer = activeLayers.get('ZDR');
+  const ethLayer = activeLayers.get('Height');
+
+  // ──── dBZ Analysis ────
+  if (dbzLayer && dbzLayer.visible && dbzLayer.data) {
+    const result = analyzeDBZ(dbzLayer);
+    html += renderDBZAnalysis(result, dbzLayer);
+  }
+
+  // ──── Velocity Analysis ────
+  if (vLayer && vLayer.visible && vLayer.data) {
+    const result = analyzeVelocity(vLayer);
+    html += renderVelocityAnalysis(result);
+  }
+
+  // ──── ZDR Analysis ────
+  if (zdrLayer && zdrLayer.visible && zdrLayer.data) {
+    const result = analyzeZDR(zdrLayer, dbzLayer);
+    html += renderZDRAnalysis(result);
+  }
+
+  // ──── ETH Analysis ────
+  if (ethLayer && ethLayer.visible && ethLayer.data) {
+    const result = analyzeETH(ethLayer);
+    html += renderETHAnalysis(result);
+  }
+
+  // ──── Multi-product scoring ────
+  if (dbzLayer && vLayer) {
+    const scoring = computeStormScore(dbzLayer, vLayer, zdrLayer, ethLayer);
+    html += renderStormScore(scoring);
+  }
+
+  if (!html) {
+    html = '<div style="color:var(--text-faint); font-size:12px;">Wczytaj dane radarowe</div>';
+  }
+
+  container.innerHTML = html;
+
+  // Render histogram if we have dBZ data
+  if (dbzLayer && dbzLayer.visible && dbzLayer.data) {
+    renderDBZHistogram(dbzLayer.data);
+  }
+}
+
+// ──── dBZ Analysis ────
+function analyzeDBZ(layer) {
+  const data = layer.data;
+  const meta = layer.meta;
+  const nRows = layer.nRows;
+  const nCols = layer.nCols;
+
+  let zmax = -Infinity;
+  let zmaxIdx = 0;
+  let count45 = 0;
+  const validValues = [];
+
+  for (let i = 0; i < data.length; i++) {
+    if (isNaN(data[i])) continue;
+    validValues.push(data[i]);
+    if (data[i] > zmax) {
+      zmax = data[i];
+      zmaxIdx = i;
+    }
+    if (data[i] >= 45) count45++;
+  }
+
+  // Zmax location
+  const zmaxRow = Math.floor(zmaxIdx / nCols);
+  const zmaxCol = zmaxIdx % nCols;
+  const zmaxCoords = gridToLatLon(zmaxRow, zmaxCol, meta);
+
+  // Area ≥ 45 dBZ in km²
+  let pixelArea_km2 = 1;
+  if (meta.xscale && meta.yscale) {
+    pixelArea_km2 = (meta.xscale * meta.yscale) / 1e6;
+  } else if (meta.LL_lat && meta.UR_lat && meta.LL_lon && meta.UR_lon) {
+    const height_km = (meta.UR_lat - meta.LL_lat) * 111.32;
+    const width_km = (meta.UR_lon - meta.LL_lon) * 111.32 * Math.cos(((meta.UR_lat + meta.LL_lat) / 2) * Math.PI / 180);
+    pixelArea_km2 = (height_km * width_km) / (nRows * nCols);
+  }
+  const area45 = count45 * pixelArea_km2;
+
+  // Add Zmax marker
+  if (zmaxCoords && zmax > 40) {
+    const marker = L.marker([zmaxCoords.lat, zmaxCoords.lon], {
+      icon: L.divIcon({
+        className: 'radar-marker marker-zmax',
+        html: `Zmax: ${zmax.toFixed(1)} dBZ`,
+        iconSize: [120, 20],
+        iconAnchor: [60, 10],
+      })
+    }).addTo(map);
+    analysisMarkers.push(marker);
+  }
+
+  return { zmax, zmaxCoords, area45, validValues, pixelArea_km2, nRows, nCols, data };
+}
+
+function renderDBZAnalysis(result, layer) {
+  const { zmax, zmaxCoords, area45 } = result;
+  let html = `<div class="analysis-section">
+    <h4>⚡ Reflektywność (dBZ)</h4>
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-label">Zmax</div>
+        <div class="kpi-value">${zmax > -Infinity ? zmax.toFixed(1) : '—'} <span class="kpi-unit">dBZ</span></div>
+        ${zmaxCoords ? `<div class="kpi-sub">${zmaxCoords.lat.toFixed(3)}°N ${zmaxCoords.lon.toFixed(3)}°E</div>` : ''}
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Pole ≥45 dBZ</div>
+        <div class="kpi-value">${area45.toFixed(1)} <span class="kpi-unit">km²</span></div>
+      </div>
+    </div>
+    <div class="chart-container" id="dbzHistogramChart"></div>
+  </div>`;
+  return html;
+}
+
+function renderDBZHistogram(data) {
+  const validValues = [];
+  for (let i = 0; i < data.length; i++) {
+    if (!isNaN(data[i]) && data[i] > -10) validValues.push(data[i]);
+  }
+
+  if (validValues.length === 0) return;
+
+  const chartEl = document.getElementById('dbzHistogramChart');
+  if (!chartEl) return;
+
+  try {
+    Plotly.newPlot(chartEl, [{
+      x: validValues,
+      type: 'histogram',
+      nbinsx: 40,
+      marker: {
+        color: 'rgba(79,152,163,0.6)',
+        line: { color: 'rgba(79,152,163,0.9)', width: 1 }
+      },
+    }], {
+      margin: { t: 10, b: 30, l: 40, r: 10 },
+      paper_bgcolor: 'transparent',
+      plot_bgcolor: 'transparent',
+      font: { family: 'IBM Plex Mono', size: 10, color: '#6b7280' },
+      xaxis: { title: 'dBZ', gridcolor: 'rgba(255,255,255,0.06)', zerolinecolor: 'rgba(255,255,255,0.1)' },
+      yaxis: { title: 'Piksele', gridcolor: 'rgba(255,255,255,0.06)', zerolinecolor: 'rgba(255,255,255,0.1)' },
+    }, { displayModeBar: false, responsive: true });
+  } catch(e) {
+    console.warn('Plotly histogram error:', e);
+  }
+}
+
+// ──── Velocity Analysis ────
+function analyzeVelocity(layer) {
+  const data = layer.data;
+  const meta = layer.meta;
+  const nRows = layer.nRows;
+  const nCols = layer.nCols;
+
+  // Couplet detection: sliding window
+  const windowSize_km = 10;
+  let windowPx = 20; // default pixels for window
+
+  if (meta.xscale) {
+    windowPx = Math.ceil((windowSize_km * 1000) / meta.xscale);
+  } else if (meta.LL_lat && meta.UR_lat) {
+    const totalKm = (meta.UR_lat - meta.LL_lat) * 111.32;
+    windowPx = Math.ceil((windowSize_km / totalKm) * nRows);
+  }
+  windowPx = Math.max(5, Math.min(windowPx, Math.min(nRows, nCols) / 2));
+
+  const halfW = Math.floor(windowPx / 2);
+  let bestVrot = 0;
+  let bestVrotRow = 0, bestVrotCol = 0;
+  let bestVmin = 0, bestVmax = 0;
+  const couplets = [];
+
+  // Scan with stride to reduce computation
+  const stride = Math.max(1, Math.floor(windowPx / 4));
+
+  for (let r = halfW; r < nRows - halfW; r += stride) {
+    for (let c = halfW; c < nCols - halfW; c += stride) {
+      let vMin = Infinity, vMax = -Infinity;
+      let vMinR = r, vMinC = c, vMaxR = r, vMaxC = c;
+
+      for (let dr = -halfW; dr <= halfW; dr++) {
+        for (let dc = -halfW; dc <= halfW; dc++) {
+          const idx = (r + dr) * nCols + (c + dc);
+          const v = data[idx];
+          if (isNaN(v)) continue;
+          if (v < vMin) { vMin = v; vMinR = r + dr; vMinC = c + dc; }
+          if (v > vMax) { vMax = v; vMaxR = r + dr; vMaxC = c + dc; }
+        }
+      }
+
+      if (vMin === Infinity || vMax === -Infinity) continue;
+      if (vMin >= 0 || vMax <= 0) continue; // Need both inbound and outbound
+
+      const vrot = (Math.abs(vMin) + Math.abs(vMax)) / 2;
+
+      // Check distance between min and max
+      const distPx = Math.sqrt((vMinR - vMaxR) ** 2 + (vMinC - vMaxC) ** 2);
+      const maxDistPx = windowPx * 1.5;
+
+      if (vrot > 15 && distPx < maxDistPx && distPx > 2) {
+        const centerR = Math.round((vMinR + vMaxR) / 2);
+        const centerC = Math.round((vMinC + vMaxC) / 2);
+        couplets.push({ vrot, row: centerR, col: centerC, vMin, vMax });
+
+        if (vrot > bestVrot) {
+          bestVrot = vrot;
+          bestVrotRow = centerR;
+          bestVrotCol = centerC;
+          bestVmin = vMin;
+          bestVmax = vMax;
+        }
+      }
+    }
+  }
+
+  // Mark couplets on map
+  const dedupedCouplets = deduplicateCouplets(couplets, windowPx);
+  dedupedCouplets.forEach(cp => {
+    const coords = gridToLatLon(cp.row, cp.col, meta);
+    if (!coords) return;
+    const isStrong = cp.vrot > 25;
+    const marker = L.marker([coords.lat, coords.lon], {
+      icon: L.divIcon({
+        className: `radar-marker ${isStrong ? 'marker-vrot-red' : 'marker-vrot-yellow'}`,
+        html: `Vrot: ${cp.vrot.toFixed(1)}`,
+        iconSize: [100, 20],
+        iconAnchor: [50, 10],
+      })
+    }).addTo(map);
+    analysisMarkers.push(marker);
+  });
+
+  const bestCoords = gridToLatLon(bestVrotRow, bestVrotCol, meta);
+
+  return {
+    vrot_max: bestVrot,
+    vrot_coords: bestCoords,
+    vmin: bestVmin,
+    vmax: bestVmax,
+    couplets: dedupedCouplets.length,
+  };
+}
+
+function deduplicateCouplets(couplets, windowPx) {
+  // Keep only the strongest couplet within each windowPx radius
+  const sorted = [...couplets].sort((a, b) => b.vrot - a.vrot);
+  const kept = [];
+  const minDist = windowPx * 0.7;
+
+  for (const cp of sorted) {
+    const tooClose = kept.some(k =>
+      Math.sqrt((k.row - cp.row) ** 2 + (k.col - cp.col) ** 2) < minDist
+    );
+    if (!tooClose) kept.push(cp);
+  }
+  return kept;
+}
+
+function renderVelocityAnalysis(result) {
+  return `<div class="analysis-section">
+    <h4>🌀 Velocity (VRADH)</h4>
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-label">Vrot max</div>
+        <div class="kpi-value" style="color:${result.vrot_max > 25 ? 'var(--danger)' : result.vrot_max > 15 ? 'var(--warn)' : 'var(--text-bright)'}">
+          ${result.vrot_max.toFixed(1)} <span class="kpi-unit">m/s</span>
+        </div>
+        ${result.vrot_coords ? `<div class="kpi-sub">${result.vrot_coords.lat.toFixed(3)}°N ${result.vrot_coords.lon.toFixed(3)}°E</div>` : ''}
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Couplety</div>
+        <div class="kpi-value">${result.couplets}</div>
+        <div class="kpi-sub">V: ${result.vmin.toFixed(1)} / +${result.vmax.toFixed(1)}</div>
+      </div>
+    </div>
+    ${result.vrot_max > 25 ? '<div class="alert alert-danger"><span class="alert-icon">⚠️</span>Silny couplet — potencjalny mezocyklon (Vrot > 25 m/s)</div>' : ''}
+    ${result.vrot_max > 15 && result.vrot_max <= 25 ? '<div class="alert alert-warn"><span class="alert-icon">⚡</span>Wykryto couplet velocity (Vrot > 15 m/s)</div>' : ''}
+  </div>`;
+}
+
+// ──── ZDR Analysis ────
+function analyzeZDR(zdrLayer, dbzLayer) {
+  const zdrData = zdrLayer.data;
+  const meta = zdrLayer.meta;
+  const nRows = zdrLayer.nRows;
+  const nCols = zdrLayer.nCols;
+
+  let zdrColumnDetected = false;
+  let hailPossible = false;
+  let zdrColumnCoords = null;
+  let hailCoords = null;
+
+  if (dbzLayer && dbzLayer.data && dbzLayer.nRows === nRows && dbzLayer.nCols === nCols) {
+    const dbzData = dbzLayer.data;
+
+    // ZDR column: ZDR > 2 AND dBZ > 40
+    let columnPixels = 0;
+    let columnSumR = 0, columnSumC = 0;
+
+    // Hail: ZDR ≈ 0 (-0.5 to 0.5) AND dBZ > 55
+    let hailPixels = 0;
+    let hailSumR = 0, hailSumC = 0;
+
+    for (let r = 0; r < nRows; r++) {
+      for (let c = 0; c < nCols; c++) {
+        const idx = r * nCols + c;
+        const zdr = zdrData[idx];
+        const dbz = dbzData[idx];
+
+        if (isNaN(zdr) || isNaN(dbz)) continue;
+
+        if (zdr > 2 && dbz > 40) {
+          columnPixels++;
+          columnSumR += r;
+          columnSumC += c;
+        }
+
+        if (zdr > -0.5 && zdr < 0.5 && dbz > 55) {
+          hailPixels++;
+          hailSumR += r;
+          hailSumC += c;
+        }
+      }
+    }
+
+    // Pixel area estimate
+    let pixelArea_km2 = 1;
+    if (meta.LL_lat && meta.UR_lat && meta.LL_lon && meta.UR_lon) {
+      const height_km = (meta.UR_lat - meta.LL_lat) * 111.32;
+      const width_km = (meta.UR_lon - meta.LL_lon) * 111.32 * Math.cos(((meta.UR_lat + meta.LL_lat) / 2) * Math.PI / 180);
+      pixelArea_km2 = (height_km * width_km) / (nRows * nCols);
+    }
+
+    const columnArea_km2 = columnPixels * pixelArea_km2;
+    if (columnArea_km2 > 5) {
+      zdrColumnDetected = true;
+      const avgR = Math.round(columnSumR / columnPixels);
+      const avgC = Math.round(columnSumC / columnPixels);
+      zdrColumnCoords = gridToLatLon(avgR, avgC, meta);
+
+      if (zdrColumnCoords) {
+        const marker = L.marker([zdrColumnCoords.lat, zdrColumnCoords.lon], {
+          icon: L.divIcon({
+            className: 'radar-marker marker-zdr-col',
+            html: 'ZDR Column',
+            iconSize: [90, 20],
+            iconAnchor: [45, 10],
+          })
+        }).addTo(map);
+        analysisMarkers.push(marker);
+      }
+    }
+
+    if (hailPixels > 3) {
+      hailPossible = true;
+      const avgR = Math.round(hailSumR / hailPixels);
+      const avgC = Math.round(hailSumC / hailPixels);
+      hailCoords = gridToLatLon(avgR, avgC, meta);
+
+      if (hailCoords) {
+        const marker = L.marker([hailCoords.lat, hailCoords.lon], {
+          icon: L.divIcon({
+            className: 'radar-marker marker-hail',
+            html: '🧊 HAIL POSSIBLE',
+            iconSize: [120, 20],
+            iconAnchor: [60, 10],
+          })
+        }).addTo(map);
+        analysisMarkers.push(marker);
+      }
+    }
+  }
+
+  return { zdrColumnDetected, hailPossible, zdrColumnCoords, hailCoords };
+}
+
+function renderZDRAnalysis(result) {
+  return `<div class="analysis-section">
+    <h4>🔬 ZDR</h4>
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-label">Kolumna ZDR</div>
+        <div class="kpi-value" style="color:${result.zdrColumnDetected ? 'var(--success)' : 'var(--text-muted)'}">
+          ${result.zdrColumnDetected ? 'TAK' : 'NIE'}
+        </div>
+        ${result.zdrColumnCoords ? `<div class="kpi-sub">${result.zdrColumnCoords.lat.toFixed(3)}°N</div>` : ''}
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Grad (ZDR≈0 + dBZ>55)</div>
+        <div class="kpi-value" style="color:${result.hailPossible ? 'var(--danger)' : 'var(--text-muted)'}">
+          ${result.hailPossible ? 'MOŻLIWY' : 'NIE'}
+        </div>
+      </div>
+    </div>
+    ${result.zdrColumnDetected ? '<div class="alert alert-info"><span class="alert-icon">🟢</span>Wykryto kolumnę ZDR (ZDR>2 + dBZ>40, >5 km²) — sygnatura silnego updraftu</div>' : ''}
+    ${result.hailPossible ? '<div class="alert alert-danger"><span class="alert-icon">🧊</span>HAIL POSSIBLE — ZDR≈0 + dBZ>55 dBZ → grad sferyczny</div>' : ''}
+  </div>`;
+}
+
+// ──── Echo Top Height Analysis ────
+function analyzeETH(layer) {
+  const data = layer.data;
+  const meta = layer.meta;
+  const nRows = layer.nRows;
+  const nCols = layer.nCols;
+
+  let ethMax = -Infinity;
+  let ethMaxIdx = 0;
+
+  for (let i = 0; i < data.length; i++) {
+    if (isNaN(data[i])) continue;
+    if (data[i] > ethMax) {
+      ethMax = data[i];
+      ethMaxIdx = i;
+    }
+  }
+
+  const ethMaxRow = Math.floor(ethMaxIdx / nCols);
+  const ethMaxCol = ethMaxIdx % nCols;
+  const ethMaxCoords = gridToLatLon(ethMaxRow, ethMaxCol, meta);
+
+  // Draw isolines on map at 3, 6, 10, 15 km
+  const levels = [3, 6, 10, 15];
+  const levelColors = ['#4fc3f7', '#66bb6a', '#ffa726', '#ef5350'];
+
+  levels.forEach((level, li) => {
+    const contourPoints = extractContour(data, nRows, nCols, level, meta);
+    if (contourPoints.length > 2) {
+      const polyline = L.polyline(contourPoints, {
+        color: levelColors[li],
+        weight: 1.5,
+        opacity: 0.6,
+        dashArray: '4 4',
+      }).addTo(map);
+      analysisMarkers.push(polyline);
+    }
+  });
+
+  return { ethMax, ethMaxCoords };
+}
+
+function renderETHAnalysis(result) {
+  return `<div class="analysis-section">
+    <h4>📏 Echo Top Height</h4>
+    <div class="kpi-grid">
+      <div class="kpi wide">
+        <div class="kpi-label">ETH max</div>
+        <div class="kpi-value">${result.ethMax > -Infinity ? result.ethMax.toFixed(1) : '—'} <span class="kpi-unit">km</span></div>
+        ${result.ethMaxCoords ? `<div class="kpi-sub">${result.ethMaxCoords.lat.toFixed(3)}°N ${result.ethMaxCoords.lon.toFixed(3)}°E</div>` : ''}
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+      <span style="font-size:10px;color:#4fc3f7;">── 3 km</span>
+      <span style="font-size:10px;color:#66bb6a;">── 6 km</span>
+      <span style="font-size:10px;color:#ffa726;">── 10 km</span>
+      <span style="font-size:10px;color:#ef5350;">── 15 km</span>
+    </div>
+  </div>`;
+}
+
+// ──── Simple contour extraction (marching squares simplified) ────
+function extractContour(data, nRows, nCols, level, meta) {
+  const points = [];
+  const step = Math.max(1, Math.floor(Math.min(nRows, nCols) / 200));
+
+  for (let r = 0; r < nRows - 1; r += step) {
+    for (let c = 0; c < nCols - 1; c += step) {
+      const v00 = data[r * nCols + c];
+      const v10 = data[(r + step) * nCols + c];
+      const v01 = data[r * nCols + (c + step)];
+      const v11 = data[(r + step) * nCols + (c + step)];
+
+      if (isNaN(v00) || isNaN(v10) || isNaN(v01) || isNaN(v11)) continue;
+
+      const above = [v00 >= level, v10 >= level, v01 >= level, v11 >= level];
+      const countAbove = above.filter(Boolean).length;
+
+      // Edge crossing: not all same
+      if (countAbove > 0 && countAbove < 4) {
+        // Approximate contour point at cell center
+        const midR = r + step / 2;
+        const midC = c + step / 2;
+        const coords = gridToLatLon(midR, midC, meta);
+        if (coords) points.push([coords.lat, coords.lon]);
+      }
+    }
+  }
+  return points;
+}
+
+// ──── Multi-product Storm Scoring ────
+function computeStormScore(dbzLayer, vLayer, zdrLayer, ethLayer) {
+  let score = 0;
+  let zmax = 0, vrot_max = 0, eth_max = 0, zdr_column = false;
+
+  // Zmax
+  if (dbzLayer && dbzLayer.data) {
+    for (let i = 0; i < dbzLayer.data.length; i++) {
+      if (!isNaN(dbzLayer.data[i]) && dbzLayer.data[i] > zmax) zmax = dbzLayer.data[i];
+    }
+    score += Math.min(zmax / 70, 1) * 30;
+  }
+
+  // Vrot
+  if (vLayer && vLayer.data) {
+    const vResult = analyzeVelocity(vLayer);
+    vrot_max = vResult.vrot_max;
+    score += Math.min(vrot_max / 30, 1) * 35;
+  }
+
+  // ETH
+  if (ethLayer && ethLayer.data) {
+    for (let i = 0; i < ethLayer.data.length; i++) {
+      if (!isNaN(ethLayer.data[i]) && ethLayer.data[i] > eth_max) eth_max = ethLayer.data[i];
+    }
+    score += Math.min(eth_max / 15, 1) * 15;
+  }
+
+  // ZDR column
+  if (zdrLayer && dbzLayer) {
+    const zResult = analyzeZDR(zdrLayer, dbzLayer);
+    zdr_column = zResult.zdrColumnDetected;
+    if (zdr_column) score += 20;
+  }
+
+  score = Math.min(100, Math.round(score));
+
+  let label = 'Komórka konwekcyjna';
+  let desc = 'Zwykła komórka burzowa bez wyraźnych oznak rotacji';
+  if (score >= 70) {
+    label = 'Superkomórka z mezocyklonem';
+    desc = 'Silna rotacja + intensywna konwekcja — zagrożenie tornadem, bardzo dużym gradem i niszczycielskim wiatrem';
+  } else if (score >= 40) {
+    label = 'Potencjalna superkomórka';
+    desc = 'Oznaki rotacji i/lub silnego updraftu — monitoruj rozwój';
+  }
+
+  return { score, label, desc, zmax, vrot_max, eth_max, zdr_column };
+}
+
+function renderStormScore(result) {
+  const scoreClass = result.score >= 70 ? 'score-high' : result.score >= 40 ? 'score-mid' : 'score-low';
+  return `<div class="analysis-section">
+    <h4>🎯 Scoring komórki burzowej</h4>
+    <div class="score-badge">
+      <div class="score-circle ${scoreClass}">${result.score}</div>
+      <div>
+        <div class="score-label">${result.label}</div>
+        <div class="score-desc">${result.desc}</div>
+      </div>
+    </div>
+    <div class="kpi-grid" style="margin-top:10px;">
+      <div class="kpi">
+        <div class="kpi-label">Zmax → 30 pkt</div>
+        <div class="kpi-value">${result.zmax.toFixed(1)} <span class="kpi-unit">dBZ</span></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Vrot → 35 pkt</div>
+        <div class="kpi-value">${result.vrot_max.toFixed(1)} <span class="kpi-unit">m/s</span></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">ETH → 15 pkt</div>
+        <div class="kpi-value">${result.eth_max.toFixed(1)} <span class="kpi-unit">km</span></div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">ZDR col → 20 pkt</div>
+        <div class="kpi-value">${result.zdr_column ? 'TAK' : 'NIE'}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// UTILITY: Grid index → Lat/Lon
+// ═══════════════════════════════════════════════════════════════════
+
+function gridToLatLon(row, col, meta) {
+  if (meta.LL_lat && meta.LL_lon && meta.UR_lat && meta.UR_lon && meta.nRows && meta.nCols) {
+    const lat = meta.UR_lat - (row / meta.nRows) * (meta.UR_lat - meta.LL_lat);
+    const lon = meta.LL_lon + (col / meta.nCols) * (meta.UR_lon - meta.LL_lon);
+    return { lat, lon };
+  }
+  if (meta.lat && meta.lon && meta.rscale && meta.nRows && meta.nCols) {
+    // PPI polar grid
+    const actualNrays = meta.nrays || meta.nRows;
+    const actualNbins = meta.nbins || meta.nCols;
+    const az_deg = (row / actualNrays) * 360;
+    const range_m = col * meta.rscale;
+    const az_rad = (az_deg - 90) * Math.PI / 180;
+    const dx_m = range_m * Math.cos(az_rad);
+    const dy_m = range_m * Math.sin(az_rad);
+    const lat = meta.lat + dy_m / 111320;
+    const lon = meta.lon + dx_m / (111320 * Math.cos(meta.lat * Math.PI / 180));
+    return { lat, lon };
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════════
+
+function exportPNG() {
+  setStatus('Eksportuję PNG…', true);
+
+  // Use Leaflet's built-in canvas to create a screenshot
+  // We'll use a simpler approach: capture the map container
+  try {
+    const mapContainer = document.getElementById('map');
+    const rect = mapContainer.getBoundingClientRect();
+    const exportCanvas = document.createElement('canvas');
+    exportCanvas.width = rect.width * 2; // retina
+    exportCanvas.height = rect.height * 2;
+    const ctx = exportCanvas.getContext('2d');
+    ctx.scale(2, 2);
+
+    // Dark background
+    ctx.fillStyle = '#0a0e14';
+    ctx.fillRect(0, 0, rect.width, rect.height);
+
+    // Draw all visible overlay canvases
+    activeLayers.forEach((layerState, product) => {
+      if (!layerState.visible || !layerState.meta) return;
+      const meta = layerState.meta;
+      // Find the file's render canvas
+      const file = loadedFiles.find(f => f.product === product && f.renderCanvas);
+      if (!file || !file.renderCanvas || !file.renderBounds) return;
+
+      try {
+        // Convert geo bounds to pixel positions
+        const bounds = file.renderBounds;
+        const nw = map.latLngToContainerPoint(L.latLng(bounds[1][0], bounds[0][1]));
+        const se = map.latLngToContainerPoint(L.latLng(bounds[0][0], bounds[1][1]));
+        const w = se.x - nw.x;
+        const h = se.y - nw.y;
+
+        ctx.globalAlpha = layerState.opacity;
+        ctx.drawImage(file.renderCanvas, nw.x, nw.y, w, h);
+        ctx.globalAlpha = 1;
+      } catch(e) { /* skip */ }
+    });
+
+    // Add timestamp watermark
+    const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = '12px IBM Plex Mono';
+    ctx.fillText(`AntiGravity Radar — ${now} UTC`, 10, rect.height - 10);
+
+    exportCanvas.toBlob(blob => {
+      if (!blob) { setStatus('Błąd eksportu PNG'); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `radar_export_${Date.now()}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setStatus('PNG zapisany');
+    }, 'image/png');
+  } catch(e) {
+    console.error('PNG export error:', e);
+    setStatus('Błąd eksportu PNG: ' + e.message);
+  }
+}
+
+function exportCSV() {
+  setStatus('Eksportuję CSV…', true);
+
+  const rows = [['timestamp', 'product', 'Zmax_dBZ', 'ETH_max_km', 'Vrot_max_ms', 'score', 'lat', 'lon']];
+
+  loadedFiles.forEach(f => {
+    if (f.error || !f.data) return;
+
+    let zmax = NaN, ethMax = NaN, vrotMax = NaN;
+    let lat = f.lat || '', lon = f.lon || '';
+
+    // Quick stats
+    for (let i = 0; i < f.data.length; i++) {
+      const v = f.data[i];
+      if (isNaN(v)) continue;
+
+      if (f.product === 'dBZ' && (isNaN(zmax) || v > zmax)) zmax = v;
+      if (f.product === 'Height' && (isNaN(ethMax) || v > ethMax)) ethMax = v;
+    }
+
+    const ts = f.timestamp ? `${f.timestamp.date} ${f.timestamp.timeUTC}` : '';
+
+    rows.push([
+      ts,
+      f.product,
+      isNaN(zmax) ? '' : zmax.toFixed(1),
+      isNaN(ethMax) ? '' : ethMax.toFixed(1),
+      isNaN(vrotMax) ? '' : vrotMax.toFixed(1),
+      '', // score computed separately
+      lat,
+      lon
+    ]);
+  });
+
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `radar_report_${Date.now()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  setStatus('CSV zapisany');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LAYER MANAGEMENT (exposed to window)
+// ═══════════════════════════════════════════════════════════════════
+
+window._toggleLayer = function(product, visible) {
+  const state = activeLayers.get(product);
+  if (!state) return;
+  state.visible = visible;
+  if (state.leafletLayer) {
+    if (visible) {
+      if (!map.hasLayer(state.leafletLayer)) state.leafletLayer.addTo(map);
+    } else {
+      if (map.hasLayer(state.leafletLayer)) map.removeLayer(state.leafletLayer);
+    }
+  }
+  runAnalysis();
+};
+
+window._setOpacity = function(product, val) {
+  const state = activeLayers.get(product);
+  if (!state) return;
+  const opacity = val / 100;
+  state.opacity = opacity;
+  if (state.leafletLayer) state.leafletLayer.setOpacity(opacity);
+  const label = document.getElementById(`opacity-val-${product}`);
+  if (label) label.textContent = val + '%';
+};
+
+window._selectFile = function(index) {
+  if (index < 0 || index >= loadedFiles.length) return;
+  const f = loadedFiles[index];
+  updateMetadataPanel(f);
+
+  // Switch map to show this file's data
+  if (f.product && !f.error && f.leafletOverlay) {
+    const pt = f.product;
+    const layerState = activeLayers.get(pt);
+    if (layerState && layerState.visible) {
+      if (layerState.leafletLayer && map.hasLayer(layerState.leafletLayer)) {
+        map.removeLayer(layerState.leafletLayer);
+      }
+      f.leafletOverlay.setOpacity(layerState.opacity);
+      f.leafletOverlay.addTo(map);
+      
+      layerState.leafletLayer = f.leafletOverlay;
+      layerState.data = f.data;
+      layerState.meta = f;
+      layerState.nRows = f.nRows;
+      layerState.nCols = f.nCols;
+      
+      // Update time index if it belongs to the time series
+      if (f.timestamp) {
+        const tsIdx = timeSeriesKeys.indexOf(f.timestamp.full);
+        if (tsIdx !== -1) {
+          currentTimeIndex = tsIdx;
+          const slider = document.getElementById('timeSlider');
+          if (slider) slider.value = tsIdx;
+          updateTimeLabel();
+        }
+      }
+      
+      runAnalysis();
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// EVENT BINDINGS
+// ═══════════════════════════════════════════════════════════════════
+
+function init() {
+  initMap();
+
+  // File input
+  const fileInput = document.getElementById('fileInput');
+  const loadBtn = document.getElementById('loadBtn');
+  const dropZone = document.getElementById('dropZone');
+
+  loadBtn.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) handleFiles([...e.target.files]);
+  });
+
+  // Drag & drop
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+  });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) handleFiles([...e.dataTransfer.files]);
+  });
+
+  // Export
+  document.getElementById('exportPngBtn').addEventListener('click', exportPNG);
+  document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
+
+  // Time controls
+  document.getElementById('timeSlider').addEventListener('input', (e) => {
+    goToTimeIndex(parseInt(e.target.value));
+  });
+  document.getElementById('timePlayBtn').addEventListener('click', togglePlay);
+  document.getElementById('timeStepBack').addEventListener('click', () => {
+    if (currentTimeIndex > 0) goToTimeIndex(currentTimeIndex - 1);
+  });
+  document.getElementById('timeStepFwd').addEventListener('click', () => {
+    if (currentTimeIndex < timeSeriesKeys.length - 1) goToTimeIndex(currentTimeIndex + 1);
+  });
+  document.getElementById('fpsSlider').addEventListener('input', (e) => {
+    fps = parseInt(e.target.value);
+    document.getElementById('fpsLabel').textContent = fps + ' fps';
+    if (isPlaying) {
+      stopPlay();
+      startPlay();
+    }
+  });
+
+  // Prevent body drag/drop from opening files
+  document.body.addEventListener('dragover', e => e.preventDefault());
+  document.body.addEventListener('drop', e => e.preventDefault());
+
+  setStatus('Gotowy — wczytaj pliki .h5');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// BOOTSTRAP
+// ═══════════════════════════════════════════════════════════════════
+
+(async () => {
+  try {
+    setStatus('Inicjalizacja h5wasm…', true);
+    H5 = await H5Ready;
+    setStatus('Gotowy — wczytaj pliki .h5');
+    init();
+  } catch (err) {
+    console.error('h5wasm init error:', err);
+    setStatus('Błąd: nie udało się załadować h5wasm — ' + err.message);
+    // Still init the map
+    init();
+  }
+})();
+
+</script>
+</body>
+</html>

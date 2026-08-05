@@ -1,0 +1,30 @@
+name: Pobieranie Danych IMGW do Firebase
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch-imgw:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch IMGW data and push to Firebase
+        run: python scripts/fetch_imgw_firebase.py
+
+      - name: Install map dependencies
+        run: pip install numpy scipy shapely matplotlib
+
+      - name: Generate and upload Map Data
+        run: python scripts/generate_map_data_firebase.py

@@ -18,3 +18,18 @@ media/*.png
 
 # Output generated maps (optional ignore or keep track)
 # mapy/wygenerowane/*.png
+
+# New structure ignores
+stacje/dane/*.json
+prognoza/dane/*.xlsx
+klimatologia/wykresy/*.png
+*.h5
+klimatologia/*.json
+
+# Pliki konfiguracyjne Firebase
+.firebase/
+firebase-debug.log
+
+# Ignoruj wszystkie excely z pamietnika itd
+*.xlsx
+*.csv
