@@ -707,13 +707,12 @@ function initRepoStats() {
       <i data-lucide="layout" style="width: 36px; height: 36px; color: var(--accent-success); margin-bottom: 0.8rem;"></i>
       <h3 style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--text-primary);">${s.htmlFiles ?? 12}</h3>
       <p style="color: var(--text-secondary); font-size: 0.85rem;">Szablony HTML (.html)</p>
-    </div>
-    <div class="card" style="text-align: center; padding: 1.5rem;">
-      <i data-lucide="database" style="width: 36px; height: 36px; color: var(--accent-warning); margin-bottom: 0.8rem;"></i>
-      <h3 style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--text-primary);">${s.excelFiles ?? 2}</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem;">Arkusze Analityczne (.xlsx)</p>
-    </div>
-}
+  if (rhTempIn) {
+    rhTempIn.addEventListener("input", calcMagnus);
+    rhRhIn.addEventListener("input", () => { lastEdited = 'rh'; calcMagnus(); });
+    rhTdIn.addEventListener("input", () => { lastEdited = 'td'; calcMagnus(); });
+    calcMagnus();
+  }
 
 }
 
