@@ -654,14 +654,7 @@ function initForecastMatrix() {
     resultDiv.style.color = info.color;
     
     const countSelected = Object.values(state).filter(v => v > 0).length;
-    descDiv.innerHTML = `Najwyższy wytypowany stopień: <strong style="color:${info.color}">${info.code}</strong> (${info.desc}).<br><span style="font-size:0.8rem; opacity:0.8">Zaznaczono ${countSelected} z 4 kategorii.</span>`;
   }
-}entListener("input", calcMagnus);
-    rhRhIn.addEventListener("input", () => { lastEdited = 'rh'; calcMagnus(); });
-    rhTdIn.addEventListener("input", () => { lastEdited = 'td'; calcMagnus(); });
-    calcMagnus();
-  }
-
 }
 
 
