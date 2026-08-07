@@ -617,7 +617,11 @@ function initForecastMatrix() {
     1: { code: "MRG", color: "#22c55e", name: "MRG (Marginalne - 1/5)", desc: "Niskie ryzyko zjawisk burzowych." },
     2: { code: "NWL", color: "#eab308", name: "NWL (Niewielkie - 2/5)", desc: "Umiarkowanie groźne burze." },
     3: { code: "SRD", color: "#f97316", name: "SRD (Średnie - 3/5)", desc: "Niebezpieczne, silne burze." },
-    4: { code: "DZ",  color: "#ef4444", name: "DZ (Duże - 4/5  cells.forEach(cell => {
+    4: { code: "DZ",  color: "#ef4444", name: "DZ (Duże - 4/5)", desc: "Bardzo groźne burze / Nawałnice." },
+    5: { code: "EXT", color: "#b91c1c", name: "EXT (Ekstremalne - 5/5)", desc: "Katastrofalne zjawiska, np. Derecho." }
+  };
+  
+  cells.forEach(cell => {
     cell.addEventListener("click", () => {
       const table = cell.closest("table");
       if (!table) return;
