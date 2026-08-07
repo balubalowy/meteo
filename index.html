@@ -69,32 +69,32 @@
         
         <div id="dashboard-tiles" class="dashboard-grid">
           <!-- DWD Europa -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-dwd" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Europa (DWD)</h3>
             <img id="dash-dwd" class="zoomable" src="https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png" alt="DWD Europa" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
           </div>
           
           <!-- SIGWX IMGW PL -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-sigwx-pl" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Polska (SIGWX)</h3>
             <img id="dash-sigwx-pl" class="zoomable" src="" alt="Ładowanie SIGWX Polska..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
 
           <!-- SIGWX CHMI CZ -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-sigwx-cz" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Czechy (SIGWX)</h3>
             <img id="dash-sigwx-cz" class="zoomable" src="" alt="Ładowanie SIGWX Czechy..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
           
           <!-- Meteo.pl Wrocław -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-meteo-wroclaw" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wrocław (UM Meteo.pl)</h3>
             <img id="img-meteo-wroclaw" class="zoomable" src="" alt="Meteogram Wrocław" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: none;">
             <div id="img-meteo-wroclaw-loading" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Ładowanie z Meteo.pl...</div>
           </div>
           
           <!-- CMM Synop IMGW -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-cmm-synop" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Mapa Meteorologiczna (CMM Synop)</h3>
             <div style="margin-bottom: 0.5rem;">
               <select id="cmm-synop-select" style="padding: 0.4rem 0.8rem; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.85rem;">
@@ -120,44 +120,44 @@
           </div>
           
           <!-- Mapa Synoptyczna IMGW -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-synopt" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Mapa Synoptyczna</h3>
             <img id="dash-synopt" class="zoomable" src="" alt="Ładowanie Mapy Synoptycznej..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
           
           <!-- Radar CAPPI -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-cappi" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Radar (COMPO CAPPI)</h3>
             <img id="dash-cappi" class="zoomable" src="" alt="Ładowanie CAPPI..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
           
           <!-- Wyładowania LTS2005 -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-lts" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wyładowania (LTS2005 IMGW)</h3>
             <img id="dash-lts" class="zoomable" src="https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Perun/LTS2005/DISCH_20260807_213200.gif" alt="Ładowanie LTS2005..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
           
           <!-- Blitzortung -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-blitzortung" style="padding: 1rem; cursor: grab;">
              <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Pioruny (Blitzortung Live Map)</h3>
              <iframe src="https://map.blitzortung.org/#6/52/19" style="width: 100%; height: 350px; border: none; border-radius: var(--radius-sm); background: #000;"></iframe>
           </div>
 
           <!-- Estofex -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-estofex" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> ESTOFEX</h3>
             <img id="dash-estofex" class="zoomable" src="https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest" alt="Estofex" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
 
           <!-- Łowcy Burz -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-lowcyburz" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Prognoza Skywarn (Łowcy Burz)</h3>
             <img id="dash-lowcyburz" class="zoomable" src="" alt="Ładowanie Prognozy Łowców Burz..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px; display: none;">
             <div id="dash-lowcyburz-loading" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Trwa pobieranie ze strony Łowców...</div>
           </div>
           
           <!-- Satelita -->
-          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+          <div class="card tile-item" data-id="tile-satellite" style="padding: 1rem; cursor: grab;">
              <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Satelita (Sat24 Polska Live)</h3>
              <iframe src="https://sat24.mobi/Image/satvis/europa/pl" style="width: 100%; height: 350px; border: none; border-radius: var(--radius-sm); background: var(--bg-tertiary);"></iframe>
           </div>

@@ -51,10 +51,37 @@ function initCmmSynop() {
 function initSortableGrid() {
    const grid = document.getElementById('dashboard-tiles');
    if (grid && typeof Sortable !== 'undefined') {
+       // Odtwórz zapisaną kolejność kafelek z localStorage
+       const savedOrder = localStorage.getItem('bmeteo_tile_order');
+       if (savedOrder) {
+           try {
+               const orderArray = JSON.parse(savedOrder);
+               const tileMap = {};
+               Array.from(grid.children).forEach(child => {
+                   const id = child.getAttribute('data-id');
+                   if (id) tileMap[id] = child;
+               });
+               orderArray.forEach(id => {
+                   if (tileMap[id]) {
+                       grid.appendChild(tileMap[id]);
+                   }
+               });
+           } catch(e) {
+               console.error("Błąd odczytu kolejności kafelek:", e);
+           }
+       }
+
+       // Inicjalizuj przeciąganie i zapisuj pożądany układ po przeciągnięciu
        new Sortable(grid, {
            animation: 150,
            ghostClass: 'sortable-ghost',
-           handle: 'h3'
+           handle: 'h3',
+           onEnd: function() {
+               const currentOrder = Array.from(grid.children)
+                   .map(child => child.getAttribute('data-id'))
+                   .filter(Boolean);
+               localStorage.setItem('bmeteo_tile_order', JSON.stringify(currentOrder));
+           }
        });
    }
 }
