@@ -598,7 +598,7 @@
       <div class="card" style="text-align: center; padding: 2rem; margin-bottom: 2rem;">
         <h3 style="margin-bottom: 0.5rem; color: var(--text-secondary);">Sugerowany Stopień Zagrożenia SOB:</h3>
         <div id="matrix-result" style="font-size: 3rem; font-weight: 800; color: var(--border-strong);">Brak wyboru</div>
-        <p id="matrix-desc" style="color: var(--text-subtle); margin-top: 1rem;">Kliknij wybrane komórki w powyższych tabelach, aby wyznaczyć stopień.</p>
+        <p id="matrix-desc" style="color: var(--text-secondary); margin-top: 1rem;">Kliknij wybrane komórki w powyższych tabelach, aby wyznaczyć stopień.</p>
       </div>
 
       <!-- Legenda SOB -->
@@ -632,12 +632,24 @@
           <p><strong>Adnotacja - Wiatr:</strong> Procenty wiatru odnoszą się do rozległości zjawiska - układy wielokomórkowe utrzymają większe szanse niż superkomórki, gdyż są one bardziej rozległe, nawet jeżeli superkomórka wygeneruje podobne porywy.</p>
         </div>
       </div>
+
+      <div class="card mt-2" style="padding: 1.5rem;">
+        <h3 style="margin-bottom: 1rem; color: var(--accent-warning); display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="shield-alert"></i> Oficjalne Progi Ostrzeżeń Meteorologicznych
+        </h3>
+        <div id="alert-warnings-grid" class="grid-2"></div>
+      </div>
     </div>
 
     <!-- TAB 6: MAPY -->
     <div id="tab-maps" class="tab-view">
-      <h2 class="section-title"><i data-lucide="map" style="margin-right: 10px;"></i> Interaktywne Mapy (IMGW Interpolacja)</h2>
-      <div id="leaflet-map" style="height: 600px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-top: 1rem;"></div>
+      <h2 class="section-title"><i data-lucide="map" style="margin-right: 10px;"></i> Interaktywne Mapy i Archiwum Nawałnic</h2>
+      <div id="leaflet-map" style="height: 550px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-top: 1rem;"></div>
+      
+      <div class="mt-2" style="margin-top: 2rem;">
+        <h3 class="section-title" style="margin-top: 1rem;"><i data-lucide="archive" style="margin-right: 8px;"></i> Archiwum Ekstremalnych Nawałnic w Polsce (2002–2017)</h3>
+        <div id="historical-cases-grid" class="grid-2"></div>
+      </div>
     </div>
       
     <div id="tab-stats" class="tab-view">
@@ -658,25 +670,28 @@
                 <i data-lucide="sliders" style="color: var(--accent-primary);"></i> Wylicz Prognozę Ensemble:
              </h3>
              <div style="display: flex; align-items: center; gap: 8px;">
-                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Próg T_max (°C):</label>
-                <input type="number" id="tab-ens-thresh" value="30" style="width: 70px; padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); color: var(--text-primary); font-weight: 600;">
+                <label style="font-size: 0.85rem; color: var(--text-secondary);">Próg Temp:</label>
+                <select id="tab-ens-thresh" class="form-select" style="width: auto; padding: 4px 8px; font-size: 0.85rem;">
+                   <option value="30">30°C (Upał)</option>
+                   <option value="32">32°C (Silny Upał)</option>
+                   <option value="35">35°C (Ekstremum)</option>
+                   <option value="25">25°C (Ciepło)</option>
+                   <option value="20">20°C</option>
+                </select>
              </div>
              <div style="display: flex; align-items: center; gap: 8px;">
-                <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Dni do przodu:</label>
-                <select id="tab-ens-days" style="padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); color: var(--text-primary); font-weight: 600;">
-                   <option value="0">Dzisiaj (+0d)</option>
-                   <option value="1" selected>Jutro (+1d)</option>
-                   <option value="2">Pojutrze (+2d)</option>
+                <label style="font-size: 0.85rem; color: var(--text-secondary);">Dni do przodu:</label>
+                <select id="tab-ens-days" class="form-select" style="width: auto; padding: 4px 8px; font-size: 0.85rem;">
+                   <option value="1">+1 dzień</option>
+                   <option value="2">+2 dni</option>
                    <option value="3">+3 dni</option>
                    <option value="4">+4 dni</option>
                    <option value="5">+5 dni</option>
-                   <option value="7">+7 dni</option>
-                   <option value="10">+10 dni</option>
                 </select>
              </div>
           </div>
-          <div style="display: flex; align-items: center; gap: 10px;">
-             <button onclick="triggerEnsFromTab()" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+          <div style="display: flex; gap: 10px;">
+             <button onclick="triggerEnsFromTab()" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">
                 <i data-lucide="zap"></i> Wylicz w Chmurze
              </button>
              <a href="prognoza/index.html" target="_blank" class="btn btn-ghost" style="padding: 8px 16px; font-size: 0.9rem; border: 1px solid var(--border-subtle);">
@@ -784,20 +799,26 @@
       setSrc('dash-lts', 'https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Perun/LTS2005/DISCH_20260807_214700.gif');
       setSrc('dash-lowcyburz', 'https://lowcyburz.pl/wp-content/uploads/2026/08/07_08_08_26.png');
 
-      // 2. Global Event Listener for Tab Buttons
+      // 2. Global Event Listener for Tab Buttons & Navigation Links
       document.addEventListener('click', function(e) {
-        const btn = e.target.closest('.tab-btn');
+        const btn = e.target.closest('.tab-btn, .nav-link, [data-tab]');
         if (!btn) return;
         const targetTab = btn.getAttribute('data-tab');
         if (!targetTab) return;
         
         e.preventDefault();
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-btn, .nav-link').forEach(b => {
+          if (b.getAttribute('data-tab')) b.classList.remove('active');
+        });
         document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
         
         btn.classList.add('active');
         const activeView = document.getElementById(targetTab);
-        if (activeView) activeView.classList.add('active');
+        if (activeView) {
+          activeView.classList.add('active');
+          window.dispatchEvent(new Event('resize'));
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
       });
     })();
   </script>
@@ -805,6 +826,6 @@
   <!-- Data & Logic -->
   <script src="assets/js/data.js?v=2"></script>
   <script src="assets/js/local_stats.js?v=1"></script>
-  <script src="assets/js/app.js?v=11"></script>
+  <script src="assets/js/app.js?v=14"></script>
 </body>
 </html>
