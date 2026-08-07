@@ -8,29 +8,31 @@
 function initApp() {
   const safeRun = (name, fn) => {
     try {
-      fn();
+      if (typeof fn === 'function') {
+        fn();
+      }
     } catch(e) {
       console.error(`Błąd w ${name}:`, e);
     }
   };
 
   safeRun('lucide', () => { if (typeof lucide !== 'undefined') lucide.createIcons(); });
-  safeRun('initNavigation', initNavigation);
-  safeRun('renderIFClassesTable', renderIFClassesTable);
-  safeRun('renderDamageEvaluator', renderDamageEvaluator);
-  safeRun('renderThermoConcepts', renderThermoConcepts);
-  safeRun('renderRadarSignatures', renderRadarSignatures);
-  safeRun('renderMeteoWarnings', renderMeteoWarnings);
-  safeRun('renderHistoricalCases', renderHistoricalCases);
-  safeRun('initLiveCalculators', initLiveCalculators);
-  safeRun('initLeafletMap', initLeafletMap);
-  safeRun('initForecastMatrix', initForecastMatrix);
-  safeRun('initRepoStats', initRepoStats);
-  safeRun('loadDashboardLinks', loadDashboardLinks);
-  safeRun('initSortableGrid', initSortableGrid);
-  safeRun('initLightbox', initLightbox);
-  safeRun('initCmmSynop', initCmmSynop);
-  safeRun('renderLocalStats', renderLocalStats);
+  safeRun('initNavigation', () => typeof initNavigation === 'function' && initNavigation());
+  safeRun('renderIFClassesTable', () => typeof renderIFClassesTable === 'function' && renderIFClassesTable());
+  safeRun('renderDamageEvaluator', () => typeof renderDamageEvaluator === 'function' && renderDamageEvaluator());
+  safeRun('renderThermoConcepts', () => typeof renderThermoConcepts === 'function' && renderThermoConcepts());
+  safeRun('renderRadarSignatures', () => typeof renderRadarSignatures === 'function' && renderRadarSignatures());
+  safeRun('renderMeteoWarnings', () => typeof renderMeteoWarnings === 'function' && renderMeteoWarnings());
+  safeRun('renderHistoricalCases', () => typeof renderHistoricalCases === 'function' && renderHistoricalCases());
+  safeRun('initLiveCalculators', () => typeof initLiveCalculators === 'function' && initLiveCalculators());
+  safeRun('initLeafletMap', () => typeof initLeafletMap === 'function' && initLeafletMap());
+  safeRun('initForecastMatrix', () => typeof initForecastMatrix === 'function' && initForecastMatrix());
+  safeRun('initRepoStats', () => typeof initRepoStats === 'function' && initRepoStats());
+  safeRun('loadDashboardLinks', () => typeof loadDashboardLinks === 'function' && loadDashboardLinks());
+  safeRun('initSortableGrid', () => typeof initSortableGrid === 'function' && initSortableGrid());
+  safeRun('initLightbox', () => typeof initLightbox === 'function' && initLightbox());
+  safeRun('initCmmSynop', () => typeof initCmmSynop === 'function' && initCmmSynop());
+  safeRun('renderLocalStats', () => typeof renderLocalStats === 'function' && renderLocalStats());
 }
 
 if (document.readyState === "loading") {
@@ -398,6 +400,28 @@ function renderLocalStats() {
   if (window.meteoStats) {
     const { total_storms, max_wind, max_cape, total_km, lastSync } = window.meteoStats;
     
+    const container = document.getElementById('storm-stats-container');
+    if (container) {
+      container.innerHTML = `
+        <div class="card" style="padding: 1.2rem; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Wszystkie Burze</div>
+          <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-primary); margin-top: 0.4rem;">${total_storms ?? 0}</div>
+        </div>
+        <div class="card" style="padding: 1.2rem; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Max Wiatr</div>
+          <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-danger); margin-top: 0.4rem;">${max_wind ?? '-'}</div>
+        </div>
+        <div class="card" style="padding: 1.2rem; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Max CAPE</div>
+          <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-warning); margin-top: 0.4rem;">${max_cape ?? '-'}</div>
+        </div>
+        <div class="card" style="padding: 1.2rem; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Przejechane Dystanse</div>
+          <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-green); margin-top: 0.4rem;">${total_km ?? '-'}</div>
+        </div>
+      `;
+    }
+
     const elTotal = document.getElementById('stat-burze-total');
     const elWind = document.getElementById('stat-max-wiatr');
     const elCape = document.getElementById('stat-max-cape');
@@ -408,7 +432,7 @@ function renderLocalStats() {
     if (elWind) elWind.textContent = max_wind ?? '-';
     if (elCape) elCape.textContent = max_cape ?? '-';
     if (elKm) elKm.textContent = total_km ?? '-';
-    if (elSync) elSync.textContent = `Ostatnia synchronizacja (sync.bat): ${lastSync ?? 'Brak danych'}`;
+    if (elSync) elSync.textContent = `Ostatnia synchronizacja: ${lastSync ?? 'Brak danych'}`;
   }
 }
 
