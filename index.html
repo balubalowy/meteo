@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Centrum Meteo Bartka — Baza Wiedzy i Narzędzia Prognostyczne</title>
+  <title>B-Meteo — Baza Wiedzy i Narzędzia Prognostyczne</title>
   <meta name="description" content="Centrum analiz meteorologicznych: stacje IMGW, prognozy ensemble, narzędzia radarowe, baza wiedzy burzowej, kalkulatory IF/DCP/Wmax/LCL.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
 
@@ -29,9 +29,22 @@
 
   <!-- Top Navigation (B-Core Style) -->
   <header class="topbar">
-      <div class="logo">
+      <div class="logo" style="display: flex; align-items: center; gap: 12px;">
           <i data-lucide="cloud-lightning" class="symbol"></i>
-          <h1>Centrum <span>Meteo</span></h1>
+          <div>
+              <h1 style="margin: 0; line-height: 1;">B-<span>Meteo</span></h1>
+              <div id="header-auth-status" style="font-size: 0.75rem; margin-top: 4px; color: var(--text-secondary);">
+                  <span id="auth-section">
+                      <button id="login-google-btn" class="btn btn-ghost" style="padding: 2px 8px; font-size: 0.75rem; border: 1px solid var(--border-subtle); color: var(--accent-primary); border-radius: 4px; cursor: pointer;">
+                          <i data-lucide="log-in" style="width: 12px; height: 12px;"></i> Zaloguj Google
+                      </button>
+                  </span>
+                  <span id="user-info" style="display: none;">
+                      <span style="color: var(--accent-success); font-weight: 500;">✓ Zalogowano: <span id="user-email" style="font-weight: 600; color: var(--text-primary);"></span></span>
+                      <button id="logout-btn" class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.7rem; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer; margin-left: 6px;">Wyloguj</button>
+                  </span>
+              </div>
+          </div>
       </div>
       
       <div class="top-stats">
@@ -52,42 +65,7 @@
   <!-- Main Content -->
   <div class="container main-content">
       <div id="tab-overview" class="tab-view active">
-        <!-- Auth Section (Compact) -->
-        <div class="card" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <i data-lucide="shield-check" style="color: var(--accent-primary);"></i>
-            <span style="font-weight: 500;">Dostęp do prywatnych modułów IMGW</span>
-          </div>
-          <div id="auth-section">
-            <button id="login-google-btn" class="btn btn-primary" style="padding: 0.5rem 1rem; background-color: #4285F4; border: none; border-radius: 4px; color: white; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;">
-              Zaloguj Google
-            </button>
-          </div>
-          <div id="user-info" style="display: none;">
-            <span style="color: var(--text-secondary); margin-right: 15px;">Zalogowano jako: <span id="user-email" style="color: var(--text-primary); font-weight: 600;"></span></span>
-            <button id="logout-btn" class="btn btn-ghost" style="padding: 0.4rem 0.8rem; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer;">Wyloguj</button>
-          </div>
-        </div>
-        
-        <!-- Private Dashboards Hub (Tylko zalogowani) -->
-        <div id="private-hub" class="grid-2" style="margin-bottom: 2rem; display: none;">
-          <a href="stacje/dashboard.html" target="_blank" class="module-card">
-            <div class="module-icon" style="background: var(--bg-tertiary); color: var(--accent-primary);"><i data-lucide="thermometer-sun"></i></div>
-            <div>
-              <div class="module-card-title">Stacje IMGW (Live)</div>
-              <div class="module-card-desc">Baza danych IMGW z chmury Firebase, ekstrema historyczne.</div>
-            </div>
-          </a>
-          <a href="prognoza/dashboard.html" target="_blank" class="module-card">
-            <div class="module-icon" style="background: var(--bg-tertiary); color: var(--accent-warning)"><i data-lucide="cloud-rain"></i></div>
-            <div>
-              <div class="module-card-title">Modele Ensemble</div>
-              <div class="module-card-desc">Oczekiwana T_max i prawdopodobieństwo przekroczeń progów.</div>
-            </div>
-          </a>
-        </div>
-
-             <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Widoki Synoptyczne, Radary i Zjawiska (Live)</h2>
+         <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Widoki Synoptyczne, Radary i Zjawiska (Live)</h2>
         
         <div id="dashboard-tiles" class="dashboard-grid">
           <!-- DWD Europa -->
