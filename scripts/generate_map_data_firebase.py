@@ -226,6 +226,18 @@ def generate_dashboard():
         "SNAPSHOT_COUNT": len(historia)
     }
 
+    def clean_nans(obj):
+        if isinstance(obj, float):
+            if math.isnan(obj) or math.isinf(obj): return None
+            return obj
+        elif isinstance(obj, dict):
+            return {k: clean_nans(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [clean_nans(i) for i in obj]
+        return obj
+
+    final_payload = clean_nans(final_payload)
+
     print(f"  Wysyłanie map_data do bazy {FIREBASE_URL}/imgw_map_data.json")
     try:
         resp_put = requests.put(f"{FIREBASE_URL}/imgw_map_data.json{auth_param}", json=final_payload)

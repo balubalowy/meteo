@@ -15,8 +15,17 @@
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- SortableJS -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 </head>
 <body>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox">
+    <span class="lightbox-close">&times;</span>
+    <img class="lightbox-content" id="lightbox-img">
+  </div>
 
   <!-- Top Navigation (B-Core Style) -->
   <header class="topbar">
@@ -78,103 +87,83 @@
           </a>
         </div>
 
-        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Sytuacja Synoptyczna i Lotnicza (Live)</h2>
+             <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Widoki Synoptyczne, Radary i Zjawiska (Live)</h2>
         
-        <div class="grid-3" style="margin-bottom: 2rem;">
+        <div id="dashboard-tiles" class="dashboard-grid">
           <!-- DWD Europa -->
-          <div class="card" style="padding: 1rem;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Europa (DWD Bodendruck)</h3>
-            <img id="dash-dwd" src="https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png" alt="DWD Europa" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Europa (DWD)</h3>
+            <img id="dash-dwd" class="zoomable" src="https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png" alt="DWD Europa" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
           </div>
-          <!-- SIGWX IMGW -->
-          <div class="card" style="padding: 1rem; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Polska (SIGWX IMGW)</h3>
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">IMGW zaktualizowało serwis Awiacja i zablokowało możliwość jego bezpośredniego osadzania na innych stronach (X-Frame-Options).</p>
-            <a href="https://awiacja.imgw.pl/prognozy-lotnicze/sigwx" target="_blank" class="btn" style="background: var(--primary); color: white;">
-              Otwórz Awiacja IMGW <i data-lucide="external-link" style="margin-left: 5px; width: 16px; height: 16px;"></i>
-            </a>
+          
+          <!-- SIGWX IMGW PL -->
+          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Polska (SIGWX)</h3>
+            <img id="dash-sigwx-pl" class="zoomable" src="" alt="Ładowanie SIGWX Polska..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
+
+          <!-- SIGWX CHMI CZ -->
+          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Czechy (SIGWX)</h3>
+            <img id="dash-sigwx-cz" class="zoomable" src="" alt="Ładowanie SIGWX Czechy..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+          </div>
+          
           <!-- Meteo.pl Wrocław -->
-          <div class="card" style="padding: 1rem;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Wrocław (UM Meteo.pl)</h3>
-            <img id="img-meteo-wroclaw" src="" alt="Meteogram Wrocław" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: none;">
+          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wrocław (UM Meteo.pl)</h3>
+            <img id="img-meteo-wroclaw" class="zoomable" src="" alt="Meteogram Wrocław" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: none;">
             <div id="img-meteo-wroclaw-loading" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Ładowanie z Meteo.pl...</div>
           </div>
-        </div>
-
-        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="map"></i> IMGW Datastore i Interpolacje</h2>
-        <div class="grid-2" style="margin-bottom: 2rem;">
-          <div class="card" style="padding: 1rem; height: 500px;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Aktualna Temperatura (Live Map)</h3>
+          
+          <!-- Aktualna Temperatura (Live Map) -->
+          <div class="card tile-item" style="padding: 1rem; height: 500px; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Aktualna Temperatura (Live)</h3>
             <iframe src="stacje/dashboard.html" style="width: 100%; height: calc(100% - 40px); border: none; border-radius: var(--radius-sm);"></iframe>
-             <div class="card" style="padding: 1rem; height: 500px; display: flex; flex-direction: column; gap: 10px;">
-            <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem; color: var(--text-secondary);">Najnowsze Dane IMGW (Datastore / Modele)</h3>
-            <div style="overflow-y: auto; display: flex; flex-direction: column; gap: 15px;">
-              <div>
-                <strong style="display:block; margin-bottom: 5px;">Mapa Synoptyczna</strong>
-                <img id="dash-synopt" src="" alt="Ładowanie Mapy Synoptycznej..." style="width: 100%; border-radius: 4px; border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 100px;">
-              </div>
-              <div>
-                <strong style="display:block; margin-bottom: 5px;">Radar (COMPO CAPPI)</strong>
-                <img id="dash-cappi" src="" alt="Ładowanie CAPPI..." style="width: 100%; border-radius: 4px; border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 100px;">
-              </div>
-              <div>
-                <strong style="display:block; margin-bottom: 5px;">Wyładowania (LTS2005)</strong>
-                <img id="dash-lts" src="" alt="Ładowanie LTS2005..." style="width: 100%; border-radius: 4px; border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 100px;">
-              </div>
-              <div>
-                <strong style="display:block; margin-bottom: 5px;">Sondaże Aerologiczne</strong>
-                <iframe src="https://modele.imgw.pl/?page_id=49533" style="width: 100%; height: 400px; border: 1px solid var(--border-subtle); border-radius: 4px; background: white;"></iframe>
-              </div>
-              <div>
-                <strong style="display:block; margin-bottom: 5px;">Prognoza Burzowa IMGW</strong>
-                <iframe src="https://modele.imgw.pl/?page_id=27337" style="width: 100%; height: 400px; border: 1px solid var(--border-subtle); border-radius: 4px; background: white;"></iframe>
-              </div>
-            </div>
           </div>
+          
+          <!-- Mapa Synoptyczna IMGW -->
+          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Mapa Synoptyczna</h3>
+            <img id="dash-synopt" class="zoomable" src="" alt="Ładowanie Mapy Synoptycznej..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
-        </div>
-
-        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="zap"></i> Ostrzeżenia i Zjawiska</h2>
-        <div class="grid-2" style="margin-bottom: 2rem;">
-          <!-- Estofex -->
-          <div class="card" style="padding: 1rem;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">ESTOFEX (Prognoza Konwekcyjna)</h3>
-            <img id="dash-estofex" src="https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest" alt="Estofex" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          
+          <!-- Radar CAPPI -->
+          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Radar (COMPO CAPPI)</h3>
+            <img id="dash-cappi" class="zoomable" src="" alt="Ładowanie CAPPI..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
-          <!-- Łowcy Burz -->
-          <div class="card" style="padding: 1rem; height: 500px;">
-             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Prognozy Skywarn (Łowcy Burz)</h3>
-             <iframe src="https://lowcyburz.pl/" style="width: 100%; height: calc(100% - 40px); border: none; border-radius: var(--radius-sm); background: white;"></iframe>
+          
+          <!-- Wyładowania LTS2005 -->
+          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wyładowania (LTS2005)</h3>
+            <img id="dash-lts" class="zoomable" src="" alt="Ładowanie LTS2005..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
-        </div>
-        
-        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="radar"></i> Interaktywne Radary Live</h2>
-        <div class="grid-2">
+          
           <!-- Blitzortung -->
-          <div class="card" style="padding: 1rem; height: 500px;">
-             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Pioruny (Blitzortung)</h3>
-             <iframe src="https://map.blitzortung.org/#5.4/52/19" style="width: 100%; height: calc(100% - 40px); border: none; border-radius: var(--radius-sm);"></iframe>
+          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Pioruny (Blitzortung)</h3>
+             <img id="dash-blitzortung" class="zoomable" src="" alt="Ładowanie Blitzortung..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
-          <!-- Sat24 -->
-          <div class="card" style="padding: 1rem; height: 500px;">
-             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Satelita Animacja (Sat24)</h3>
-             <img src="https://api.sat24.com/animated/PL/visual/1/Central%20European%20Standard%20Time" alt="Sat24" style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-sm);">
+
+          <!-- Estofex -->
+          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> ESTOFEX</h3>
+            <img id="dash-estofex" class="zoomable" src="" alt="Ładowanie Estofex..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+          </div>
+
+          <!-- Łowcy Burz -->
+          <div class="card tile-item" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Prognoza Skywarn (Łowcy Burz)</h3>
+            <img id="dash-lowcyburz" class="zoomable" src="" alt="Ładowanie Prognozy Łowców Burz..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px; display: none;">
+            <div id="dash-lowcyburz-loading" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Trwa pobieranie ze strony Łowców...</div>
+          </div>
+          
+          <!-- Satelita -->
+          <div class="card tile-item" style="padding: 1rem; height: 500px; cursor: default;">
+             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary); cursor: grab;"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Satelita (EUMETSAT / Sat24)</h3>
+             <iframe id="dash-sat24-frame" src="" style="width: 100%; height: calc(100% - 40px); border: none; border-radius: var(--radius-sm); background: white;"></iframe>
           </div>
         </div>
-        
-        <script>
-          // Linki z JSON s w wikszoci statyczne lub obsugiwane przez iframy. Skrypt podmienia DWD jeli co ulegnie zmianie.
-          fetch('assets/js/dashboard_links.json?v=' + new Date().getTime())
-            .then(res => res.json())
-            .then(data => {
-              if(data.dwd_europa) document.getElementById('dash-dwd').src = data.dwd_europa;
-              if(data.imgw_synoptyczna) document.getElementById('dash-synopt').src = data.imgw_synoptyczna;
-              if(data.imgw_cappi) document.getElementById('dash-cappi').src = data.imgw_cappi;
-              if(data.imgw_lts) document.getElementById('dash-lts').src = data.imgw_lts;
-            })
-            .catch(e => console.error("Nie udalo sie pobrac zaktualizowanych linkow obrazow", e));
-        </script>
       </div>
 
     <!-- TAB 2: OCENA SZKÓD IF-SCALE -->

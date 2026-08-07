@@ -45,9 +45,24 @@ def main():
     links = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "estofex": "https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest",
-        "blitzortung": "https://map.blitzortung.org/#5.4/52/19",
-        "lowcyburz": "https://lowcyburz.pl/"
+        "blitzortung": "https://images.blitzortung.org/Images/image_b_pl.png",
+        "sat24": "https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_CentralEurope.jpg",
+        "sigwx_imgw": "https://aviation-api.imgw.pl/image/significant/pl",
+        "sigwx_chmi": "https://aviation-api.imgw.pl/image/significant/cz"
     }
+
+    # Lowcy Burz scraper
+    try:
+        req_lb = urllib.request.Request("https://lowcyburz.pl/", headers={'User-Agent': 'Mozilla/5.0'})
+        html_lb = urllib.request.urlopen(req_lb, context=ctx, timeout=10).read().decode('utf-8', errors='ignore')
+        matches = re.findall(r'<img[^>]+src=["\']([^"\']+)["\']', html_lb)
+        forecast_images = [m for m in matches if 'wp-content/uploads' in m and not 'logo' in m.lower() and not 'icon' in m.lower()]
+        if forecast_images:
+            links['lowcyburz'] = forecast_images[0]
+        else:
+            links['lowcyburz'] = ""
+    except Exception as e:
+        print("Błąd Lowcy Burz:", e)
 
     # 1. IMGW Datastore
     try:
@@ -71,28 +86,8 @@ def main():
     # 2. Meteo.pl Wrocław
     links['meteo_wroclaw'] = "https://www.meteo.pl/um/metco/mgram_pict.php?ntype=0u&row=436&col=181&lang=pl"
 
-    # 3. Awiacja IMGW
-    html_awiacja = fetch_html("https://awiacja.imgw.pl/prognozy-lotnicze/sigwx", 'utf-8')
-    match_imgw = re.search(r'src="([^"]*sigwx_polska[^"]*\.(?:png|jpg|gif))"', html_awiacja, re.IGNORECASE)
-    match_chmi = re.search(r'src="([^"]*sigwx_chmi[^"]*\.(?:png|jpg|gif))"', html_awiacja, re.IGNORECASE)
-    if match_imgw:
-        u = match_imgw.group(1)
-        if not u.startswith("http"): u = "https://awiacja.imgw.pl" + u
-        links['sigwx_imgw'] = u
-    if match_chmi:
-        u = match_chmi.group(1)
-        if not u.startswith("http"): u = "https://awiacja.imgw.pl" + u
-        links['sigwx_chmi'] = u
-
-    # 4. DWD Hobby
+    # 3. DWD Hobby
     links['dwd_europa'] = "https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png"
-
-    # 5. Sat24 PL
-    links['sat24'] = "https://api.sat24.com/animated/PL/visual/1/Central%20European%20Standard%20Time"
-    
-    # 6. Modele IMGW (Sondaże, Prognoza)
-    # The user wants PDF or PNG. Since we can't easily parse WordPress, we can embed the iframes in HTML instead, or provide direct links.
-    # We will let index.html handle this.
 
     out_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "js")
     os.makedirs(out_dir, exist_ok=True)

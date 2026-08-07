@@ -19,25 +19,76 @@ document.addEventListener("DOMContentLoaded", () => {
   initLiveCalculators();
   initLeafletMap();
   initForecastMatrix();
-  initRepoStats();
-  loadDashboardLinks();
+   initRepoStats();
+   loadDashboardLinks();
+   initSortableGrid();
+   initLightbox();
 });
 
+function initSortableGrid() {
+   const grid = document.getElementById('dashboard-tiles');
+   if (grid && typeof Sortable !== 'undefined') {
+       new Sortable(grid, {
+           animation: 150,
+           ghostClass: 'sortable-ghost',
+           handle: 'h3'
+       });
+   }
+}
+
+function initLightbox() {
+   const lightbox = document.getElementById('lightbox');
+   const lightboxImg = document.getElementById('lightbox-img');
+   const closeBtn = document.querySelector('.lightbox-close');
+   if (!lightbox || !lightboxImg || !closeBtn) return;
+
+   document.addEventListener('click', (e) => {
+       if (e.target.classList.contains('zoomable')) {
+           lightboxImg.src = e.target.src;
+           lightbox.classList.add('active');
+       }
+   });
+
+   closeBtn.addEventListener('click', () => {
+       lightbox.classList.remove('active');
+   });
+
+   lightbox.addEventListener('click', (e) => {
+       if (e.target === lightbox) {
+           lightbox.classList.remove('active');
+       }
+   });
+}
+
 function loadDashboardLinks() {
-  fetch('assets/js/dashboard_links.json')
+  fetch('assets/js/dashboard_links.json?v=' + new Date().getTime())
     .then(r => r.json())
     .then(links => {
+       if (links.dwd_europa) document.getElementById('dash-dwd').src = links.dwd_europa;
        if (links.imgw_synoptyczna) document.getElementById('dash-synopt').src = links.imgw_synoptyczna;
        if (links.imgw_cappi) document.getElementById('dash-cappi').src = links.imgw_cappi;
        if (links.imgw_lts) document.getElementById('dash-lts').src = links.imgw_lts;
+       if (links.estofex) document.getElementById('dash-estofex').src = links.estofex;
+       if (links.blitzortung) document.getElementById('dash-blitzortung').src = links.blitzortung;
+       if (links.sat24) document.getElementById('dash-sat24-frame').src = links.sat24;
+       if (links.sigwx_imgw) document.getElementById('dash-sigwx-pl').src = links.sigwx_imgw;
+       if (links.sigwx_chmi) document.getElementById('dash-sigwx-cz').src = links.sigwx_chmi;
+       
        if (links.meteo_wroclaw) {
           const mw = document.getElementById('img-meteo-wroclaw');
           const l = document.getElementById('img-meteo-wroclaw-loading');
-          if (mw) {
-              mw.src = links.meteo_wroclaw;
-              mw.style.display = 'block';
-              if(l) l.style.display = 'none';
-          }
+          if (mw) { mw.src = links.meteo_wroclaw; mw.style.display = 'block'; }
+          if (l) l.style.display = 'none';
+       }
+
+       if (links.lowcyburz) {
+          const lb = document.getElementById('dash-lowcyburz');
+          const l = document.getElementById('dash-lowcyburz-loading');
+          if (lb) { lb.src = links.lowcyburz; lb.style.display = 'block'; }
+          if (l) l.style.display = 'none';
+       } else {
+          const l = document.getElementById('dash-lowcyburz-loading');
+          if(l) l.innerText = "Brak mapy w najnowszym wpisie.";
        }
     })
     .catch(e => console.error("Error loading dashboard links:", e));
@@ -58,7 +109,7 @@ function initNavigation() {
       tabViews.forEach(v => v.classList.remove("active"));
 
       link.classList.add("active");
-      const activeView = document.getElementById(`tab-${targetTab}`);
+      const activeView = document.getElementById(targetTab);
       if (activeView) activeView.classList.add("active");
     });
   });
