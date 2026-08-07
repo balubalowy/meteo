@@ -90,10 +90,9 @@ function loadDashboardLinks() {
        if (links.dwd_europa) document.getElementById('dash-dwd').src = links.dwd_europa;
        if (links.imgw_synoptyczna) document.getElementById('dash-synopt').src = links.imgw_synoptyczna;
        if (links.imgw_cappi) document.getElementById('dash-cappi').src = links.imgw_cappi;
-       if (links.imgw_lts) document.getElementById('dash-lts').src = links.imgw_lts;
-       if (links.sat24) {
-         const satEl = document.getElementById('dash-satellite');
-         if (satEl) satEl.src = links.sat24;
+       if (links.imgw_lts) {
+         const ltsEl = document.getElementById('dash-lts');
+         if (ltsEl) ltsEl.src = links.imgw_lts;
        }
        if (links.sigwx_imgw) document.getElementById('dash-sigwx-pl').src = links.sigwx_imgw;
        if (links.sigwx_chmi) document.getElementById('dash-sigwx-cz').src = links.sigwx_chmi;
