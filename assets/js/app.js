@@ -228,7 +228,26 @@ function renderHistoricalCases() {
 }
 
 // ─── 8. Kalkulatory Na Żywo ───
+function renderLocalStats() {
+  if (window.meteoStats) {
+    const { total_storms, max_wind, max_cape, total_km, lastSync } = window.meteoStats;
+    
+    const elTotal = document.getElementById('stat-burze-total');
+    const elWind = document.getElementById('stat-max-wiatr');
+    const elCape = document.getElementById('stat-max-cape');
+    const elKm = document.getElementById('stat-km');
+    const elSync = document.getElementById('last-sync-time');
+    
+    if (elTotal) elTotal.textContent = total_storms ?? '-';
+    if (elWind) elWind.textContent = max_wind ?? '-';
+    if (elCape) elCape.textContent = max_cape ?? '-';
+    if (elKm) elKm.textContent = total_km ?? '-';
+    if (elSync) elSync.textContent = `Ostatnia synchronizacja (sync.bat): ${lastSync ?? 'Brak danych'}`;
+  }
+}
+
 function initLiveCalculators() {
+
   // A. Kalkulator Wiatru
   // Źródło: 1 kt = 1.852 km/h; 1 m/s = 3.6 km/h (allmetsat)
   const windVal = document.getElementById("calc-wind-val");

@@ -58,7 +58,7 @@ def create_grid(lats, lons, vals, u_vals=None, v_vals=None):
     if len(vals) < 3:
         return [], [], [], [], [], [], None, None, None
     
-    grid_lon, grid_lat = np.mgrid[13.5:24.5:0.04, 48.5:55.5:0.04]
+    grid_lon, grid_lat = np.mgrid[13.5:24.5:0.08, 48.5:55.5:0.08]
     points = np.array([lons, lats]).T
     
     grid_z_linear = griddata(points, vals, (grid_lon, grid_lat), method='linear')

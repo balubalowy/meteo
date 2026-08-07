@@ -1,1 +1,1 @@
-﻿window.meteoStats = { pythonFiles: 33, htmlFiles: 11, excelFiles: 2, jsFiles: 4, lastSync: '2026-08-07 19:10:44' };
+window.meteoStats = {"total_storms": 73, "max_wind": 86.0, "max_cape": 3870.0, "total_km": 5423.0, "lastSync": "2026-08-07 19:33:34"};

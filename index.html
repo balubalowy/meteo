@@ -26,17 +26,17 @@
       </div>
       
       <div class="top-stats">
-          <a href="#" class="btn btn-ghost nav-link active" data-tab="overview"><i data-lucide="layout-dashboard"></i> Pulpit</a>
-          <a href="#" class="btn btn-ghost nav-link" data-tab="if-evaluator"><i data-lucide="tornado"></i> Skala IF</a>
-          <a href="#" class="btn btn-ghost nav-link" data-tab="calculators"><i data-lucide="calculator"></i> Kalkulatory</a>
-          <a href="#" class="btn btn-ghost nav-link" data-tab="knowledge"><i data-lucide="book-open"></i> Baza Wiedzy</a>
-          <a href="#" class="btn btn-ghost nav-link" data-tab="alert-rules"><i data-lucide="alert-triangle"></i> Ostrzeżenia</a>
-          <a href="#" class="btn btn-ghost nav-link" data-tab="maps"><i data-lucide="map"></i> Mapy</a>
-          <a href="#" class="btn btn-ghost nav-link" data-tab="stats"><i data-lucide="bar-chart-2"></i> Statystyki</a>
-          
-          <span style="color: var(--border-strong);">|</span>
-          <a href="prognoza/dashboard.html" target="_blank" class="btn btn-ghost"><i data-lucide="cloud-rain"></i> Ensembles</a>
-          <a href="stacje/dashboard.html" target="_blank" class="btn btn-ghost"><i data-lucide="thermometer-sun"></i> Stacje Live</a>
+          <nav class="nav-links">
+          <a href="#" class="nav-link tab-btn active" data-tab="tab-overview"><i data-lucide="layout-dashboard"></i> Pulpit</a>
+          <a href="#" class="nav-link tab-btn" data-tab="tab-if-evaluator"><i data-lucide="tornado"></i> Skala IF</a>
+          <a href="#" class="nav-link tab-btn" data-tab="tab-calculators"><i data-lucide="calculator"></i> Kalkulatory</a>
+          <a href="#" class="nav-link tab-btn" data-tab="tab-knowledge"><i data-lucide="book-open"></i> Baza Wiedzy</a>
+          <a href="#" class="nav-link tab-btn" data-tab="tab-alert-rules"><i data-lucide="alert-triangle"></i> Ostrzeżenia</a>
+          <a href="#" class="nav-link tab-btn" data-tab="tab-maps"><i data-lucide="map"></i> Mapy</a>
+          <a href="#" class="nav-link tab-btn" data-tab="tab-stats"><i data-lucide="bar-chart-2"></i> Statystyki</a>
+          <a href="#" class="nav-link tab-btn" data-tab="tab-ensembles"><i data-lucide="cloud-rain"></i> Ensembles</a>
+          <a href="#" class="nav-link tab-btn" data-tab="tab-stacje"><i data-lucide="thermometer"></i> Stacje Live</a>
+        </nav>
       </div>
   </header>
 
@@ -103,14 +103,31 @@
           <div class="card" style="padding: 1rem; height: 500px;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Aktualna Temperatura (Live Map)</h3>
             <iframe src="stacje/dashboard.html" style="width: 100%; height: calc(100% - 40px); border: none; border-radius: var(--radius-sm);"></iframe>
+             <div class="card" style="padding: 1rem; height: 500px; display: flex; flex-direction: column; gap: 10px;">
+            <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem; color: var(--text-secondary);">Najnowsze Dane IMGW (Datastore / Modele)</h3>
+            <div style="overflow-y: auto; display: flex; flex-direction: column; gap: 15px;">
+              <div>
+                <strong style="display:block; margin-bottom: 5px;">Mapa Synoptyczna</strong>
+                <img id="dash-synopt" src="" alt="Ładowanie Mapy Synoptycznej..." style="width: 100%; border-radius: 4px; border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 100px;">
+              </div>
+              <div>
+                <strong style="display:block; margin-bottom: 5px;">Radar (COMPO CAPPI)</strong>
+                <img id="dash-cappi" src="" alt="Ładowanie CAPPI..." style="width: 100%; border-radius: 4px; border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 100px;">
+              </div>
+              <div>
+                <strong style="display:block; margin-bottom: 5px;">Wyładowania (LTS2005)</strong>
+                <img id="dash-lts" src="" alt="Ładowanie LTS2005..." style="width: 100%; border-radius: 4px; border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 100px;">
+              </div>
+              <div>
+                <strong style="display:block; margin-bottom: 5px;">Sondaże Aerologiczne</strong>
+                <iframe src="https://modele.imgw.pl/?page_id=49533" style="width: 100%; height: 400px; border: 1px solid var(--border-subtle); border-radius: 4px; background: white;"></iframe>
+              </div>
+              <div>
+                <strong style="display:block; margin-bottom: 5px;">Prognoza Burzowa IMGW</strong>
+                <iframe src="https://modele.imgw.pl/?page_id=27337" style="width: 100%; height: 400px; border: 1px solid var(--border-subtle); border-radius: 4px; background: white;"></iframe>
+              </div>
+            </div>
           </div>
-          <div class="card" style="padding: 1rem; height: 500px; display: flex; flex-direction: column; gap: 10px;">
-            <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem; color: var(--text-secondary);">Dostęp do Datastore IMGW (Katalog)</h3>
-            <a href="https://danepubliczne.imgw.pl/pl/datastore?product=Mapa%20synoptyczna" target="_blank" class="btn btn-ghost" style="border: 1px solid var(--border-subtle); padding: 1rem;"><i data-lucide="external-link"></i> Najnowsza Mapa Synoptyczna</a>
-            <a href="https://danepubliczne.imgw.pl/pl/datastore?product=COMPO_CAPPI.comp.cappi" target="_blank" class="btn btn-ghost" style="border: 1px solid var(--border-subtle); padding: 1rem;"><i data-lucide="external-link"></i> COMPO CAPPI (Radar PNG)</a>
-            <a href="https://danepubliczne.imgw.pl/pl/datastore?product=LTS2005" target="_blank" class="btn btn-ghost" style="border: 1px solid var(--border-subtle); padding: 1rem;"><i data-lucide="external-link"></i> LTS2005 (Wyładowania)</a>
-            <a href="https://modele.imgw.pl/?page_id=49533" target="_blank" class="btn btn-ghost" style="border: 1px solid var(--border-subtle); padding: 1rem;"><i data-lucide="external-link"></i> Sondaże Aerologiczne IMGW</a>
-            <a href="https://modele.imgw.pl/?page_id=27337" target="_blank" class="btn btn-ghost" style="border: 1px solid var(--border-subtle); padding: 1rem;"><i data-lucide="external-link"></i> Prognoza Burzowa IMGW</a>
           </div>
         </div>
 
@@ -148,6 +165,9 @@
             .then(res => res.json())
             .then(data => {
               if(data.dwd_europa) document.getElementById('dash-dwd').src = data.dwd_europa;
+              if(data.imgw_synoptyczna) document.getElementById('dash-synopt').src = data.imgw_synoptyczna;
+              if(data.imgw_cappi) document.getElementById('dash-cappi').src = data.imgw_cappi;
+              if(data.imgw_lts) document.getElementById('dash-lts').src = data.imgw_lts;
             })
             .catch(e => console.error("Nie udalo sie pobrac zaktualizowanych linkow obrazow", e));
         </script>
@@ -419,26 +439,49 @@
     <!-- TAB 6: MAPY -->
     <div id="tab-maps" class="tab-view">
       <h2 class="section-title"><i data-lucide="map" style="margin-right: 10px;"></i> Interaktywne Mapy (IMGW Interpolacja)</h2>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 2rem;">System map w czasie rzeczywistym bazujący na Twoim skrypcie Pythona (Firebase Map Data).</p>
+  </div>
       
-      <div class="card" style="height: 80vh; padding: 0; overflow: hidden; border: 1px solid var(--border-subtle);">
-         <iframe src="stacje/dashboard.html" style="width: 100%; height: 100%; border: none;"></iframe>
-      </div>
-    </div>
-
-    <!-- TAB 7: STATYSTYKI -->
-    <div id="tab-stats" class="tab-view">
-      <h2 class="section-title"><i data-lucide="bar-chart-2" style="margin-right: 10px;"></i> Statystyki Bazy i Repozytorium</h2>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 2rem;">Dane synchronizowane automatycznie przez skrypt <code>sync.bat</code>.</p>
-      
-      <div id="repo-stats-grid" class="grid-3">
-        <!-- Generowane dynamicznie -->
-        <div class="card" style="text-align: center; padding: 3rem;">
-           <div class="loader">Ładowanie statystyk...</div>
+      <div id="tab-stats" class="tab-view" style="display: none;">
+        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+          <i data-lucide="bar-chart-2"></i> Pamiętnik Burz - Statystyki
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Wczytywanie z pliku Excel. Zaktualizuj statystyki używając skryptu parse_storm_stats.py</p>
+        
+        <div id="storm-stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Renderowane przez JS -->
+            <div class="card stat-card" style="text-align: center; padding: 2rem;">
+               <i data-lucide="cloud-lightning" style="width: 48px; height: 48px; color: var(--accent); margin: 0 auto 1rem auto; opacity: 0.8;"></i>
+               <h3 id="stat-burze-total" style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.5rem;">-</h3>
+               <p style="color: var(--text-secondary); font-size: 0.9rem;">Zarejestrowanych Burz</p>
+            </div>
+            
+            <div class="card stat-card" style="text-align: center; padding: 2rem;">
+               <i data-lucide="wind" style="width: 48px; height: 48px; color: var(--secondary); margin: 0 auto 1rem auto; opacity: 0.8;"></i>
+               <h3 id="stat-max-wiatr" style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.5rem;">-</h3>
+               <p style="color: var(--text-secondary); font-size: 0.9rem;">Maksymalny Zmierzony Wiatr (km/h)</p>
+            </div>
+            
+            <div class="card stat-card" style="text-align: center; padding: 2rem;">
+               <i data-lucide="thermometer" style="width: 48px; height: 48px; color: var(--primary); margin: 0 auto 1rem auto; opacity: 0.8;"></i>
+               <h3 id="stat-max-cape" style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.5rem;">-</h3>
+               <p style="color: var(--text-secondary); font-size: 0.9rem;">Maksymalne CAPE</p>
+            </div>
+            
+            <div class="card stat-card" style="text-align: center; padding: 2rem;">
+               <i data-lucide="map-pin" style="width: 48px; height: 48px; color: #f59e0b; margin: 0 auto 1rem auto; opacity: 0.8;"></i>
+               <h3 id="stat-km" style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.5rem;">-</h3>
+               <p style="color: var(--text-secondary); font-size: 0.9rem;">Przejechane Kilometry</p>
+            </div>
         </div>
       </div>
-    </div>
-
+      
+      <div id="tab-ensembles" class="tab-view" style="display: none; height: 85vh;">
+         <iframe src="prognoza/Dashboard_Pogody.html" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
+      </div>
+      
+      <div id="tab-stacje" class="tab-view" style="display: none; height: 85vh;">
+         <iframe src="stacje/dashboard.html" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
+      </div>
   </div>
 
   <!-- Leaflet JS -->

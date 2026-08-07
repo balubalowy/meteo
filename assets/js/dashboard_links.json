@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-08-07 19:06:16",
+  "timestamp": "2026-08-07 19:21:44",
   "estofex": "https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest",
   "blitzortung": "https://map.blitzortung.org/#5.4/52/19",
   "lowcyburz": "https://lowcyburz.pl/",
+  "imgw_synoptyczna": "https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/mapasynoptyczna/mapasynop_202608071200.png",
+  "imgw_cappi": "https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Polrad/Produkty/POLCOMP/COMPO_CAPPI.comp.cappi/2026080717200000dBZ.cappi.png",
   "dwd_europa": "https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png",
-  "sat24": "https://api.sat24.com/animated/PL/visual/1/Central%20European%20Standard%20Time",
-  "sondaze_imgw": "https://cmm.imgw.pl/wp-content/uploads/IKONY/OPISY_IKON.png",
-  "prognoza_burz_imgw": "https://cmm.imgw.pl/wp-content/uploads/IKONY/OPISY_IKON.png"
+  "sat24": "https://api.sat24.com/animated/PL/visual/1/Central%20European%20Standard%20Time"
 }

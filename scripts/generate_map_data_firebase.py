@@ -233,6 +233,7 @@ def generate_dashboard():
         print("  [OK] Dane przestrzenne zaktualizowane w Firebase!")
     except Exception as e:
         print(f"  [!] Błąd wysyłania do Firebase: {e}")
+        sys.exit(1)
         
     print("=" * 65)
 

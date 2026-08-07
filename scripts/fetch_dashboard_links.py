@@ -1,29 +1,44 @@
 import urllib.request
+import urllib.parse
 import re
 import json
 import os
+import ssl
 from datetime import datetime
 
-def fetch_html(url, charset='utf-8'):
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'})
+# Disable SSL verification just in case IMGW has issues
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
+def fetch_html(url, charset='utf-8', data=None):
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'})
     try:
-        response = urllib.request.urlopen(req, timeout=15)
+        if data:
+            data = urllib.parse.urlencode(data).encode('utf-8')
+        response = urllib.request.urlopen(req, data=data, context=ctx, timeout=15)
         return response.read().decode(charset, errors='ignore')
     except Exception as e:
         print(f"Error fetching {url}: {e}")
         return ""
 
-def get_latest_imgw_datastore(product):
+def get_latest_imgw_datastore(path):
     try:
-        html = fetch_html(f"https://danepubliczne.imgw.pl/datastore/getfiledown/{product}")
-        # Search for files like .png
-        # The HTML usually has lines like: <a href="filename.png">filename.png</a>
-        matches = re.findall(r'href="([^"]+\.png)"', html, re.IGNORECASE)
+        url = "https://danepubliczne.imgw.pl/pl/datastore/getFilesList"
+        data = {"productType": "oper", "path": path}
+        html = fetch_html(url, data=data)
+        
+        # matches like href="datastore/getfiledown/Oper/mapasynoptyczna/mapasynop_202608010000.png"
+        matches = re.findall(r'href=[\'"]datastore/getfiledown([^\'"]+(?:\.png|\.gif|\.jpg))[\'"]', html, re.IGNORECASE)
         if matches:
-            matches.sort(reverse=True)
-            return f"https://danepubliczne.imgw.pl/datastore/getfiledown/{product}/{matches[0]}"
+            # We want the regular image, not the _echoOnly for CAPPI
+            filtered = [m for m in matches if '_echoOnly' not in m and '.tmb' not in m]
+            if not filtered:
+                filtered = matches
+            latest = sorted(filtered)[-1]
+            return f"https://danepubliczne.imgw.pl/datastore/getfiledown{latest}"
     except Exception as e:
-        print("Błąd datastore dla", product, ":", e)
+        print("Błąd datastore dla", path, ":", e)
     return ""
 
 def main():
@@ -34,7 +49,17 @@ def main():
         "lowcyburz": "https://lowcyburz.pl/"
     }
 
-    # 1. Meteo.pl Wrocław
+    # 1. IMGW Datastore
+    syn_url = get_latest_imgw_datastore("/Oper/mapasynoptyczna")
+    if syn_url: links['imgw_synoptyczna'] = syn_url
+    
+    cappi_url = get_latest_imgw_datastore("/Oper/Polrad/Produkty/POLCOMP/COMPO_CAPPI.comp.cappi")
+    if cappi_url: links['imgw_cappi'] = cappi_url
+    
+    lts_url = get_latest_imgw_datastore("/Oper/Perun/LTS2005")
+    if lts_url: links['imgw_lts'] = lts_url
+
+    # 2. Meteo.pl Wrocław
     html_meteo = fetch_html("https://www.meteo.pl/um/php/meteorogram_list.php?ntype=0u&row=436&col=181&lang=pl&cname=Wroc%B3aw", 'iso-8859-2')
     match = re.search(r'src="(.*?mgram_pict\.php.*?)"', html_meteo)
     if match:
@@ -45,7 +70,7 @@ def main():
             url = "https://www.meteo.pl/um/php/" + url
         links['meteo_wroclaw'] = url
 
-    # 2. Awiacja IMGW
+    # 3. Awiacja IMGW
     html_awiacja = fetch_html("https://awiacja.imgw.pl/prognozy-lotnicze/sigwx", 'utf-8')
     match_imgw = re.search(r'src="([^"]*sigwx_polska[^"]*\.(?:png|jpg|gif))"', html_awiacja, re.IGNORECASE)
     match_chmi = re.search(r'src="([^"]*sigwx_chmi[^"]*\.(?:png|jpg|gif))"', html_awiacja, re.IGNORECASE)
@@ -58,41 +83,15 @@ def main():
         if not u.startswith("http"): u = "https://awiacja.imgw.pl" + u
         links['sigwx_chmi'] = u
 
-    # 3. DWD Hobby
-    html_dwd = fetch_html("https://www.dwd.de/DE/leistungen/hobbymet_wk_europa/hobbyeuropakarten.html", 'utf-8')
-    match = re.search(r'src="([^"]*bwk_bodendruck_na_ana\.png)"', html_dwd)
-    if match:
-        u = match.group(1)
-        if not u.startswith("http"): u = "https://www.dwd.de" + u
-        links['dwd_europa'] = u
+    # 4. DWD Hobby
+    links['dwd_europa'] = "https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png"
 
-    # 4. IMGW Datastore
-    # Mapa synoptyczna
-    syn_url = get_latest_imgw_datastore("Zjawiska_Meteo/Mapa_synoptyczna")
-    if syn_url: links['imgw_synoptyczna'] = syn_url
-    
-    # CAPPI
-    cappi_url = get_latest_imgw_datastore("Dane_radarowe/COMPO_CAPPI.comp.cappi")
-    if cappi_url: links['imgw_cappi'] = cappi_url
-    
-    # LTS2005
-    lts_url = get_latest_imgw_datastore("Dane_radarowe/COMPO_LTS2005.comp.lts")
-    if lts_url: links['imgw_lts'] = lts_url
-
-    # 5. Sat24 PL (Obejście iframe iframe protection przez pobranie najnowszego statycznego gifa)
+    # 5. Sat24 PL
     links['sat24'] = "https://api.sat24.com/animated/PL/visual/1/Central%20European%20Standard%20Time"
     
     # 6. Modele IMGW (Sondaże, Prognoza)
-    html_sondaze = fetch_html("https://modele.imgw.pl/?page_id=49533")
-    match_sondaz = re.search(r'src="([^"]*upload[^"]*\.png)"', html_sondaze, re.IGNORECASE)
-    if match_sondaz:
-        links['sondaze_imgw'] = match_sondaz.group(1)
-        
-    html_prognoza = fetch_html("https://modele.imgw.pl/?page_id=27337")
-    match_prognoza = re.search(r'src="([^"]*upload[^"]*\.png)"', html_prognoza, re.IGNORECASE)
-    if match_prognoza:
-        links['prognoza_burz_imgw'] = match_prognoza.group(1)
-
+    # The user wants PDF or PNG. Since we can't easily parse WordPress, we can embed the iframes in HTML instead, or provide direct links.
+    # We will let index.html handle this.
 
     out_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "js")
     os.makedirs(out_dir, exist_ok=True)
