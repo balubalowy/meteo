@@ -685,14 +685,14 @@
           </div>
        </div>
        <div id="tab-ens-status" style="display: none; padding: 10px; margin-bottom: 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 500;"></div>
-       <div style="height: 75vh; width: 100%;">
+       <div style="height: 94vh; width: 100%;">
           <iframe id="iframe-ensemble" src="prognoza/dashboard.html" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
        </div>
     </div>
     
-    <div id="tab-stacje" class="tab-view" style="height: 85vh;">
-       <iframe src="stacje/dashboard.html" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
-    </div>
+    <div id="tab-stacje" class="tab-view" style="height: 94vh;">
+        <iframe src="stacje/dashboard.html" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
+     </div>
   </div>
 
   <!-- Leaflet JS -->
@@ -706,15 +706,13 @@
     
     // Import configuration
     import { firebaseConfig } from './assets/js/firebase-config.js';
-    
-    // Check if configuration is filled out
+
     const isConfigured = firebaseConfig.apiKey && firebaseConfig.apiKey !== "TWOJ_API_KEY";
     
-    let app, auth, db;
     if (isConfigured) {
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      db = getFirestore(app);
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
       
       const provider = new GoogleAuthProvider();
       
@@ -724,30 +722,29 @@
       const userInfo = document.getElementById('user-info');
       const userEmail = document.getElementById('user-email');
       
-      // We'll hide main content tabs by default via CSS in the future, 
-      // but for now let's just make the login work.
-      
-      loginBtn.addEventListener('click', () => {
-        signInWithPopup(auth, provider).catch(error => {
-          console.error("Login failed", error);
-          alert("Błąd logowania: " + error.message);
+      if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+          signInWithPopup(auth, provider).catch(error => {
+            console.error("Login failed", error);
+            alert("Błąd logowania: " + error.message);
+          });
         });
-      });
+      }
       
-      logoutBtn.addEventListener('click', () => {
-        signOut(auth);
-      });
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+          signOut(auth);
+        });
+      }
       
       onAuthStateChanged(auth, (user) => {
         if (user) {
-          // User is signed in
           authSection.style.display = 'none';
           userInfo.style.display = 'block';
           userEmail.textContent = user.email;
           const privateHub = document.getElementById('private-hub');
           if(privateHub) privateHub.style.display = 'grid';
         } else {
-          // User is signed out
           authSection.style.display = 'block';
           userInfo.style.display = 'none';
           const privateHub = document.getElementById('private-hub');
@@ -755,15 +752,24 @@
         }
       });
     } else {
-      document.getElementById('login-google-btn').textContent = "Skonfiguruj Firebase w assets/js/firebase-config.js";
-      document.getElementById('login-google-btn').disabled = true;
-      document.getElementById('login-google-btn').style.backgroundColor = "#9CA3AF";
+      const loginBtn = document.getElementById('login-google-btn');
+      if (loginBtn) {
+        loginBtn.textContent = "Skonfiguruj Firebase w assets/js/firebase-config.js";
+        loginBtn.disabled = true;
+        loginBtn.style.backgroundColor = "#9CA3AF";
+      }
     }
   </script>
   
   <!-- Inline Bulletproof Navigation & Image Fallbacks -->
   <script>
     (function() {
+      // 0. Render Lucide Icons
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      });
+
       // 1. Direct Image Fallbacks
       const setSrc = (id, url) => {
         const el = document.getElementById(id);
@@ -799,6 +805,6 @@
   <!-- Data & Logic -->
   <script src="assets/js/data.js?v=2"></script>
   <script src="assets/js/local_stats.js?v=1"></script>
-  <script src="assets/js/app.js?v=9"></script>
+  <script src="assets/js/app.js?v=10"></script>
 </body>
 </html>
