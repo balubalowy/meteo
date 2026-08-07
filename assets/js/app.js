@@ -20,7 +20,28 @@ document.addEventListener("DOMContentLoaded", () => {
   initLeafletMap();
   initForecastMatrix();
   initRepoStats();
+  loadDashboardLinks();
 });
+
+function loadDashboardLinks() {
+  fetch('assets/js/dashboard_links.json')
+    .then(r => r.json())
+    .then(links => {
+       if (links.imgw_synoptyczna) document.getElementById('dash-synopt').src = links.imgw_synoptyczna;
+       if (links.imgw_cappi) document.getElementById('dash-cappi').src = links.imgw_cappi;
+       if (links.imgw_lts) document.getElementById('dash-lts').src = links.imgw_lts;
+       if (links.meteo_wroclaw) {
+          const mw = document.getElementById('img-meteo-wroclaw');
+          const l = document.getElementById('img-meteo-wroclaw-loading');
+          if (mw) {
+              mw.src = links.meteo_wroclaw;
+              mw.style.display = 'block';
+              if(l) l.style.display = 'none';
+          }
+       }
+    })
+    .catch(e => console.error("Error loading dashboard links:", e));
+}
 
 // ─── 1. Nawigacja (top-nav + module cards) ───
 function initNavigation() {

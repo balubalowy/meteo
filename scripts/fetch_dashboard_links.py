@@ -50,25 +50,26 @@ def main():
     }
 
     # 1. IMGW Datastore
-    syn_url = get_latest_imgw_datastore("/Oper/mapasynoptyczna")
-    if syn_url: links['imgw_synoptyczna'] = syn_url
-    
-    cappi_url = get_latest_imgw_datastore("/Oper/Polrad/Produkty/POLCOMP/COMPO_CAPPI.comp.cappi")
-    if cappi_url: links['imgw_cappi'] = cappi_url
-    
-    lts_url = get_latest_imgw_datastore("/Oper/Perun/LTS2005")
-    if lts_url: links['imgw_lts'] = lts_url
+    try:
+        syn_url = get_latest_imgw_datastore("/Oper/mapasynoptyczna")
+        if syn_url: links['imgw_synoptyczna'] = syn_url
+    except Exception as e:
+        print("Błąd mapy synoptycznej:", e)
+        
+    try:
+        cappi_url = get_latest_imgw_datastore("/Oper/Polrad/Produkty/POLCOMP/COMPO_CAPPI.comp.cappi")
+        if cappi_url: links['imgw_cappi'] = cappi_url
+    except Exception as e:
+        print("Błąd CAPPI:", e)
+        
+    try:
+        lts_url = get_latest_imgw_datastore("/Oper/Perun/LTS2005")
+        if lts_url: links['imgw_lts'] = lts_url
+    except Exception as e:
+        print("Błąd LTS:", e)
 
     # 2. Meteo.pl Wrocław
-    html_meteo = fetch_html("https://www.meteo.pl/um/php/meteorogram_list.php?ntype=0u&row=436&col=181&lang=pl&cname=Wroc%B3aw", 'iso-8859-2')
-    match = re.search(r'src="(.*?mgram_pict\.php.*?)"', html_meteo)
-    if match:
-        url = match.group(1)
-        if url.startswith("../"):
-            url = "https://www.meteo.pl/um/" + url[3:]
-        elif not url.startswith("http"):
-            url = "https://www.meteo.pl/um/php/" + url
-        links['meteo_wroclaw'] = url
+    links['meteo_wroclaw'] = "https://www.meteo.pl/um/metco/mgram_pict.php?ntype=0u&row=436&col=181&lang=pl"
 
     # 3. Awiacja IMGW
     html_awiacja = fetch_html("https://awiacja.imgw.pl/prognozy-lotnicze/sigwx", 'utf-8')

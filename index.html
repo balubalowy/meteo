@@ -27,15 +27,15 @@
       
       <div class="top-stats">
           <nav class="nav-links">
-          <a href="#" class="nav-link tab-btn active" data-tab="tab-overview"><i data-lucide="layout-dashboard"></i> Pulpit</a>
-          <a href="#" class="nav-link tab-btn" data-tab="tab-if-evaluator"><i data-lucide="tornado"></i> Skala IF</a>
-          <a href="#" class="nav-link tab-btn" data-tab="tab-calculators"><i data-lucide="calculator"></i> Kalkulatory</a>
-          <a href="#" class="nav-link tab-btn" data-tab="tab-knowledge"><i data-lucide="book-open"></i> Baza Wiedzy</a>
-          <a href="#" class="nav-link tab-btn" data-tab="tab-alert-rules"><i data-lucide="alert-triangle"></i> Ostrzeżenia</a>
-          <a href="#" class="nav-link tab-btn" data-tab="tab-maps"><i data-lucide="map"></i> Mapy</a>
-          <a href="#" class="nav-link tab-btn" data-tab="tab-stats"><i data-lucide="bar-chart-2"></i> Statystyki</a>
-          <a href="#" class="nav-link tab-btn" data-tab="tab-ensembles"><i data-lucide="cloud-rain"></i> Ensembles</a>
-          <a href="#" class="nav-link tab-btn" data-tab="tab-stacje"><i data-lucide="thermometer"></i> Stacje Live</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn active" data-tab="tab-overview"><i data-lucide="layout-dashboard"></i> Pulpit</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-if-evaluator"><i data-lucide="tornado"></i> Skala IF</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-calculators"><i data-lucide="calculator"></i> Kalkulatory</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-knowledge"><i data-lucide="book-open"></i> Baza Wiedzy</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-alert-rules"><i data-lucide="alert-triangle"></i> Ostrzeżenia</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-maps"><i data-lucide="map"></i> Mapy</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-stats"><i data-lucide="bar-chart-2"></i> Statystyki</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-ensembles"><i data-lucide="cloud-rain"></i> Ensembles</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-stacje"><i data-lucide="thermometer"></i> Stacje Live</a>
         </nav>
       </div>
   </header>
@@ -87,14 +87,18 @@
             <img id="dash-dwd" src="https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png" alt="DWD Europa" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
           </div>
           <!-- SIGWX IMGW -->
-          <div class="card" style="padding: 1rem;">
+          <div class="card" style="padding: 1rem; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Polska (SIGWX IMGW)</h3>
-            <iframe src="https://awiacja.imgw.pl/prognozy-lotnicze/sigwx" style="width: 100%; height: 350px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: white;"></iframe>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">IMGW zaktualizowało serwis Awiacja i zablokowało możliwość jego bezpośredniego osadzania na innych stronach (X-Frame-Options).</p>
+            <a href="https://awiacja.imgw.pl/prognozy-lotnicze/sigwx" target="_blank" class="btn" style="background: var(--primary); color: white;">
+              Otwórz Awiacja IMGW <i data-lucide="external-link" style="margin-left: 5px; width: 16px; height: 16px;"></i>
+            </a>
           </div>
           <!-- Meteo.pl Wrocław -->
           <div class="card" style="padding: 1rem;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Wrocław (UM Meteo.pl)</h3>
-            <iframe src="https://www.meteo.pl/um/php/meteorogram_list.php?ntype=0u&row=436&col=181&lang=pl&cname=Wroc%B3aw" style="width: 100%; height: 350px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: white;"></iframe>
+            <img id="img-meteo-wroclaw" src="" alt="Meteogram Wrocław" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: none;">
+            <div id="img-meteo-wroclaw-loading" style="text-align: center; padding: 2rem; color: var(--text-secondary);">Ładowanie z Meteo.pl...</div>
           </div>
         </div>
 
