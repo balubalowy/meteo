@@ -761,9 +761,44 @@
     }
   </script>
   
+  <!-- Inline Bulletproof Navigation & Image Fallbacks -->
+  <script>
+    (function() {
+      // 1. Direct Image Fallbacks
+      const setSrc = (id, url) => {
+        const el = document.getElementById(id);
+        if (el && url) el.src = url;
+      };
+      setSrc('dash-sigwx-pl', 'https://aviation-api.imgw.pl/image/significant/pl');
+      setSrc('dash-sigwx-cz', 'https://aviation-api.imgw.pl/image/significant/cz');
+      setSrc('img-meteo-wroclaw', 'https://www.meteo.pl/um/metco/mgram_pict.php?ntype=0u&row=436&col=181&lang=pl');
+      setSrc('dash-cmm-synop', 'https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/CMM_mapy/synop/TEMPERATURA_2026080723.png');
+      setSrc('dash-synopt', 'https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/mapasynoptyczna/mapasynop_202608071200.png');
+      setSrc('dash-cappi', 'https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Polrad/Produkty/POLCOMP/COMPO_CAPPI.comp.cappi/2026080721450000dBZ.cappi.png');
+      setSrc('dash-lts', 'https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Perun/LTS2005/DISCH_20260807_214700.gif');
+      setSrc('dash-lowcyburz', 'https://lowcyburz.pl/wp-content/uploads/2026/08/07_08_08_26.png');
+
+      // 2. Global Event Listener for Tab Buttons
+      document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.tab-btn');
+        if (!btn) return;
+        const targetTab = btn.getAttribute('data-tab');
+        if (!targetTab) return;
+        
+        e.preventDefault();
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+        
+        btn.classList.add('active');
+        const activeView = document.getElementById(targetTab);
+        if (activeView) activeView.classList.add('active');
+      });
+    })();
+  </script>
+
   <!-- Data & Logic -->
   <script src="assets/js/data.js?v=2"></script>
   <script src="assets/js/local_stats.js?v=1"></script>
-  <script src="assets/js/app.js?v=7"></script>
+  <script src="assets/js/app.js?v=8"></script>
 </body>
 </html>
