@@ -11,16 +11,18 @@ ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
-def fetch_html(url, charset='utf-8', data=None):
+def fetch_html(url, charset='utf-8', data=None, retries=2):
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'})
-    try:
-        if data:
-            data = urllib.parse.urlencode(data).encode('utf-8')
-        response = urllib.request.urlopen(req, data=data, context=ctx, timeout=15)
-        return response.read().decode(charset, errors='ignore')
-    except Exception as e:
-        print(f"Error fetching {url}: {e}")
-        return ""
+    encoded_data = urllib.parse.urlencode(data).encode('utf-8') if data else None
+    for attempt in range(retries + 1):
+        try:
+            response = urllib.request.urlopen(req, data=encoded_data, context=ctx, timeout=30)
+            return response.read().decode(charset, errors='ignore')
+        except Exception as e:
+            if attempt < retries:
+                continue
+            print(f"Błąd pobierania {url}: {e}")
+            return ""
 
 def get_latest_imgw_datastore(path):
     try:
