@@ -41,6 +41,19 @@ def get_latest_imgw_datastore(path):
         print("Błąd datastore dla", path, ":", e)
     return ""
 
+def get_latest_imgw_datastore_all(path):
+    """Returns list of all download URLs from a given IMGW datastore path."""
+    try:
+        url = "https://danepubliczne.imgw.pl/pl/datastore/getFilesList"
+        data = {"productType": "oper", "path": path}
+        html = fetch_html(url, data=data)
+        
+        matches = re.findall(r'href=[\'"]datastore/getfiledown([^\'\"]+(?:\.png|\.gif|\.jpg))[\'"]', html, re.IGNORECASE)
+        return [f"https://danepubliczne.imgw.pl/datastore/getfiledown{m}" for m in matches]
+    except Exception as e:
+        print("Błąd datastore_all dla", path, ":", e)
+    return []
+
 def main():
     links = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -88,6 +101,40 @@ def main():
 
     # 3. DWD Hobby
     links['dwd_europa'] = "https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png"
+
+    # 4. CMM Synop (wszystkie produkty pogodowe z IMGW)
+    # Ścieżka: /Oper/CMM_mapy/synop/, pliki: TEMPERATURA_2026080720.png
+    cmm_products = {
+        'cmm_temp': 'TEMPERATURA',
+        'cmm_temp_min': 'TEMP_MIN_W_NOCY',
+        'cmm_temp_max': 'TEMP_MAX_W_DZIEN',
+        'cmm_temp_grunt': 'TEMP_GRUNT_MIN_W_NOCY',
+        'cmm_temp_odcz': 'TEMP_ODCZ',
+        'cmm_temp_srednia': 'TEMPERATURA_SREDNIA_DOBOWA',
+        'cmm_opad': 'OPAD_SUMA_DOBOWA',
+        'cmm_wiatr': 'WIATR',
+        'cmm_poryw': 'PORYW_MAX',
+        'cmm_cisnienie': 'CISNIENIE',
+        'cmm_cisn_zmiana': 'CISNIENIE_ZMIANA_DOBOWA',
+        'cmm_wilgotnosc': 'WILGOTNOSC',
+        'cmm_zachmurzenie': 'ZACHMURZENIE_GODZ',
+        'cmm_widzialnosc': 'WIDZIALNOSC',
+        'cmm_uslonecznienie': 'USLONECZNIENIE',
+        'cmm_podstawa': 'PODSTAWA_GODZ',
+    }
+    # Get all files from CMM_mapy/synop
+    try:
+        all_cmm_url = get_latest_imgw_datastore_all("/Oper/CMM_mapy/synop")
+        for key, prefix in cmm_products.items():
+            matching = [f for f in all_cmm_url if '/' + prefix + '_' in f]
+            if matching:
+                latest = sorted(matching)[-1]
+                links[key] = latest
+                print(f"  CMM {key}: OK")
+            else:
+                print(f"  CMM {key}: brak pliku")
+    except Exception as e:
+        print(f"  CMM błąd: {e}")
 
     out_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "js")
     os.makedirs(out_dir, exist_ok=True)

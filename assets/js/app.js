@@ -23,7 +23,30 @@ document.addEventListener("DOMContentLoaded", () => {
    loadDashboardLinks();
    initSortableGrid();
    initLightbox();
+   initCmmSynop();
+   renderLocalStats();
 });
+
+function initCmmSynop() {
+  const select = document.getElementById('cmm-synop-select');
+  const img = document.getElementById('dash-cmm-synop');
+  if (!select || !img) return;
+
+  // CMM links will be populated by loadDashboardLinks into window._cmmLinks
+  function loadCmm() {
+    const key = 'cmm_' + select.value;
+    if (window._cmmLinks && window._cmmLinks[key]) {
+      img.src = window._cmmLinks[key];
+      img.alt = 'CMM Synop: ' + select.options[select.selectedIndex].text;
+    } else {
+      img.alt = 'Brak danych CMM. Uruchom sync.bat.';
+    }
+  }
+
+  select.addEventListener('change', loadCmm);
+  // Will be called after dashboard links load
+  window._cmmLoadFn = loadCmm;
+}
 
 function initSortableGrid() {
    const grid = document.getElementById('dashboard-tiles');
@@ -68,9 +91,6 @@ function loadDashboardLinks() {
        if (links.imgw_synoptyczna) document.getElementById('dash-synopt').src = links.imgw_synoptyczna;
        if (links.imgw_cappi) document.getElementById('dash-cappi').src = links.imgw_cappi;
        if (links.imgw_lts) document.getElementById('dash-lts').src = links.imgw_lts;
-       if (links.estofex) document.getElementById('dash-estofex').src = links.estofex;
-       if (links.blitzortung) document.getElementById('dash-blitzortung').src = links.blitzortung;
-       if (links.sat24) document.getElementById('dash-sat24-frame').src = links.sat24;
        if (links.sigwx_imgw) document.getElementById('dash-sigwx-pl').src = links.sigwx_imgw;
        if (links.sigwx_chmi) document.getElementById('dash-sigwx-cz').src = links.sigwx_chmi;
        
@@ -90,6 +110,10 @@ function loadDashboardLinks() {
           const l = document.getElementById('dash-lowcyburz-loading');
           if(l) l.innerText = "Brak mapy w najnowszym wpisie.";
        }
+
+       // Store CMM links and trigger load
+       window._cmmLinks = links;
+       if (window._cmmLoadFn) window._cmmLoadFn();
     })
     .catch(e => console.error("Error loading dashboard links:", e));
 }
@@ -110,7 +134,10 @@ function initNavigation() {
 
       link.classList.add("active");
       const activeView = document.getElementById(targetTab);
-      if (activeView) activeView.classList.add("active");
+      if (activeView) {
+        activeView.classList.add("active");
+        window.dispatchEvent(new Event('resize'));
+      }
     });
   });
 
@@ -506,7 +533,7 @@ function initLeafletMap() {
 
 // 💡 10. Interaktywna Tabela Prognoz (Forecast Matrix SOB)
 function initForecastMatrix() {
-  const cells = document.querySelectorAll(".selectable-cell");
+  const cells = document.querySelectorAll(".sob-cell:not(.disabled)");
   const resultDiv = document.getElementById("matrix-result");
   const descDiv = document.getElementById("matrix-desc");
   
@@ -519,57 +546,48 @@ function initForecastMatrix() {
     rain: 0
   };
   
-  const levels = {
-    "MRG": { val: 1, color: "var(--accent-info)", name: "MARGINAL (MRG)" },
-    "NWL": { val: 2, color: "var(--accent-success)", name: "NISKI (NWL)" },
-    "SRD": { val: 3, color: "var(--accent-warning)", name: "ŚREDNI (SRD)" },
-    "DZ":  { val: 4, color: "var(--accent-danger)", name: "DUŻY (DZ)" },
-    "EXT": { val: 5, color: "#9333ea", name: "EKSTREMALNY (EXT)" }
+  const levelDetails = {
+    1: { code: "MRG", color: "#22c55e", name: "MRG (Marginalne - 1/5)", desc: "Niskie ryzyko zjawisk burzowych." },
+    2: { code: "NWL", color: "#eab308", name: "NWL (Niewielkie - 2/5)", desc: "Umiarkowanie groźne burze." },
+    3: { code: "SRD", color: "#f97316", name: "SRD (Średnie - 3/5)", desc: "Niebezpieczne, silne burze." },
+    4: { code: "DZ",  color: "#ef4444", name: "DZ (Duże - 4/5)", desc: "Gwałtowne, bardzo niebezpieczne burze." },
+    5: { code: "EXT", color: "#d946ef", name: "EXT (Ekstremalne - 5/5)", desc: "Ekstremalnie groźne i niszczycielskie burze." }
   };
   
   cells.forEach(cell => {
     cell.addEventListener("click", () => {
-      const col = cell.getAttribute("data-col");
-      const valCode = cell.getAttribute("data-val");
-      const levelObj = levels[valCode];
+      const table = cell.closest("table");
+      if (!table) return;
+      const cat = table.getAttribute("data-cat");
+      const val = parseInt(cell.getAttribute("data-val")) || 0;
       
-      // Clear column
-      document.querySelectorAll(`.selectable-cell[data-col="${col}"]`).forEach(c => {
-         c.classList.remove("selected");
-         c.style.backgroundColor = "";
-         c.style.color = "";
-      });
+      // Clear selection in this table
+      table.querySelectorAll(".sob-cell").forEach(c => c.classList.remove("selected"));
       
-      // Select
+      // Select clicked cell
       cell.classList.add("selected");
-      cell.style.backgroundColor = levelObj.color;
-      cell.style.color = "#fff";
-      
-      state[col] = levelObj.val;
+      state[cat] = val;
       
       updateMatrixResult();
     });
   });
   
   function updateMatrixResult() {
-    let maxLevel = Math.max(state.wind, state.torn, state.hail, state.rain);
+    let maxVal = Math.max(state.wind, state.torn, state.hail, state.rain);
     
-    if (maxLevel === 0) {
+    if (maxVal === 0) {
       resultDiv.textContent = "Brak wyboru";
       resultDiv.style.color = "var(--border-strong)";
-      descDiv.textContent = "Wybierz prawdopodobieństwa dla wszystkich 4 zagrożeń.";
+      descDiv.textContent = "Kliknij wybrane komórki w powyższych tabelach, aby wyznaczyć stopień.";
       return;
     }
     
-    // Find name
-    let finalCode = "";
-    for (let k in levels) {
-      if (levels[k].val === maxLevel) finalCode = k;
-    }
+    const info = levelDetails[maxVal];
+    resultDiv.textContent = info.name;
+    resultDiv.style.color = info.color;
     
-    resultDiv.textContent = levels[finalCode].name;
-    resultDiv.style.color = levels[finalCode].color;
-    descDiv.textContent = `Wybrano stopień na podstawie najwyższego wytypowanego ryzyka.`;
+    const countSelected = Object.values(state).filter(v => v > 0).length;
+    descDiv.innerHTML = `Najwyższy wytypowany stopień: <strong style="color:${info.color}">${info.code}</strong> (${info.desc}).<br><span style="font-size:0.8rem; opacity:0.8">Zaznaczono ${countSelected} z 4 kategorii.</span>`;
   }
 }
 

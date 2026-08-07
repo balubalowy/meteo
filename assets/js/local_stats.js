@@ -1,1 +1,1 @@
-window.meteoStats = {"total_storms": 73, "max_wind": 86.0, "max_cape": 3870.0, "total_km": 5423.0, "lastSync": "2026-08-07 20:19:16"};
+window.meteoStats = {"total_storms": 73, "max_wind": 86.0, "max_cape": 3870.0, "total_km": 5423.0, "lastSync": "2026-08-07 20:53:34"};

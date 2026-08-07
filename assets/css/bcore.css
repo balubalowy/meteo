@@ -244,3 +244,47 @@ body {
     to {transform: scale(1); opacity: 1;}
 }
 
+/* SOB Table Matrix Styles */
+.sob-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    text-align: center;
+}
+.sob-table th {
+    padding: 0.4rem;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-subtle);
+    font-weight: 600;
+}
+.sob-table td {
+    padding: 0.4rem;
+    border: 1px solid var(--border-subtle);
+}
+.sob-cell {
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+.sob-cell:hover {
+    transform: scale(1.05);
+    filter: brightness(1.2);
+}
+.sob-cell.selected {
+    outline: 3px solid #fff;
+    outline-offset: -3px;
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+.sob-cell.disabled {
+    cursor: not-allowed;
+    background: repeating-linear-gradient(45deg, #1c1c1e, #1c1c1e 5px, #2c2c2e 5px, #2c2c2e 10px);
+    color: #666;
+}
+.sob-cell.mrg { background: #22c55e; color: #000; }
+.sob-cell.nwl { background: #eab308; color: #000; }
+.sob-cell.srd { background: #f97316; color: #000; }
+.sob-cell.dz  { background: #ef4444; color: #fff; }
+.sob-cell.ext { background: #d946ef; color: #fff; }
+
