@@ -40,8 +40,8 @@
                       </button>
                   </span>
                   <span id="user-info" style="display: none;">
-                      <span style="color: var(--accent-success); font-weight: 500;">✓ Zalogowano: <span id="user-email" style="font-weight: 600; color: var(--text-primary);"></span></span>
-                      <button id="logout-btn" class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.7rem; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer; margin-left: 6px;">Wyloguj</button>
+                      <span style="color: var(--accent-success); font-weight: 500; font-size: 0.7rem; white-space: nowrap;">✓ Zalogowano: <span id="user-email" style="font-weight: 600; color: var(--text-primary); max-width: 130px; display: inline-block; vertical-align: bottom; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span></span>
+                      <button id="logout-btn" class="btn btn-ghost" style="padding: 1px 5px; font-size: 0.68rem; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer; margin-left: 4px;">Wyloguj</button>
                   </span>
               </div>
           </div>
@@ -62,7 +62,7 @@
         </nav>
       </div>
   </header>
-
+  
   <!-- Main Content -->
   <div class="container main-content">
       <div id="tab-overview" class="tab-view active">
@@ -89,694 +89,666 @@
           
           <!-- Meteo.pl Wrocław -->
           <div class="card tile-item" data-id="tile-meteo-wroclaw" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wrocław (UM Meteo.pl)</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Meteogram Wrocław</h3>
+            <div id="img-meteo-wroclaw-loading" style="display: block; font-size: 0.85rem; color: var(--text-secondary);">Wczytywanie...</div>
             <img id="img-meteo-wroclaw" class="zoomable" src="https://www.meteo.pl/um/metco/mgram_pict.php?ntype=0u&row=436&col=181&lang=pl" alt="Meteogram Wrocław" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
           </div>
-          
-          <!-- CMM Synop IMGW -->
+
+          <!-- CMM IMGW Mapa Synoptyczna -->
           <div class="card tile-item" data-id="tile-cmm-synop" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Mapa Meteorologiczna (CMM Synop)</h3>
-            <div style="margin-bottom: 0.5rem;">
-              <select id="cmm-synop-select" style="padding: 0.4rem 0.8rem; background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); font-size: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+              <h3 style="font-size: 1.1rem; color: var(--text-secondary); margin: 0;"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> CMM IMGW</h3>
+              <select id="cmm-synop-select" class="form-select" style="width: auto; padding: 2px 6px; font-size: 0.75rem;">
                 <option value="temp">Temperatura</option>
-                <option value="temp_min">Temp. min (noc)</option>
-                <option value="temp_max">Temp. max (dzień)</option>
-                <option value="temp_grunt">Temp. grunt min (noc)</option>
-                <option value="temp_odcz">Temp. odczuwalna</option>
-                <option value="temp_srednia">Temp. średnia dobowa</option>
-                <option value="opad">Opad suma dobowa</option>
-                <option value="wiatr">Wiatr</option>
-                <option value="poryw">Poryw max</option>
+                <option value="opad">Opad 24h</option>
+                <option value="wiatr">Wiatr porywy</option>
+                <option value="wiatr_sr">Wiatr średni</option>
+                <option value="wilg">Wilgotność</option>
                 <option value="cisnienie">Ciśnienie</option>
-                <option value="cisn_zmiana">Ciśnienie zmiana dobowa</option>
-                <option value="wilgotnosc">Wilgotność</option>
-                <option value="zachmurzenie">Zachmurzenie</option>
-                <option value="widzialnosc">Widzialność</option>
-                <option value="uslonecznienie">Usłonecznienie</option>
-                <option value="podstawa">Podstawa chmur</option>
+                <option value="uslonecznienie">Uczłonecznienie</option>
               </select>
             </div>
-            <img id="dash-cmm-synop" class="zoomable" src="https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/CMM_mapy/synop/TEMPERATURA_2026080723.png" alt="CMM Synop Temperatura" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+            <img id="dash-cmm-synop" class="zoomable" src="https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/CMM_mapy/synop/TEMPERATURA_2026080723.png" alt="CMM Synop" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
-          
-          <!-- Mapa Synoptyczna IMGW -->
+
+          <!-- IMGW Mapa Synoptyczna -->
           <div class="card tile-item" data-id="tile-synopt" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Mapa Synoptyczna</h3>
-            <img id="dash-synopt" class="zoomable" src="https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/mapasynoptyczna/mapasynop_202608071200.png" alt="Mapa Synoptyczna" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Mapa Synoptyczna IMGW</h3>
+            <img id="dash-synopt" class="zoomable" src="https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/mapasynoptyczna/mapasynop_202608071200.png" alt="Mapa Synoptyczna IMGW" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
-          
-          <!-- Radar CAPPI -->
+
+          <!-- Radar CAPPI IMGW -->
           <div class="card tile-item" data-id="tile-cappi" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Radar (COMPO CAPPI)</h3>
-            <img id="dash-cappi" class="zoomable" src="https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Polrad/Produkty/POLCOMP/COMPO_CAPPI.comp.cappi/2026080721450000dBZ.cappi.png" alt="Radar CAPPI" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Radar CAPPI IMGW</h3>
+            <img id="dash-cappi" class="zoomable" src="https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Polrad/Produkty/POLCOMP/COMPO_CAPPI.comp.cappi/2026080721450000dBZ.cappi.png" alt="Radar CAPPI IMGW" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
-          
-          <!-- Wyładowania LTS2005 -->
+
+          <!-- Detekcja Wyładowań LTS -->
           <div class="card tile-item" data-id="tile-lts" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wyładowania (LTS2005 IMGW)</h3>
-            <img id="dash-lts" class="zoomable" src="https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Perun/LTS2005/DISCH_20260807_214700.gif" alt="Wyładowania LTS2005" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
-          </div>
-          
-          <!-- Blitzortung -->
-          <div class="card tile-item" data-id="tile-blitzortung" style="padding: 1rem; cursor: grab;">
-             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Pioruny (Blitzortung Live Map)</h3>
-             <iframe src="https://map.blitzortung.org/#6/52/19" style="width: 100%; height: 350px; border: none; border-radius: var(--radius-sm); background: #000;"></iframe>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wyładowania (PERUN LTS)</h3>
+            <img id="dash-lts" class="zoomable" src="https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Perun/LTS2005/DISCH_20260807_214700.gif" alt="Wyładowania PERUN" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
 
-          <!-- Estofex -->
-          <div class="card tile-item" data-id="tile-estofex" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> ESTOFEX</h3>
-            <img id="dash-estofex" class="zoomable" src="https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest" alt="Estofex" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
-          </div>
-
-          <!-- Łowcy Burz -->
+          <!-- Polscy Łowcy Burz -->
           <div class="card tile-item" data-id="tile-lowcyburz" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Prognoza Skywarn (Łowcy Burz)</h3>
-            <img id="dash-lowcyburz" class="zoomable" src="https://lowcyburz.pl/wp-content/uploads/2026/08/07_08_08_26.png" alt="Prognoza Łowców Burz" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
-          </div>
-          
-          <!-- Satelita -->
-          <div class="card tile-item" data-id="tile-satellite" style="padding: 1rem; cursor: grab;">
-             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Satelita (Sat24 Polska Live)</h3>
-             <iframe src="https://sat24.mobi/Image/satvis/europa/pl" style="width: 100%; height: 350px; border: none; border-radius: var(--radius-sm); background: var(--bg-tertiary);"></iframe>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Polscy Łowcy Burz (Prognoza)</h3>
+            <div id="dash-lowcyburz-loading" style="display: block; font-size: 0.85rem; color: var(--text-secondary);">Wczytywanie...</div>
+            <img id="dash-lowcyburz" class="zoomable" src="https://lowcyburz.pl/wp-content/uploads/2026/08/07_08_08_26.png" alt="Prognoza Łowców Burz" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
           </div>
         </div>
       </div>
 
-    <!-- TAB 2: OCENA SZKÓD IF-SCALE -->
-    <div id="tab-if-evaluator" class="tab-view auth-required">
-      <div class="card mb-3">
-        <div class="card-header-bar">
-          <div class="card-title">Kalkulator Oceny Zniszczeń ESSL IF-Scale (v1.0e 2025)</div>
-        </div>
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-          Wybierz wskaźnik zniszczeń (Damage Indicator) oraz stopień uszkodzenia (DoD), aby wyliczyć natychmiastową trójwymiarową prędkość wiatru w porywie według wytycznych ESSL 2025.
-        </p>
-
-        <div class="grid-3">
-          <div class="form-group">
-            <label class="form-label">1. Wskaźnik Zniszczeń (Damage Indicator):</label>
-            <select id="eval-di-select" class="form-select"></select>
+      <!-- TAB 2: SKALA IF -->
+      <div id="tab-if-evaluator" class="tab-view">
+        <div class="card mb-2">
+          <div class="card-header-bar">
+            <div class="card-title">Kalkulator Oceny Zniszczeń ESSL IF-Scale (v1.0e 2025)</div>
           </div>
-          <div class="form-group">
-            <label class="form-label">2. Klasa Obiektu / Podkategoria:</label>
-            <select id="eval-sub-select" class="form-select"></select>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            Wybierz wskaźnik zniszczeń (Damage Indicator) oraz stopień uszkodzenia (DoD), aby wyliczyć natychmiastową trójwymiarową prędkość wiatru w porywie według wytycznych ESSL 2025.
+          </p>
+
+          <div class="grid-3">
+            <div class="form-group">
+              <label class="form-label">1. Wskaźnik Zniszczeń (Damage Indicator):</label>
+              <select id="eval-di-select" class="form-select"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">2. Klasa Obiektu / Podkategoria:</label>
+              <select id="eval-sub-select" class="form-select"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">3. Stopień Uszkodzenia (Degree of Damage):</label>
+              <select id="eval-dod-select" class="form-select">
+                <option value="1">DoD 1: Uszkodzenia częściowe / zrywanie elementów</option>
+                <option value="2">DoD 2: Poważne uszkodzenie / zawalenie &gt; 50%</option>
+                <option value="3">DoD 3: Całkowita destrukcja / unoszenie w powietrze</option>
+              </select>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">3. Stopień Uszkodzenia (Degree of Damage):</label>
-            <select id="eval-dod-select" class="form-select">
-              <option value="1">DoD 1: Uszkodzenia częściowe / zrywanie elementów</option>
-              <option value="2">DoD 2: Poważne uszkodzenie / zawalenie &gt; 50%</option>
-              <option value="3">DoD 3: Całkowita destrukcja / unoszenie w powietrze</option>
-            </select>
-          </div>
+
+          <div id="eval-result-box" class="result-box mt-1"></div>
         </div>
 
-        <div id="eval-result-box" class="result-box mt-1"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-header-bar">
-          <div class="card-title">Tabela Klas International Fujita (ESSL 2025)</div>
-        </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Klasa</th>
-              <th>Prędkość centralna (km/h)</th>
-              <th>Prędkość centralna (m/s)</th>
-              <th>Węzły (kt)</th>
-              <th>Opis Charakterystyczny</th>
-            </tr>
-          </thead>
-          <tbody id="if-classes-table-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TAB 3: KALKULATORY -->
-    <div id="tab-calculators" class="tab-view">
-      <div class="grid-2 mb-2">
-        <!-- Przelicznik Wiatru -->
         <div class="card">
           <div class="card-header-bar">
-            <div class="card-title">1. Przelicznik Prędkości Wiatru</div>
+            <div class="card-title">Tabela Klas International Fujita (ESSL 2025)</div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Wartość wejściowa:</label>
-            <input type="number" id="calc-wind-val" class="form-input" value="100">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Jednostka wejściowa:</label>
-            <select id="calc-wind-unit" class="form-select">
-              <option value="kmh">km/h</option>
-              <option value="ms">m/s</option>
-              <option value="kt">węzły (kt)</option>
-            </select>
-          </div>
-          <div class="result-box mt-1">
-            <div class="stat-label">Wyniki przeliczenia:</div>
-            <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-primary); margin-top: 0.2rem;" id="res-wind-kmh">100.0 km/h</div>
-            <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-success); margin-top: 0.2rem;" id="res-wind-ms">27.8 m/s</div>
-            <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-warning); margin-top: 0.2rem;" id="res-wind-kt">54.0 kt</div>
-          </div>
-          <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-            Źródło: 1 kt = 1.852 km/h; 1 m/s = 3.6 km/h (allmetsat)
-          </div>
-        </div>
-
-        <!-- Kalkulator DCP -->
-        <div class="card">
-          <div class="card-header-bar">
-            <div class="card-title">2. Derecho Composite Parameter (DCP)</div>
-          </div>
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="form-label">DCAPE [J/kg]:</label>
-              <input type="number" id="calc-dcp-dcape" class="form-input" value="1000" step="50">
-            </div>
-            <div class="form-group">
-              <label class="form-label">MUCAPE [J/kg]:</label>
-              <input type="number" id="calc-dcp-mucape" class="form-input" value="2500" step="100">
-            </div>
-            <div class="form-group">
-              <label class="form-label">DLS 0–6 km [m/s]:</label>
-              <input type="number" id="calc-dcp-dls" class="form-input" value="22" step="1">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Średni wiatr 0–6 km [m/s]:</label>
-              <input type="number" id="calc-dcp-meanwind" class="form-input" value="18" step="1">
-            </div>
-          </div>
-          <div class="result-box mt-1">
-            <div class="stat-label">Wyznaczony Indeks DCP:</div>
-            <div style="font-size: 1.4rem; font-weight: 700; color: var(--accent-danger); margin-top: 0.1rem;" id="res-dcp-val">4.25</div>
-          </div>
-          <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-            Źródło: DCP &gt; 2.0 → ryzyko Derecho (Evans &amp; Doswell / SPC).
-          </div>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <!-- Kalkulator Wmax -->
-        <div class="card">
-          <div class="card-header-bar">
-            <div class="card-title">3. Prąd Wstępujący (Wmax)</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Energia CAPE [J/kg]:</label>
-            <input type="number" id="calc-cape-val" class="form-input" value="2000" step="100">
-          </div>
-          <div class="result-box mt-1">
-            <div class="stat-label">Maksymalna prędkość prądu (Wmax):</div>
-            <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-danger); margin-top: 0.1rem;" id="res-wmax-val">63.2 m/s (228 km/h)</div>
-          </div>
-          <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-            Źródło: Wzór Zięby — W<sub>max</sub> = √(2 × CAPE) [m/s]
-          </div>
-        </div>
-
-        <!-- Kalkulator LCL -->
-        <div class="card">
-          <div class="card-header-bar">
-            <div class="card-title">4. Podstawa Chmur (LCL)</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Temperatura (T) [°C]:</label>
-            <input type="number" id="calc-lcl-temp" class="form-input" value="25.0" step="0.5">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Punkt rosy (T<sub>d</sub>) [°C]:</label>
-            <input type="number" id="calc-lcl-td" class="form-input" value="18.0" step="0.5">
-          </div>
-          <div class="result-box mt-1">
-            <div class="stat-label">Wysokość podstawy LCL:</div>
-            <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-info); margin-top: 0.1rem;" id="res-lcl-height">875 m n.p.g.</div>
-          </div>
-          <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-            Źródło: Wzór Espy'edy — h<sub>LCL</sub> ≈ 125 × (T − T<sub>d</sub>) [m]
-          </div>
-        </div>
-      </div>
-
-      <div class="grid-2 mt-2">
-        <!-- Kalkulator Wilgotności / Punktu Rosy -->
-        <div class="card">
-          <div class="card-header-bar">
-            <div class="card-title">5. Wilgotność / Punkt Rosy (Magnus)</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Temperatura (T) [°C]:</label>
-            <input type="number" id="calc-rh-temp" class="form-input" value="20.0" step="0.5">
-          </div>
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="form-label">Wilgotność (RH) [%]:</label>
-              <input type="number" id="calc-rh-rh" class="form-input" value="50" step="1" min="1" max="100">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Punkt Rosy (T<sub>d</sub>) [°C]:</label>
-              <input type="number" id="calc-rh-td" class="form-input" value="9.3" step="0.5">
-            </div>
-          </div>
-          <div class="result-box mt-1">
-            <div class="stat-label">Ostatnio wyliczono:</div>
-            <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-success); margin-top: 0.1rem;" id="res-rh-val">Wpisz dane aby przeliczyć...</div>
-          </div>
-          <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-            Wpisz RH aby otrzymać T<sub>d</sub>, lub wpisz T<sub>d</sub> aby otrzymać RH. (Wzór Magnusa-Tetensa).
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 4: BAZA WIEDZY (Złączona Aerologia i Sygnatury) -->
-    <div id="tab-knowledge" class="tab-view">
-      <h2 class="section-title"><i data-lucide="book-open" style="margin-right: 10px;"></i> Baza Wiedzy (Aerologia i Sygnatury)</h2>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 2rem;">Źródła: dr M. Zięba, dr hab. M. Taszarek, K. Ostrowski, W. Pilorz</p>
-      
-      <div class="grid-2">
-        <!-- Akordeon: Aerologia -->
-        <div class="card" style="padding: 1.5rem;">
-          <h3 style="margin-bottom: 1rem; color: var(--accent-primary);"><i data-lucide="thermometer"></i> Parametry Aerologiczne</h3>
-          <div id="thermo-concepts-grid" style="display: flex; flex-direction: column; gap: 1rem;">
-             <!-- Wypełniane przez app.js jako akordeony -->
-          </div>
-        </div>
-
-        <!-- Akordeon: Sygnatury -->
-        <div class="card" style="padding: 1.5rem;">
-          <h3 style="margin-bottom: 1rem; color: var(--accent-primary);"><i data-lucide="radar"></i> Atlas Sygnatur Radarowych</h3>
-          <div id="radar-signatures-grid" style="display: flex; flex-direction: column; gap: 1rem;">
-             <!-- Wypełniane przez app.js jako akordeony -->
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 5: OSTRZEŻENIA (Oficjalna Tabela Prognostyczna SOB) -->
-    <div id="tab-alert-rules" class="tab-view">
-      <h2 class="section-title" style="border-color: var(--accent-danger);"><i data-lucide="alert-triangle" style="margin-right: 10px;"></i> Tabela Prognostyczna SOB</h2>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Kliknij w komórki tabel (po jednej dla każdego z 4 zjawisk: Wiatr, Tornado, Grad, Deszcz), aby wyliczyć sugerowany stopień zagrożenia wedle oficjalnej metodologii SOB.</p>
-      
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-        <!-- 1. WIATR -->
-        <div class="card" style="padding: 1rem;">
-          <h3 style="background: #eab308; color: #000; padding: 0.5rem; text-align: center; border-radius: var(--radius-sm); font-weight: 700; margin-bottom: 0.8rem;">Wiatr</h3>
-          <table class="sob-table" data-cat="wind">
+          <table class="data-table">
             <thead>
               <tr>
-                <th>Prędkość</th>
-                <th>10-30%</th>
-                <th>30-60%</th>
-                <th>>60%</th>
+                <th>Klasa</th>
+                <th>Prędkość centralna (km/h)</th>
+                <th>Prędkość centralna (m/s)</th>
+                <th>Węzły (kt)</th>
+                <th>Opis Charakterystyczny</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>&lt;60 km/h</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-              </tr>
-              <tr>
-                <td>60-80 km/h</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-              </tr>
-              <tr>
-                <td>80-90 km/h</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-              </tr>
-              <tr>
-                <td>90-110 km/h</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-              </tr>
-              <tr>
-                <td>110-120 km/h</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-                <td class="sob-cell ext" data-val="5">EXT</td>
-              </tr>
-              <tr>
-                <td>&gt;120 km/h</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-                <td class="sob-cell ext" data-val="5">EXT</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- 2. TORNADO -->
-        <div class="card" style="padding: 1rem;">
-          <h3 style="background: #ef4444; color: #fff; padding: 0.5rem; text-align: center; border-radius: var(--radius-sm); font-weight: 700; margin-bottom: 0.8rem;">Tornado</h3>
-          <table class="sob-table" data-cat="torn">
-            <thead>
-              <tr>
-                <th>Intensywność</th>
-                <th>2-5%</th>
-                <th>5-15%</th>
-                <th>>15%</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>X (Brak)</td>
-                <td class="sob-cell disabled">-</td>
-                <td class="sob-cell disabled">-</td>
-                <td class="sob-cell disabled">-</td>
-              </tr>
-              <tr>
-                <td>Landspout</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-              </tr>
-              <tr>
-                <td>IF0 - IF1</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-              </tr>
-              <tr>
-                <td>IF1 - IF2</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-              </tr>
-              <tr>
-                <td>IF2+</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-                <td class="sob-cell ext" data-val="5">EXT</td>
-              </tr>
-              <tr>
-                <td>IF3+</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-                <td class="sob-cell ext" data-val="5">EXT</td>
-                <td class="sob-cell ext" data-val="5">EXT</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- 3. GRAD -->
-        <div class="card" style="padding: 1rem;">
-          <h3 style="background: #22c55e; color: #000; padding: 0.5rem; text-align: center; border-radius: var(--radius-sm); font-weight: 700; margin-bottom: 0.8rem;">Grad</h3>
-          <table class="sob-table" data-cat="hail">
-            <thead>
-              <tr>
-                <th>Średnica</th>
-                <th>5-15%</th>
-                <th>15-45%</th>
-                <th>>45%</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Brak</td>
-                <td class="sob-cell disabled">-</td>
-                <td class="sob-cell disabled">-</td>
-                <td class="sob-cell disabled">-</td>
-              </tr>
-              <tr>
-                <td>&lt;2 cm</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-              </tr>
-              <tr>
-                <td>2 - 4 cm</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-              </tr>
-              <tr>
-                <td>4 - 6 cm</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-              </tr>
-              <tr>
-                <td>6 - 10 cm</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-                <td class="sob-cell ext" data-val="5">EXT</td>
-              </tr>
-              <tr>
-                <td>&gt;10 cm</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-                <td class="sob-cell ext" data-val="5">EXT</td>
-                <td class="sob-cell ext" data-val="5">EXT</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- 4. DESZCZ -->
-        <div class="card" style="padding: 1rem;">
-          <h3 style="background: #3b82f6; color: #fff; padding: 0.5rem; text-align: center; border-radius: var(--radius-sm); font-weight: 700; margin-bottom: 0.8rem;">Deszcz</h3>
-          <table class="sob-table" data-cat="rain">
-            <thead>
-              <tr>
-                <th>Opad</th>
-                <th>5-15%</th>
-                <th>15-45%</th>
-                <th>>45%</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>&lt;20 mm</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-              </tr>
-              <tr>
-                <td>20 - 40 mm</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-              </tr>
-              <tr>
-                <td>40 - 60 mm</td>
-                <td class="sob-cell mrg" data-val="1">MRG</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-              </tr>
-              <tr>
-                <td>&gt;60 mm</td>
-                <td class="sob-cell nwl" data-val="2">NWL</td>
-                <td class="sob-cell srd" data-val="3">SRD</td>
-                <td class="sob-cell dz" data-val="4">DZ</td>
-              </tr>
-              <tr>
-                <td>X</td>
-                <td class="sob-cell disabled">-</td>
-                <td class="sob-cell disabled">-</td>
-                <td class="sob-cell disabled">-</td>
-              </tr>
-              <tr>
-                <td>X</td>
-                <td class="sob-cell disabled">-</td>
-                <td class="sob-cell disabled">-</td>
-                <td class="sob-cell disabled">-</td>
-              </tr>
-            </tbody>
+            <tbody id="if-classes-table-body"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- Wynik Kalkulatora SOB -->
-      <div class="card" style="text-align: center; padding: 2rem; margin-bottom: 2rem;">
-        <h3 style="margin-bottom: 0.5rem; color: var(--text-secondary);">Sugerowany Stopień Zagrożenia SOB:</h3>
-        <div id="matrix-result" style="font-size: 3rem; font-weight: 800; color: var(--border-strong);">Brak wyboru</div>
-        <p id="matrix-desc" style="color: var(--text-secondary); margin-top: 1rem;">Kliknij wybrane komórki w powyższych tabelach, aby wyznaczyć stopień.</p>
-      </div>
+      <!-- TAB 3: KALKULATORY -->
+      <div id="tab-calculators" class="tab-view">
+        <div class="grid-2 mb-2">
+          <!-- Przelicznik Wiatru -->
+          <div class="card">
+            <div class="card-header-bar">
+              <div class="card-title">1. Przelicznik Prędkości Wiatru</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Wartość wejściowa:</label>
+              <input type="number" id="calc-wind-val" class="form-input" value="100">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jednostka wejściowa:</label>
+              <select id="calc-wind-unit" class="form-select">
+                <option value="kmh">km/h</option>
+                <option value="ms">m/s</option>
+                <option value="kt">węzły (kt)</option>
+              </select>
+            </div>
+            <div class="result-box mt-1">
+              <div class="stat-label">Wyniki przeliczenia:</div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-primary); margin-top: 0.2rem;" id="res-wind-kmh">100.0 km/h</div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-success); margin-top: 0.2rem;" id="res-wind-ms">27.8 m/s</div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-warning); margin-top: 0.2rem;" id="res-wind-kt">54.0 kt</div>
+            </div>
+            <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
+              Źródło: 1 kt = 1.852 km/h; 1 m/s = 3.6 km/h (allmetsat)
+            </div>
+          </div>
 
-      <!-- Legenda SOB -->
-      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
-        <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Legenda i Objaśnienia SOB</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-          <div style="background: rgba(34, 197, 94, 0.15); border-left: 4px solid #22c55e; padding: 0.8rem; border-radius: 4px;">
-            <strong style="color: #22c55e;">MRG (1/5) - Marginalne</strong>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Burze przynoszące niskie ryzyko</p>
-          </div>
-          <div style="background: rgba(234, 179, 8, 0.15); border-left: 4px solid #eab308; padding: 0.8rem; border-radius: 4px;">
-            <strong style="color: #eab308;">NWL (2/5) - Niewielkie</strong>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Umiarkowanie groźne burze</p>
-          </div>
-          <div style="background: rgba(249, 115, 22, 0.15); border-left: 4px solid #f97316; padding: 0.8rem; border-radius: 4px;">
-            <strong style="color: #f97316;">SRD (3/5) - Średnie</strong>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Niebezpieczne, silne burze</p>
-          </div>
-          <div style="background: rgba(239, 68, 68, 0.15); border-left: 4px solid #ef4444; padding: 0.8rem; border-radius: 4px;">
-            <strong style="color: #ef4444;">DZ (4/5) - Duże</strong>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Niebezpieczne, gwałtowne burze</p>
-          </div>
-          <div style="background: rgba(217, 70, 239, 0.15); border-left: 4px solid #d946ef; padding: 0.8rem; border-radius: 4px;">
-            <strong style="color: #d946ef;">EXT (5/5) - Ekstremalne</strong>
-            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Ekstremalnie groźne i niszczycielskie burze</p>
+          <!-- Kalkulator DCP -->
+          <div class="card">
+            <div class="card-header-bar">
+              <div class="card-title">2. Derecho Composite Parameter (DCP)</div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">DCAPE [J/kg]:</label>
+                <input type="number" id="calc-dcp-dcape" class="form-input" value="1000" step="50">
+              </div>
+              <div class="form-group">
+                <label class="form-label">MUCAPE [J/kg]:</label>
+                <input type="number" id="calc-dcp-mucape" class="form-input" value="2500" step="100">
+              </div>
+              <div class="form-group">
+                <label class="form-label">DLS 0–6 km [m/s]:</label>
+                <input type="number" id="calc-dcp-dls" class="form-input" value="22" step="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Średni wiatr 0–6 km [m/s]:</label>
+                <input type="number" id="calc-dcp-meanwind" class="form-input" value="18" step="1">
+              </div>
+            </div>
+            <div class="result-box mt-1">
+              <div class="stat-label">Wyznaczony Indeks DCP:</div>
+              <div style="font-size: 1.4rem; font-weight: 700; color: var(--accent-danger); margin-top: 0.1rem;" id="res-dcp-val">4.25</div>
+            </div>
+            <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
+              Źródło: DCP &gt; 2.0 → ryzyko Derecho (Evans &amp; Doswell / SPC).
+            </div>
           </div>
         </div>
 
-        <div style="font-size: 0.85rem; color: var(--text-secondary); border-top: 1px solid var(--border-subtle); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-          <p><strong>Adnotacja - Grad:</strong> Procenty gradu odnoszą się do tego, jaka jest szansa na jego wystąpienie w związku z interakcjami międzykomórkowymi, oraz ilości burz zdolnych wygenerować grad o danym rozmiarze. Ponadto, akumulacja gradu o danym rozmiarze podwyższa poziom zagrożenia o 1 stopień.</p>
-          <p><strong>Adnotacja - Wiatr:</strong> Procenty wiatru odnoszą się do rozległości zjawiska - układy wielokomórkowe utrzymają większe szanse niż superkomórki, gdyż są one bardziej rozległe, nawet jeżeli superkomórka wygeneruje podobne porywy.</p>
+        <div class="grid-2">
+          <!-- Kalkulator Wmax -->
+          <div class="card">
+            <div class="card-header-bar">
+              <div class="card-title">3. Prąd Wstępujący (Wmax)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Energia CAPE [J/kg]:</label>
+              <input type="number" id="calc-cape-val" class="form-input" value="2000" step="100">
+            </div>
+            <div class="result-box mt-1">
+              <div class="stat-label">Maksymalna prędkość prądu (Wmax):</div>
+              <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-danger); margin-top: 0.1rem;" id="res-wmax-val">63.2 m/s (228 km/h)</div>
+            </div>
+            <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
+              Źródło: Wzór Zięby — W<sub>max</sub> = √(2 × CAPE) [m/s]
+            </div>
+          </div>
+
+          <!-- Kalkulator LCL -->
+          <div class="card">
+            <div class="card-header-bar">
+              <div class="card-title">4. Podstawa Chmur (LCL)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Temperatura (T) [°C]:</label>
+              <input type="number" id="calc-lcl-temp" class="form-input" value="25.0" step="0.5">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Punkt rosy (T<sub>d</sub>) [°C]:</label>
+              <input type="number" id="calc-lcl-td" class="form-input" value="18.0" step="0.5">
+            </div>
+            <div class="result-box mt-1">
+              <div class="stat-label">Wysokość podstawy LCL:</div>
+              <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-info); margin-top: 0.1rem;" id="res-lcl-height">875 m n.p.g.</div>
+            </div>
+            <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
+              Źródło: Wzór Espy'edy — h<sub>LCL</sub> ≈ 125 × (T − T<sub>d</sub>) [m]
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2 mt-2">
+          <!-- Kalkulator Wilgotności / Punktu Rosy -->
+          <div class="card">
+            <div class="card-header-bar">
+              <div class="card-title">5. Wilgotność / Punkt Rosy (Magnus)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Temperatura (T) [°C]:</label>
+              <input type="number" id="calc-rh-temp" class="form-input" value="20.0" step="0.5">
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Wilgotność (RH) [%]:</label>
+                <input type="number" id="calc-rh-rh" class="form-input" value="50" step="1" min="1" max="100">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Punkt Rosy (T<sub>d</sub>) [°C]:</label>
+                <input type="number" id="calc-rh-td" class="form-input" value="9.3" step="0.5">
+              </div>
+            </div>
+            <div class="result-box mt-1">
+              <div class="stat-label">Ostatnio wyliczono:</div>
+              <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-success); margin-top: 0.1rem;" id="res-rh-val">Wpisz dane aby przeliczyć...</div>
+            </div>
+            <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
+              Wpisz RH aby otrzymać T<sub>d</sub>, lub wpisz T<sub>d</sub> aby otrzymać RH. (Wzór Magnusa-Tetensa).
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="card mt-2" style="padding: 1.5rem;">
-        <h3 style="margin-bottom: 1rem; color: var(--accent-warning); display: flex; align-items: center; gap: 8px;">
-          <i data-lucide="shield-alert"></i> Oficjalne Progi Ostrzeżeń Meteorologicznych
-        </h3>
-        <div id="alert-warnings-grid" class="grid-2"></div>
-      </div>
-    </div>
+      <!-- TAB 4: BAZA WIEDZY (Złączona Aerologia i Sygnatury) -->
+      <div id="tab-knowledge" class="tab-view">
+        <h2 class="section-title"><i data-lucide="book-open" style="margin-right: 10px;"></i> Baza Wiedzy (Aerologia i Sygnatury)</h2>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 2rem;">Źródła: dr M. Zięba, dr hab. M. Taszarek, K. Ostrowski, W. Pilorz</p>
+        
+        <div class="grid-2">
+          <!-- Akordeon: Aerologia -->
+          <div class="card" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1rem; color: var(--accent-primary);"><i data-lucide="thermometer"></i> Parametry Aerologiczne</h3>
+            <div id="thermo-concepts-grid" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+          </div>
 
-    <!-- TAB 6: MAPY -->
-    <div id="tab-maps" class="tab-view">
-      <h2 class="section-title"><i data-lucide="map" style="margin-right: 10px;"></i> Interaktywne Mapy i Archiwum Nawałnic</h2>
-      <div id="leaflet-map" style="height: 550px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-top: 1rem;"></div>
-      
-      <div class="mt-2" style="margin-top: 2rem;">
-        <h3 class="section-title" style="margin-top: 1rem;"><i data-lucide="archive" style="margin-right: 8px;"></i> Archiwum Ekstremalnych Nawałnic w Polsce (2002–2017)</h3>
-        <div id="historical-cases-grid" class="grid-2"></div>
+          <!-- Akordeon: Sygnatury -->
+          <div class="card" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1rem; color: var(--accent-primary);"><i data-lucide="radar"></i> Atlas Sygnatur Radarowych</h3>
+            <div id="radar-signatures-grid" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+          </div>
+        </div>
       </div>
-    </div>
-      
-    <div id="tab-stats" class="tab-view">
-      <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
-        <i data-lucide="bar-chart-2"></i> Pamiętnik Burz - Statystyki
-      </h2>
-      <p style="color: var(--text-secondary); margin-bottom: 2rem;">Wczytywanie z pliku Excel. Zaktualizuj statystyki używając skryptu parse_storm_stats.py</p>
-      
-      <div id="storm-stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;"></div>
-      <div id="storm-ratings-container"></div>
-      <div id="repo-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;"></div>
-    </div>
-    
-    <div id="tab-ensembles" class="tab-view">
-       <div class="card" style="margin-bottom: 1rem; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-          <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-             <h3 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; color: var(--text-primary);">
-                <i data-lucide="sliders" style="color: var(--accent-primary);"></i> Wylicz Prognozę Ensemble:
-             </h3>
-             <div style="display: flex; align-items: center; gap: 8px;">
-                <label style="font-size: 0.85rem; color: var(--text-secondary);">Próg Temp:</label>
-                <select id="tab-ens-thresh" class="form-select" style="width: auto; padding: 4px 8px; font-size: 0.85rem;">
-                   <option value="30">30°C (Upał)</option>
-                   <option value="32">32°C (Silny Upał)</option>
-                   <option value="35">35°C (Ekstremum)</option>
-                   <option value="25">25°C (Ciepło)</option>
-                   <option value="20">20°C</option>
-                </select>
-             </div>
-             <div style="display: flex; align-items: center; gap: 8px;">
-                <label style="font-size: 0.85rem; color: var(--text-secondary);">Dni do przodu:</label>
-                <select id="tab-ens-days" class="form-select" style="width: auto; padding: 4px 8px; font-size: 0.85rem;">
-                   <option value="1">+1 dzień</option>
-                   <option value="2">+2 dni</option>
-                   <option value="3">+3 dni</option>
-                   <option value="4">+4 dni</option>
-                   <option value="5">+5 dni</option>
-                </select>
-             </div>
+
+      <!-- TAB 5: OSTRZEŻENIA (Oficjalna Tabela Prognostyczna SOB) -->
+      <div id="tab-alert-rules" class="tab-view">
+        <h2 class="section-title" style="border-color: var(--accent-danger);"><i data-lucide="alert-triangle" style="margin-right: 10px;"></i> Tabela Prognostyczna SOB</h2>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Kliknij w komórki tabel (po jednej dla każdego z 4 zjawisk: Wiatr, Tornado, Grad, Deszcz), aby wyliczyć sugerowany stopień zagrożenia wedle oficjalnej metodologii SOB.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+          <!-- 1. WIATR -->
+          <div class="card" style="padding: 1rem;">
+            <h3 style="background: #eab308; color: #000; padding: 0.5rem; text-align: center; border-radius: var(--radius-sm); font-weight: 700; margin-bottom: 0.8rem;">Wiatr</h3>
+            <table class="sob-table" data-cat="wind">
+              <thead>
+                <tr>
+                  <th>Prędkość</th>
+                  <th>10-30%</th>
+                  <th>30-60%</th>
+                  <th>>60%</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>&lt;60 km/h</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                </tr>
+                <tr>
+                  <td>60-80 km/h</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                </tr>
+                <tr>
+                  <td>80-90 km/h</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                </tr>
+                <tr>
+                  <td>90-110 km/h</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                </tr>
+                <tr>
+                  <td>110-120 km/h</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                  <td class="sob-cell ext" data-val="5">EXT</td>
+                </tr>
+                <tr>
+                  <td>&gt;120 km/h</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                  <td class="sob-cell ext" data-val="5">EXT</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div style="display: flex; gap: 10px;">
-             <button onclick="triggerEnsFromTab()" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">
-                <i data-lucide="zap"></i> Wylicz w Chmurze
-             </button>
-             <a href="prognoza/index.html" target="_blank" class="btn btn-ghost" style="padding: 8px 16px; font-size: 0.9rem; border: 1px solid var(--border-subtle);">
-                <i data-lucide="external-link"></i> Pełny Generator
-             </a>
+
+          <!-- 2. TORNADO -->
+          <div class="card" style="padding: 1rem;">
+            <h3 style="background: #ef4444; color: #fff; padding: 0.5rem; text-align: center; border-radius: var(--radius-sm); font-weight: 700; margin-bottom: 0.8rem;">Tornado</h3>
+            <table class="sob-table" data-cat="torn">
+              <thead>
+                <tr>
+                  <th>Intensywność</th>
+                  <th>2-5%</th>
+                  <th>5-15%</th>
+                  <th>>15%</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>X (Brak)</td>
+                  <td class="sob-cell disabled">-</td>
+                  <td class="sob-cell disabled">-</td>
+                  <td class="sob-cell disabled">-</td>
+                </tr>
+                <tr>
+                  <td>Landspout</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                </tr>
+                <tr>
+                  <td>IF0 - IF1</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                </tr>
+                <tr>
+                  <td>IF1 - IF2</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                </tr>
+                <tr>
+                  <td>IF2+</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                  <td class="sob-cell ext" data-val="5">EXT</td>
+                </tr>
+                <tr>
+                  <td>IF3+</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                  <td class="sob-cell ext" data-val="5">EXT</td>
+                  <td class="sob-cell ext" data-val="5">EXT</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-       </div>
-       <div id="tab-ens-status" style="display: none; padding: 10px; margin-bottom: 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 500;"></div>
-       <div style="height: 94vh; width: 100%;">
-          <iframe id="iframe-ensemble" src="prognoza/dashboard.html?v=3" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
+
+          <!-- 3. GRAD -->
+          <div class="card" style="padding: 1rem;">
+            <h3 style="background: #22c55e; color: #000; padding: 0.5rem; text-align: center; border-radius: var(--radius-sm); font-weight: 700; margin-bottom: 0.8rem;">Grad</h3>
+            <table class="sob-table" data-cat="hail">
+              <thead>
+                <tr>
+                  <th>Średnica</th>
+                  <th>5-15%</th>
+                  <th>15-45%</th>
+                  <th>>45%</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Brak</td>
+                  <td class="sob-cell disabled">-</td>
+                  <td class="sob-cell disabled">-</td>
+                  <td class="sob-cell disabled">-</td>
+                </tr>
+                <tr>
+                  <td>&lt;2 cm</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                </tr>
+                <tr>
+                  <td>2 - 4 cm</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                </tr>
+                <tr>
+                  <td>4 - 6 cm</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                </tr>
+                <tr>
+                  <td>6 - 10 cm</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                  <td class="sob-cell ext" data-val="5">EXT</td>
+                </tr>
+                <tr>
+                  <td>&gt;10 cm</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                  <td class="sob-cell ext" data-val="5">EXT</td>
+                  <td class="sob-cell ext" data-val="5">EXT</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 4. DESZCZ -->
+          <div class="card" style="padding: 1rem;">
+            <h3 style="background: #3b82f6; color: #fff; padding: 0.5rem; text-align: center; border-radius: var(--radius-sm); font-weight: 700; margin-bottom: 0.8rem;">Deszcz</h3>
+            <table class="sob-table" data-cat="rain">
+              <thead>
+                <tr>
+                  <th>Opad</th>
+                  <th>5-15%</th>
+                  <th>15-45%</th>
+                  <th>>45%</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>&lt;20 mm</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                </tr>
+                <tr>
+                  <td>20 - 40 mm</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                </tr>
+                <tr>
+                  <td>40 - 60 mm</td>
+                  <td class="sob-cell mrg" data-val="1">MRG</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                </tr>
+                <tr>
+                  <td>&gt;60 mm</td>
+                  <td class="sob-cell nwl" data-val="2">NWL</td>
+                  <td class="sob-cell srd" data-val="3">SRD</td>
+                  <td class="sob-cell dz" data-val="4">DZ</td>
+                </tr>
+                <tr>
+                  <td>X</td>
+                  <td class="sob-cell disabled">-</td>
+                  <td class="sob-cell disabled">-</td>
+                  <td class="sob-cell disabled">-</td>
+                </tr>
+                <tr>
+                  <td>X</td>
+                  <td class="sob-cell disabled">-</td>
+                  <td class="sob-cell disabled">-</td>
+                  <td class="sob-cell disabled">-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Wynik Kalkulatora SOB -->
+        <div class="card" style="text-align: center; padding: 2rem; margin-bottom: 2rem;">
+          <h3 style="margin-bottom: 0.5rem; color: var(--text-secondary);">Sugerowany Stopień Zagrożenia SOB:</h3>
+          <div id="matrix-result" style="font-size: 3rem; font-weight: 800; color: var(--border-strong);">Brak wyboru</div>
+          <p id="matrix-desc" style="color: var(--text-secondary); margin-top: 1rem;">Kliknij wybrane komórki w powyższych tabelach, aby wyznaczyć stopień.</p>
+        </div>
+
+        <!-- Legenda SOB -->
+        <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+          <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Legenda i Objaśnienia SOB</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="background: rgba(34, 197, 94, 0.15); border-left: 4px solid #22c55e; padding: 0.8rem; border-radius: 4px;">
+              <strong style="color: #22c55e;">MRG (1/5) - Marginalne</strong>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Burze przynoszące niskie ryzyko</p>
+            </div>
+            <div style="background: rgba(234, 179, 8, 0.15); border-left: 4px solid #eab308; padding: 0.8rem; border-radius: 4px;">
+              <strong style="color: #eab308;">NWL (2/5) - Niewielkie</strong>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Umiarkowanie groźne burze</p>
+            </div>
+            <div style="background: rgba(249, 115, 22, 0.15); border-left: 4px solid #f97316; padding: 0.8rem; border-radius: 4px;">
+              <strong style="color: #f97316;">SRD (3/5) - Średnie</strong>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Niebezpieczne, silne burze</p>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.15); border-left: 4px solid #ef4444; padding: 0.8rem; border-radius: 4px;">
+              <strong style="color: #ef4444;">DZ (4/5) - Duże</strong>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Niebezpieczne, gwałtowne burze</p>
+            </div>
+            <div style="background: rgba(217, 70, 239, 0.15); border-left: 4px solid #d946ef; padding: 0.8rem; border-radius: 4px;">
+              <strong style="color: #d946ef;">EXT (5/5) - Ekstremalne</strong>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Ekstremalnie groźne i niszczycielskie burze</p>
+            </div>
+          </div>
+
+          <div style="font-size: 0.85rem; color: var(--text-secondary); border-top: 1px solid var(--border-subtle); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <p><strong>Adnotacja - Grad:</strong> Procenty gradu odnoszą się do tego, jaka jest szansa na jego wystąpienie w związku z interakcjami międzykomórkowymi, oraz ilości burz zdolnych wygenerować grad o danym rozmiarze. Ponadto, akumulacja gradu o danym rozmiarze podwyższa poziom zagrożenia o 1 stopień.</p>
+            <p><strong>Adnotacja - Wiatr:</strong> Procenty wiatru odnoszą się do rozległości zjawiska - układy wielokomórkowe utrzymają większe szanse niż superkomórki, gdyż są one bardziej rozległe, nawet jeżeli superkomórka wygeneruje podobne porywy.</p>
+          </div>
+        </div>
+
+        <div class="card mt-2" style="padding: 1.5rem;">
+          <h3 style="margin-bottom: 1rem; color: var(--accent-warning); display: flex; align-items: center; gap: 8px;">
+            <i data-lucide="shield-alert"></i> Oficjalne Progi Ostrzeżeń Meteorologicznych
+          </h3>
+          <div id="alert-warnings-grid" class="grid-2"></div>
+        </div>
+      </div>
+
+      <!-- TAB 6: MAPY -->
+      <div id="tab-maps" class="tab-view">
+        <h2 class="section-title"><i data-lucide="map" style="margin-right: 10px;"></i> Interaktywne Mapy i Archiwum Nawałnic</h2>
+        <div id="leaflet-map" style="height: 550px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-top: 1rem;"></div>
+        
+        <div class="mt-2" style="margin-top: 2rem;">
+          <h3 class="section-title" style="margin-top: 1rem;"><i data-lucide="archive" style="margin-right: 8px;"></i> Archiwum Ekstremalnych Nawałnic w Polsce (2002–2017)</h3>
+          <div id="historical-cases-grid" class="grid-2"></div>
+        </div>
+      </div>
+        
+      <div id="tab-stats" class="tab-view">
+        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
+          <i data-lucide="bar-chart-2"></i> Pamiętnik Burz - Statystyki
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Wczytywanie z pliku Excel. Zaktualizuj statystyki używając skryptu parse_storm_stats.py</p>
+        
+        <div id="storm-stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;"></div>
+        <div id="storm-ratings-container"></div>
+        <div id="repo-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;"></div>
+      </div>
+      
+      <div id="tab-ensembles" class="tab-view">
+         <div class="card" style="margin-bottom: 1rem; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+               <h3 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; color: var(--text-primary);">
+                  <i data-lucide="sliders" style="color: var(--accent-primary);"></i> Wylicz Prognozę Ensemble:
+               </h3>
+               <div style="display: flex; align-items: center; gap: 8px;">
+                  <label style="font-size: 0.85rem; color: var(--text-secondary);">Próg Temp:</label>
+                  <select id="tab-ens-thresh" class="form-select" style="width: auto; padding: 4px 8px; font-size: 0.85rem;">
+                     <option value="30">30°C (Upał)</option>
+                     <option value="32">32°C (Silny Upał)</option>
+                     <option value="35">35°C (Ekstremum)</option>
+                     <option value="25">25°C (Ciepło)</option>
+                     <option value="20">20°C</option>
+                  </select>
+               </div>
+               <div style="display: flex; align-items: center; gap: 8px;">
+                  <label style="font-size: 0.85rem; color: var(--text-secondary);">Dni do przodu:</label>
+                  <select id="tab-ens-days" class="form-select" style="width: auto; padding: 4px 8px; font-size: 0.85rem;">
+                     <option value="1">+1 dzień</option>
+                     <option value="2">+2 dni</option>
+                     <option value="3">+3 dni</option>
+                     <option value="4">+4 dni</option>
+                     <option value="5">+5 dni</option>
+                  </select>
+               </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+               <button onclick="triggerEnsFromTab()" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">
+                  <i data-lucide="zap"></i> Wylicz w Chmurze
+               </button>
+               <a href="prognoza/index.html" target="_blank" class="btn btn-ghost" style="padding: 8px 16px; font-size: 0.9rem; border: 1px solid var(--border-subtle);">
+                  <i data-lucide="external-link"></i> Pełny Generator
+               </a>
+            </div>
+         </div>
+         <div id="tab-ens-status" style="display: none; padding: 10px; margin-bottom: 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 500;"></div>
+         <div style="height: 94vh; width: 100%;">
+            <iframe id="iframe-ensemble" src="prognoza/dashboard.html?v=3" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
+         </div>
+      </div>
+      
+      <div id="tab-stacje" class="tab-view" style="height: 94vh;">
+          <iframe src="stacje/dashboard.html?v=3" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
        </div>
     </div>
-    
-    <div id="tab-stacje" class="tab-view" style="height: 94vh;">
-        <iframe src="stacje/dashboard.html?v=3" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
-     </div>
-  </div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  
-  <!-- Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
     
-    // Import configuration
-    import { firebaseConfig } from './assets/js/firebase-config.js';
+    <!-- Firebase SDKs -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+      import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+      import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+      
+      // Import configuration
+      import { firebaseConfig } from './assets/js/firebase-config.js';
 
-    const isConfigured = firebaseConfig.apiKey && firebaseConfig.apiKey !== "TWOJ_API_KEY";
-    
-    if (isConfigured) {
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
+      const isConfigured = firebaseConfig.apiKey && firebaseConfig.apiKey !== "TWOJ_API_KEY";
       
-      const provider = new GoogleAuthProvider();
-      
-      const loginBtn = document.getElementById('login-google-btn');
-      const logoutBtn = document.getElementById('logout-btn');
-      const authSection = document.getElementById('auth-section');
-      const userInfo = document.getElementById('user-info');
-      const userEmail = document.getElementById('user-email');
-      
-      if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
-          signInWithPopup(auth, provider).catch(error => {
-            console.error("Login failed", error);
-            alert("Błąd logowania: " + error.message);
+      if (isConfigured) {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        const provider = new GoogleAuthProvider();
+        
+        const loginBtn = document.getElementById('login-google-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const authSection = document.getElementById('auth-section');
+        const userInfo = document.getElementById('user-info');
+        const userEmail = document.getElementById('user-email');
+        
+        if (loginBtn) {
+          loginBtn.addEventListener('click', () => {
+            signInWithPopup(auth, provider).catch(error => {
+              console.error("Login failed", error);
+              alert("Błąd logowania: " + error.message);
+            });
           });
-        });
-      }
-      
-      if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-          signOut(auth);
-        });
-      }
-      
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          authSection.style.display = 'none';
-          userInfo.style.display = 'block';
-          userEmail.textContent = user.email;
-          const privateHub = document.getElementById('private-hub');
-          if(privateHub) privateHub.style.display = 'grid';
-        } else {
-          authSection.style.display = 'block';
-          userInfo.style.display = 'none';
-          const privateHub = document.getElementById('private-hub');
-          if(privateHub) privateHub.style.display = 'none';
         }
-      });
-    } else {
-      const loginBtn = document.getElementById('login-google-btn');
-      if (loginBtn) {
-        loginBtn.textContent = "Skonfiguruj Firebase w assets/js/firebase-config.js";
-        loginBtn.disabled = true;
-        loginBtn.style.backgroundColor = "#9CA3AF";
+        
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', () => {
+            signOut(auth);
+          });
+        }
+        
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            authSection.style.display = 'none';
+            userInfo.style.display = 'block';
+            userEmail.textContent = user.email;
+            userEmail.title = user.email;
+            const privateHub = document.getElementById('private-hub');
+            if(privateHub) privateHub.style.display = 'grid';
+          } else {
+            authSection.style.display = 'block';
+            userInfo.style.display = 'none';
+            const privateHub = document.getElementById('private-hub');
+            if(privateHub) privateHub.style.display = 'none';
+          }
+        });
+      } else {
+        const loginBtn = document.getElementById('login-google-btn');
+        if (loginBtn) {
+          loginBtn.textContent = "Skonfiguruj Firebase w assets/js/firebase-config.js";
+          loginBtn.disabled = true;
+          loginBtn.style.backgroundColor = "#9CA3AF";
+        }
       }
-    }
-  </script>
-  
-  <!-- Inline Bulletproof Navigation & Image Fallbacks -->
+    </script>
+    
+    <!-- Inline Bulletproof Navigation & Image Fallbacks -->
   <script>
     (function() {
       // 0. Render Lucide Icons

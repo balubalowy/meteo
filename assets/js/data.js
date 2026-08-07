@@ -250,3 +250,5 @@ const METEO_DATA = {
     }
   ]
 };
+
+window.METEO_DATA = METEO_DATA;

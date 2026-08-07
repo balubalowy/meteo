@@ -207,14 +207,21 @@ function initNavigation() {
   });
 }
 
+function getMeteoData() {
+  if (typeof METEO_DATA !== 'undefined' && METEO_DATA) return METEO_DATA;
+  if (typeof window !== 'undefined' && window.METEO_DATA) return window.METEO_DATA;
+  return null;
+}
+
 // ─── 2. Tabela Klas IF-Scale ESSL 2025 ───
 function renderIFClassesTable() {
   const container = document.getElementById("if-classes-table-body");
-  if (!container || !METEO_DATA.ifScaleClasses) return;
+  const data = getMeteoData();
+  if (!container || !data || !data.ifScaleClasses) return;
 
   container.innerHTML = "";
 
-  METEO_DATA.ifScaleClasses.forEach(item => {
+  data.ifScaleClasses.forEach(item => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><span class="if-badge" style="background:${getIFBadgeColor(item.code)}">${item.code}</span></td>
@@ -248,16 +255,17 @@ function renderDamageEvaluator() {
   const selectSub = document.getElementById("eval-sub-select");
   const selectDod = document.getElementById("eval-dod-select");
   const resultBox = document.getElementById("eval-result-box");
+  const data = getMeteoData();
 
-  if (!selectDi || !selectSub || !selectDod) return;
+  if (!selectDi || !selectSub || !selectDod || !data || !data.damageIndicators) return;
 
-  selectDi.innerHTML = METEO_DATA.damageIndicators.map(di =>
+  selectDi.innerHTML = data.damageIndicators.map(di =>
     `<option value="${di.id}">${di.name}</option>`
   ).join("");
 
   function updateSubclasses() {
     const currentDiId = selectDi.value;
-    const diObj = METEO_DATA.damageIndicators.find(d => d.id === currentDiId);
+    const diObj = data.damageIndicators.find(d => d.id === currentDiId);
     if (!diObj) return;
 
     selectSub.innerHTML = diObj.subclasses.map(s =>
@@ -285,7 +293,7 @@ function renderDamageEvaluator() {
       rating = (dodVal === 1) ? "IF1.5" : "IF2.5";
     }
 
-    const classObj = METEO_DATA.ifScaleClasses.find(c => c.code === rating) || METEO_DATA.ifScaleClasses[2];
+    const classObj = data.ifScaleClasses.find(c => c.code === rating) || data.ifScaleClasses[2];
 
     resultBox.innerHTML = `
       <div style="font-size:0.85rem; color:var(--text-muted)">Wyznaczony stopień uszkodzenia ESSL:</div>
@@ -312,9 +320,10 @@ function renderDamageEvaluator() {
 // ─── 4. Termodynamika (Zięba & Taszarek) ───
 function renderThermoConcepts() {
   const container = document.getElementById("thermo-concepts-grid");
-  if (!container || !METEO_DATA.thermoConcepts) return;
+  const data = getMeteoData();
+  if (!container || !data || !data.thermoConcepts) return;
 
-  container.innerHTML = METEO_DATA.thermoConcepts.map(c => `
+  container.innerHTML = data.thermoConcepts.map(c => `
     <div class="card">
       <div class="card-title" style="color:var(--primary); margin-bottom:0.25rem">${c.name}</div>
       <div style="font-size:0.75rem; color:var(--purple); font-weight:700; margin-bottom:0.4rem">${c.type}</div>
@@ -329,9 +338,10 @@ function renderThermoConcepts() {
 // ─── 5. Sygnatury Radarowe (Pilorz) ───
 function renderRadarSignatures() {
   const container = document.getElementById("radar-signatures-grid");
-  if (!container || !METEO_DATA.radarSignatures) return;
+  const data = getMeteoData();
+  if (!container || !data || !data.radarSignatures) return;
 
-  container.innerHTML = METEO_DATA.radarSignatures.map(r => `
+  container.innerHTML = data.radarSignatures.map(r => `
     <div class="card" style="border-top:3px solid var(--primary)">
       <div class="card-title">${r.name}</div>
       <div style="font-size:0.75rem; color:var(--primary); font-weight:700; margin-bottom:0.4rem">Typ: ${r.type}</div>
@@ -346,9 +356,10 @@ function renderRadarSignatures() {
 // ─── 6. Ostrzeżenia Meteo ───
 function renderMeteoWarnings() {
   const container = document.getElementById("alert-warnings-grid");
-  if (!container || !METEO_DATA.alertWarnings) return;
+  const data = getMeteoData();
+  if (!container || !data || !data.alertWarnings) return;
 
-  container.innerHTML = METEO_DATA.alertWarnings.map(w => `
+  container.innerHTML = data.alertWarnings.map(w => `
     <div class="card alert-card" style="border-left:4px solid ${w.color}">
       <div class="card-title" style="color:${w.color}">${w.level}</div>
       <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.75rem">${w.desc}</p>
@@ -365,9 +376,10 @@ function renderMeteoWarnings() {
 // ─── 7. Archiwum Przypadków Historycznych ───
 function renderHistoricalCases() {
   const container = document.getElementById("historical-cases-grid");
-  if (!container || !METEO_DATA.historicalCases) return;
+  const data = getMeteoData();
+  if (!container || !data || !data.historicalCases) return;
 
-  container.innerHTML = METEO_DATA.historicalCases.map(hc => `
+  container.innerHTML = data.historicalCases.map(hc => `
     <div class="case-card">
       <div class="case-card-title">${hc.title}</div>
       <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.6rem">${hc.desc}</p>
