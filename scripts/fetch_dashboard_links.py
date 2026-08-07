@@ -102,6 +102,9 @@ def main():
     # 3. DWD Hobby
     links['dwd_europa'] = "https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png"
 
+    # Sat24 live satellite
+    links['sat24'] = "https://sat24.mobi/Image/satvis/europa/pl"
+
     # 4. CMM Synop (wszystkie produkty pogodowe z IMGW)
     # Ścieżka: /Oper/CMM_mapy/synop/, pliki: TEMPERATURA_2026080720.png
     cmm_products = {
@@ -126,11 +129,13 @@ def main():
     try:
         all_cmm_url = get_latest_imgw_datastore_all("/Oper/CMM_mapy/synop")
         for key, prefix in cmm_products.items():
-            matching = [f for f in all_cmm_url if '/' + prefix + '_' in f]
+            # Exact regex matching to avoid 'TEMPERATURA' matching 'TEMPERATURA_SREDNIA_DOBOWA'
+            pattern = r'/' + re.escape(prefix) + r'_\d+(?:\.png|\.jpg|\.gif)$'
+            matching = [f for f in all_cmm_url if re.search(pattern, f)]
             if matching:
                 latest = sorted(matching)[-1]
                 links[key] = latest
-                print(f"  CMM {key}: OK")
+                print(f"  CMM {key}: OK ({latest.split('/')[-1]})")
             else:
                 print(f"  CMM {key}: brak pliku")
     except Exception as e:

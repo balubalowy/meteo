@@ -91,6 +91,10 @@ function loadDashboardLinks() {
        if (links.imgw_synoptyczna) document.getElementById('dash-synopt').src = links.imgw_synoptyczna;
        if (links.imgw_cappi) document.getElementById('dash-cappi').src = links.imgw_cappi;
        if (links.imgw_lts) document.getElementById('dash-lts').src = links.imgw_lts;
+       if (links.sat24) {
+         const satEl = document.getElementById('dash-satellite');
+         if (satEl) satEl.src = links.sat24;
+       }
        if (links.sigwx_imgw) document.getElementById('dash-sigwx-pl').src = links.sigwx_imgw;
        if (links.sigwx_chmi) document.getElementById('dash-sigwx-cz').src = links.sigwx_chmi;
        
@@ -591,7 +595,71 @@ function initForecastMatrix() {
   }
 }
 
-// 📊 11. Statystyki z local_stats.js
+// ─── 8. Kalkulatory Na Żywo & Statystyki z Excela ───
+function renderLocalStats() {
+  if (!window.meteoStats) return;
+  const s = window.meteoStats;
+  
+  const container = document.getElementById('storm-stats-container');
+  if (container && s.summary) {
+    const items = [
+      { title: "Burze (Łowy / Aktywne)", val: s.summary.burze_lowy.val, icon: "cloud-lightning", color: "var(--accent-primary)", info: s.summary.burze_lowy.info, stan: s.summary.burze_lowy.stan },
+      { title: "Dni Burzowe (Łowy)", val: s.summary.dni_burzowe_lowy.val, icon: "calendar", color: "var(--accent-primary)", info: s.summary.dni_burzowe_lowy.info, stan: s.summary.dni_burzowe_lowy.stan },
+      { title: "Ogólna Liczba Burz", val: s.summary.burze_ogolem.val, icon: "zap", color: "var(--accent-warning)", info: s.summary.burze_ogolem.info, stan: s.summary.burze_ogolem.stan },
+      { title: "Ogólna Liczba Dni Burzowych", val: s.summary.dni_burzowe_ogolem.val, icon: "cloud-rain", color: "var(--accent-warning)", info: s.summary.dni_burzowe_ogolem.info, stan: s.summary.dni_burzowe_ogolem.stan },
+      { title: "Suma Kilometrów", val: s.summary.km_suma.val + " km", icon: "map-pin", color: "#f59e0b", info: s.summary.km_suma.info, stan: s.summary.km_suma.stan },
+      
+      { title: "Max Grad", val: s.summary.grad_max.val, icon: "circle-dot", color: "#3b82f6", info: s.summary.grad_max.info, stan: s.summary.grad_max.stan },
+      { title: "Max Poryw Wiatru", val: s.summary.wiatr_max.val, icon: "wind", color: "#ef4444", info: s.summary.wiatr_max.info, stan: s.summary.wiatr_max.stan },
+      { title: "Max Opad Deszczu", val: s.summary.opad_max.val, icon: "droplets", color: "#06b6d4", info: s.summary.opad_max.info, stan: s.summary.opad_max.stan },
+      { title: "Max Temperatura", val: s.summary.temp_max.val, icon: "thermometer-sun", color: "#f97316", info: s.summary.temp_max.info, stan: s.summary.temp_max.stan },
+      { title: "Min Temperatura", val: s.summary.temp_min.val, icon: "snowflake", color: "#38bdf8", info: s.summary.temp_min.info, stan: s.summary.temp_min.stan }
+    ];
+
+    container.innerHTML = items.map(item => `
+      <div class="card stat-card" style="text-align: center; padding: 1.5rem; position: relative;">
+        <i data-lucide="${item.icon}" style="width: 36px; height: 36px; color: ${item.color}; margin: 0 auto 0.8rem auto; opacity: 0.9;"></i>
+        <h3 style="font-size: 2.2rem; color: var(--text-primary); margin-bottom: 0.3rem;">${item.val}</h3>
+        <p style="color: var(--text-primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem;">${item.title}</p>
+        ${item.info ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">${item.info}</div>` : ''}
+        ${item.stan ? `<div style="font-size: 0.7rem; color: var(--accent-primary); margin-top: 0.4rem; font-weight: 500;">${item.stan}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  // Render Ratings Table (Sheet 'Skala')
+  const ratingsContainer = document.getElementById('storm-ratings-container');
+  if (ratingsContainer && s.ratings) {
+    ratingsContainer.innerHTML = `
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 10px;">
+          <i data-lucide="award" style="color: var(--accent-warning);"></i> Podsumowanie Ocen (Arkusz Skala)
+        </h3>
+        <table class="data-table" style="margin: 0; width: 100%;">
+          <thead>
+            <tr>
+              <th>Nazwa oceny</th>
+              <th style="text-align: center;">Zagrożenia (suma)</th>
+              <th style="text-align: center;">Wygląd (suma)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${s.ratings.map(r => `
+              <tr>
+                <td><strong>${r.name}</strong></td>
+                <td style="text-align: center; font-weight: 700; color: var(--accent-warning);">${r.zagrozenia}</td>
+                <td style="text-align: center; font-weight: 700; color: var(--accent-primary);">${r.wyglad}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  initRepoStats();
+}
+
 function initRepoStats() {
   const container = document.getElementById("repo-stats-grid");
   if (!container) return;
@@ -604,23 +672,23 @@ function initRepoStats() {
   const s = window.meteoStats;
   
   container.innerHTML = `
-    <div class="card" style="text-align: center; padding: 2rem;">
-      <i data-lucide="file-code" style="width: 48px; height: 48px; color: var(--accent-primary); margin-bottom: 1rem;"></i>
-      <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">${s.pythonFiles}</h3>
-      <p style="color: var(--text-secondary);">Skrypty Python (.py)</p>
+    <div class="card" style="text-align: center; padding: 1.5rem;">
+      <i data-lucide="file-code" style="width: 36px; height: 36px; color: var(--accent-primary); margin-bottom: 0.8rem;"></i>
+      <h3 style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--text-primary);">${s.pythonFiles ?? 33}</h3>
+      <p style="color: var(--text-secondary); font-size: 0.85rem;">Skrypty Python (.py)</p>
     </div>
-    <div class="card" style="text-align: center; padding: 2rem;">
-      <i data-lucide="layout" style="width: 48px; height: 48px; color: var(--accent-success); margin-bottom: 1rem;"></i>
-      <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">${s.htmlFiles}</h3>
-      <p style="color: var(--text-secondary);">Szablony HTML (.html)</p>
+    <div class="card" style="text-align: center; padding: 1.5rem;">
+      <i data-lucide="layout" style="width: 36px; height: 36px; color: var(--accent-success); margin-bottom: 0.8rem;"></i>
+      <h3 style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--text-primary);">${s.htmlFiles ?? 12}</h3>
+      <p style="color: var(--text-secondary); font-size: 0.85rem;">Szablony HTML (.html)</p>
     </div>
-    <div class="card" style="text-align: center; padding: 2rem;">
-      <i data-lucide="database" style="width: 48px; height: 48px; color: var(--accent-warning); margin-bottom: 1rem;"></i>
-      <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">${s.excelFiles}</h3>
-      <p style="color: var(--text-secondary);">Arkusze Analityczne (.xlsx)</p>
+    <div class="card" style="text-align: center; padding: 1.5rem;">
+      <i data-lucide="database" style="width: 36px; height: 36px; color: var(--accent-warning); margin-bottom: 0.8rem;"></i>
+      <h3 style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--text-primary);">${s.excelFiles ?? 2}</h3>
+      <p style="color: var(--text-secondary); font-size: 0.85rem;">Arkusze Analityczne (.xlsx)</p>
     </div>
-    <div class="card" style="grid-column: span 3; text-align: center; padding: 1.5rem; background: var(--bg-tertiary);">
-       <p style="color: var(--text-muted); font-size: 0.9rem;">Ostatnia synchronizacja (sync.bat): <strong>${s.lastSync}</strong></p>
+    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 1rem; background: var(--bg-tertiary);">
+       <p style="color: var(--text-muted); font-size: 0.85rem;">Ostatnia synchronizacja (sync.bat): <strong>${s.lastSync ?? 'Brak'}</strong></p>
     </div>
   `;
   

@@ -162,7 +162,7 @@
           <!-- Blitzortung -->
           <div class="card tile-item" style="padding: 1rem; cursor: grab;">
              <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Pioruny (Blitzortung)</h3>
-             <img id="dash-blitzortung" class="zoomable" src="https://images.blitzortung.org/Images/image_b_pl.png" alt="Blitzortung Polska" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+             <img id="dash-blitzortung" class="zoomable" src="https://images.blitzortung.org/Images/image_b_pl.png" referrerpolicy="no-referrer" alt="Blitzortung Polska" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
 
           <!-- Estofex -->
@@ -180,8 +180,8 @@
           
           <!-- Satelita -->
           <div class="card tile-item" style="padding: 1rem; cursor: grab;">
-             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Satelita (WeatherOnline)</h3>
-             <img id="dash-satellite" class="zoomable" src="https://www.weatheronline.pl/daten/sat/polen/strm/latest.gif" alt="Satelita Polska" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Satelita (Sat24 Polska)</h3>
+             <img id="dash-satellite" class="zoomable" src="https://sat24.mobi/Image/satvis/europa/pl" alt="Satelita Polska" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
         </div>
       </div>
@@ -669,32 +669,8 @@
       </h2>
       <p style="color: var(--text-secondary); margin-bottom: 2rem;">Wczytywanie z pliku Excel. Zaktualizuj statystyki używając skryptu parse_storm_stats.py</p>
       
-      <div id="storm-stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-          <!-- Renderowane przez JS -->
-          <div class="card stat-card" style="text-align: center; padding: 2rem;">
-             <i data-lucide="cloud-lightning" style="width: 48px; height: 48px; color: var(--accent-primary); margin: 0 auto 1rem auto; opacity: 0.8;"></i>
-             <h3 id="stat-burze-total" style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.5rem;">-</h3>
-             <p style="color: var(--text-secondary); font-size: 0.9rem;">Zarejestrowanych Burz</p>
-          </div>
-          
-          <div class="card stat-card" style="text-align: center; padding: 2rem;">
-             <i data-lucide="wind" style="width: 48px; height: 48px; color: var(--accent-warning); margin: 0 auto 1rem auto; opacity: 0.8;"></i>
-             <h3 id="stat-max-wiatr" style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.5rem;">-</h3>
-             <p style="color: var(--text-secondary); font-size: 0.9rem;">Maksymalny Zmierzony Wiatr (km/h)</p>
-          </div>
-          
-          <div class="card stat-card" style="text-align: center; padding: 2rem;">
-             <i data-lucide="thermometer" style="width: 48px; height: 48px; color: var(--accent-danger); margin: 0 auto 1rem auto; opacity: 0.8;"></i>
-             <h3 id="stat-max-cape" style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.5rem;">-</h3>
-             <p style="color: var(--text-secondary); font-size: 0.9rem;">Maksymalne CAPE</p>
-          </div>
-          
-          <div class="card stat-card" style="text-align: center; padding: 2rem;">
-             <i data-lucide="map-pin" style="width: 48px; height: 48px; color: #f59e0b; margin: 0 auto 1rem auto; opacity: 0.8;"></i>
-             <h3 id="stat-km" style="font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.5rem;">-</h3>
-             <p style="color: var(--text-secondary); font-size: 0.9rem;">Przejechane Kilometry</p>
-          </div>
-      </div>
+      <div id="storm-stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;"></div>
+      <div id="storm-ratings-container"></div>
       <div id="repo-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;"></div>
     </div>
     

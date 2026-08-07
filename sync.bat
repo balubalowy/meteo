@@ -8,6 +8,7 @@ echo =======================================
 echo 1. Zbieranie statystyk burzowych (Excel)...
 
 python scripts/parse_storm_stats.py
+python scripts/fetch_dashboard_links.py
 
 echo.
 echo 2. Wypychanie na GitHub...
