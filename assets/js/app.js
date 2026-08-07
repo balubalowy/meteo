@@ -5,7 +5,7 @@
  * Źródła: ESSL 2025, dr M. Zięba, dr hab. M. Taszarek, W. Pilorz
  */
 
-document.addEventListener("DOMContentLoaded", () => {
+function initApp() {
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
@@ -19,13 +19,19 @@ document.addEventListener("DOMContentLoaded", () => {
   initLiveCalculators();
   initLeafletMap();
   initForecastMatrix();
-   initRepoStats();
-   loadDashboardLinks();
-   initSortableGrid();
-   initLightbox();
-   initCmmSynop();
-   renderLocalStats();
-});
+  initRepoStats();
+  loadDashboardLinks();
+  initSortableGrid();
+  initLightbox();
+  initCmmSynop();
+  renderLocalStats();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
 
 function initCmmSynop() {
   const select = document.getElementById('cmm-synop-select');
