@@ -262,51 +262,67 @@ def generate_dashboard():
 
         fig.update_layout(updatemenus=[dropdown_data, dropdown_style], sliders=[opacity_slider, isoline_slider])
         
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dashboard_data.json"), "w", encoding="utf-8") as f: f.write(fig.to_json())
         
-        json_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dashboard_data.json")
-        with open(json_file, "w", encoding="utf-8") as f:
-            f.write(fig.to_json())
-        plot_html = '<div id="plot_div"></div>\n<script>\nfetch("dashboard_data.json").then(r => r.json()).then(fig => Plotly.newPlot("plot_div", fig.data, fig.layout));\n</script>'
-    
-        
-        
-        dashboard_html = f"""<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Pogodowy</title>
-  <link rel="stylesheet" href="../assets/css/bcore.css">
-  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body>
-  <header class="topbar">
-      <div class="logo">
-          <i data-lucide="cloud-lightning" class="symbol"></i>
-          <h1>Modele <span>Ensemble</span></h1>
-      </div>
-      <div class="top-stats">
-          <a href="../index.html" class="btn btn-ghost"><i data-lucide="arrow-left"></i> Powrót do Głównego Centrum</a>
-      </div>
-  </header>
-  
-  <div class="container main-content">
-      <div class="card mb-3">
-          <div class="card-header-bar" style="justify-content: space-between;">
-              <div class="card-title">Ensemble: Próg upału > {threshold}°C</div>
-              <div class="stat-label">Wygenerowano: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>
-          </div>
-          <p style="color: var(--text-secondary); margin-bottom: 16px;">Przedział czasowy: +{days_ahead} dni</p>
-          <div class="map-container" style="background: var(--bg-tertiary); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); min-height: 70vh;">
-              {plot_html}
-          </div>
-      </div>
-  </div>
-  <script>lucide.createIcons();</script>
-</body>
-</html>"""
-
+        dashboard_html = f"""
+        <!DOCTYPE html>
+        <html lang="pl">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Dashboard Pogodowy</title>
+            <style>
+                body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #f0f0f0; margin: 0; padding: 20px; }}
+                .container {{ max-width: 1400px; margin: 0 auto; }}
+                .header {{ background-color: #1e1e1e; padding: 20px 30px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); border-left: 5px solid #ff4500; display: flex; justify-content: space-between; align-items: center; }}
+                h1 {{ margin: 0 0 10px 0; font-size: 28px; color: #ffffff; }}
+                .meta {{ font-size: 16px; color: #aaaaaa; }}
+                .highlight {{ color: #00fa9a; font-weight: bold; }}
+                .models {{ font-size: 14px; background: #2c2c2c; padding: 12px; border-radius: 8px; border-left: 3px solid #1e90ff; }}
+                .map-container {{ background-color: #ffffff; border-radius: 12px; overflow: hidden; padding: 0; height: 75vh; box-shadow: 0 8px 16px rgba(0,0,0,0.5); }}
+                .footer {{ text-align: center; margin-top: 20px; font-size: 13px; color: #777; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <div>
+                        <h1>Prognoza: Oczekiwana T_max oraz Prawdopodobieństwo</h1>
+                        <div class="meta">
+                            Prognoza na: <span class="highlight">+{days_ahead} dni</span> od dzisiaj 
+                            (próg prawdopodobieństwa: <span class="highlight">T_max > {threshold}°C</span>)
+                        </div>
+                    </div>
+                    <div class="models">
+                        <b>Zintegrowane modele (Ensemble):</b><br>
+                        ECMWF IFS (50), ECMWF AIFS (50), NCEP GEFS (30), ICON-EU EPS (39)
+                    </div>
+                </div>
+                <div class="controls" style="background: #2c2c2c; padding: 10px; margin-bottom: 10px; border-radius: 8px; color: #ffffff;">
+                    <b>Opcje widoczności: </b>
+                    <label style="margin-right: 15px; cursor: pointer;"><input type="checkbox" id="chk-pt" checked onchange="updateView()"> Znaczniki (Kółka)</label>
+                    <label style="cursor: pointer;"><input type="checkbox" id="chk-txt" checked onchange="updateView()"> Wartości (Etykiety)</label>
+                </div>
+                <div class="map-container">
+                    {plot_html}
+                </div>
+                
+                <script>
+                function updateView() {{
+                    var pt = document.getElementById("chk-pt").checked;
+                    var txt = document.getElementById("chk-txt").checked;
+                    var mode = pt && txt ? 'markers+text' : (pt ? 'markers' : (txt ? 'text' : 'none'));
+                    Plotly.restyle('plot_div', {{'mode': mode}}, [0, 1]);
+                }}
+                </script>
+                
+                <div class="footer">
+                    Skrypt wygenerowany automatycznie. System interpolacji przestrzennej map z maskowaniem poligonowym Polski.
+                </div>
+            </div>
+        </body>
+        </html>
+        """
         
         html_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Dashboard_Pogody.html")
         with open(html_file, "w", encoding="utf-8") as f:

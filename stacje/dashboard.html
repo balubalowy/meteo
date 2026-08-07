@@ -4,35 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard IMGW - Ekstrema Historyczne (Firebase)</title>
+    <link rel="stylesheet" href="../assets/css/bcore.css">
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #090914 0%, #1a1a3e 100%); color: #e0e0e0; }
-        .header { padding: 10px 25px; background: rgba(10, 10, 40, 0.95); border-bottom: 2px solid #3366ff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); position: relative; z-index: 100; }
-        .header h1 { margin: 0; font-size: 22px; color: #6699ff; }
-        .header .sub { font-size: 13px; color: #aaa; margin-top: 2px; }
-        .controls { display: flex; gap: 15px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
-        .control-group { display: flex; flex-direction: column; }
-        .control-group label { font-size: 11px; color: #888; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 1px; }
-        .checkbox-group { display: flex; flex-direction: column; justify-content: center; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 4px; border: 1px solid #333; }
-        .checkbox-row { display: flex; gap: 12px; font-size: 13px; margin-top: 2px; }
-        .checkbox-row label { color: #ccc; text-transform: none; letter-spacing: normal; display: flex; align-items: center; gap: 4px; cursor: pointer; margin-bottom: 0; }
-        select { background: #1e1e3f; color: #fff; border: 1px solid #444; padding: 6px 12px; border-radius: 4px; font-size: 14px; cursor: pointer; outline: none; }
-        select:focus { border-color: #3366ff; }
-        .stats { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
-        .stat-box { background: rgba(50, 50, 100, 0.5); padding: 5px 12px; border-radius: 6px; font-size: 12px; border: 1px solid rgba(255,255,255,0.1); }
-        .stat-box .val { color: #66ccff; font-weight: bold; }
-        .map-container { width: 100%; height: calc(100vh - 140px); position: relative; }
-        #plot { width: 100%; height: 100%; }
-        
-        .sliders-container { position: absolute; bottom: 20px; left: 20px; background: rgba(10, 10, 40, 0.85); padding: 15px; border-radius: 8px; z-index: 1000; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 10px; width: 300px; }
+        .map-container { width: 100%; height: calc(100vh - 180px); position: relative; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-subtle); }
+        #plot { width: 100%; height: 100%; background: var(--bg-primary); }
+        .sliders-container { position: absolute; bottom: 20px; left: 20px; background: rgba(36, 36, 38, 0.85); backdrop-filter: blur(5px); padding: 15px; border-radius: 8px; z-index: 1000; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 10px; width: 300px; }
         .slider-row { display: flex; flex-direction: column; }
-        .slider-row label { font-size: 12px; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .slider-row label { font-size: 12px; margin-bottom: 5px; display: flex; justify-content: space-between; color: var(--text-primary); }
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #3366ff; cursor: pointer; margin-top: -6px; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #444; border-radius: 2px; }
-        
-        #loading { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 10, 40, 0.9); z-index: 2000; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; flex-direction: column; }
-        .spinner { border: 4px solid rgba(255,255,255,0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: #3366ff; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: var(--accent-primary); cursor: pointer; margin-top: -6px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: var(--border-strong); border-radius: 2px; }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-primary); z-index: 2000; display: flex; justify-content: center; align-items: center; color: white; font-size: 1.5rem; flex-direction: column; }
+        .spinner { border: 4px solid var(--border-subtle); width: 40px; height: 40px; border-radius: 50%; border-left-color: var(--accent-primary); animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -42,11 +27,20 @@
         <div>Pobieranie danych z Firebase (chmura)...</div>
     </div>
 
-    <div class="header">
-        <h1>Baza Danych IMGW - Pełna Historia i Ekstrema (Live)</h1>
-        <div class="sub">Czas wygenerowania w chmurze: <b id="ui-time">---</b> | Przeanalizowano <span id="ui-count">0</span> snapshotów | Łączenie z Firebase (Realtime Database)...</div>
-        
-        <div class="controls">
+    <header class="topbar" style="margin-bottom: var(--space-4);">
+        <div class="logo">
+            <i data-lucide="thermometer" class="symbol"></i>
+            <div>
+                <h1>Baza Danych IMGW - <span>Pełna Historia (Live)</span></h1>
+                <div style="font-size: 0.75rem; color: var(--text-secondary);">Czas wygenerowania w chmurze: <b id="ui-time">---</b> | Przeanalizowano <span id="ui-count">0</span> snapshotów | Łączenie z Firebase...</div>
+            </div>
+        </div>
+        <div class="top-stats">
+            <a href="../index.html" class="btn btn-ghost"><i data-lucide="arrow-left"></i> Powrót do Głównego Centrum</a>
+        </div>
+    </header>
+    
+    <div class="controls" style="display: flex; gap: 15px; margin-bottom: 15px; padding: 0 16px;">
             <div class="control-group">
                 <label>Parametr</label>
                 <select id="sel-zmienna" onchange="updateMap()">
