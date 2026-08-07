@@ -36,7 +36,7 @@ System przeszedł wielką refaktoryzację do najnowszych standardów **Design Sy
 graph TD
     subgraph "Urządzenia Użytkownika"
         PC["Przeglądarka Desktop/Mobile"]
-        PC <-->|Odczyt Danych Live (Plotly/Leaflet)| FB[("Firebase DB")]
+        PC -->|Odczyt Danych Live Plotly/Leaflet| FB[("Firebase DB")]
     end
 
     subgraph "Źródła Danych"

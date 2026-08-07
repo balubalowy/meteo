@@ -1,8 +1,10 @@
 {
-  "timestamp": "2026-08-07 18:55:06",
+  "timestamp": "2026-08-07 19:06:16",
   "estofex": "https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest",
-  "sat24": "https://en.sat24.com/en",
   "blitzortung": "https://map.blitzortung.org/#5.4/52/19",
   "lowcyburz": "https://lowcyburz.pl/",
-  "dwd_europa": "https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png"
+  "dwd_europa": "https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png",
+  "sat24": "https://api.sat24.com/animated/PL/visual/1/Central%20European%20Standard%20Time",
+  "sondaze_imgw": "https://cmm.imgw.pl/wp-content/uploads/IKONY/OPISY_IKON.png",
+  "prognoza_burz_imgw": "https://cmm.imgw.pl/wp-content/uploads/IKONY/OPISY_IKON.png"
 }

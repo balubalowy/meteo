@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 
 def fetch_html(url, charset='utf-8'):
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'})
     try:
         response = urllib.request.urlopen(req, timeout=15)
         return response.read().decode(charset, errors='ignore')
@@ -13,11 +13,23 @@ def fetch_html(url, charset='utf-8'):
         print(f"Error fetching {url}: {e}")
         return ""
 
+def get_latest_imgw_datastore(product):
+    try:
+        html = fetch_html(f"https://danepubliczne.imgw.pl/datastore/getfiledown/{product}")
+        # Search for files like .png
+        # The HTML usually has lines like: <a href="filename.png">filename.png</a>
+        matches = re.findall(r'href="([^"]+\.png)"', html, re.IGNORECASE)
+        if matches:
+            matches.sort(reverse=True)
+            return f"https://danepubliczne.imgw.pl/datastore/getfiledown/{product}/{matches[0]}"
+    except Exception as e:
+        print("Błąd datastore dla", product, ":", e)
+    return ""
+
 def main():
     links = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "estofex": "https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest",
-        "sat24": "https://en.sat24.com/en",
         "blitzortung": "https://map.blitzortung.org/#5.4/52/19",
         "lowcyburz": "https://lowcyburz.pl/"
     }
@@ -35,12 +47,16 @@ def main():
 
     # 2. Awiacja IMGW
     html_awiacja = fetch_html("https://awiacja.imgw.pl/prognozy-lotnicze/sigwx", 'utf-8')
-    # Znalezienie img z src zawierającym sigwx (dowolne rozszerzenie png/jpg)
-    match = re.search(r'src="([^"]*sigwx[^"]*\.(?:png|jpg))"', html_awiacja, re.IGNORECASE)
-    if match:
-        u = match.group(1)
+    match_imgw = re.search(r'src="([^"]*sigwx_polska[^"]*\.(?:png|jpg|gif))"', html_awiacja, re.IGNORECASE)
+    match_chmi = re.search(r'src="([^"]*sigwx_chmi[^"]*\.(?:png|jpg|gif))"', html_awiacja, re.IGNORECASE)
+    if match_imgw:
+        u = match_imgw.group(1)
         if not u.startswith("http"): u = "https://awiacja.imgw.pl" + u
-        links['sigwx_polska'] = u
+        links['sigwx_imgw'] = u
+    if match_chmi:
+        u = match_chmi.group(1)
+        if not u.startswith("http"): u = "https://awiacja.imgw.pl" + u
+        links['sigwx_chmi'] = u
 
     # 3. DWD Hobby
     html_dwd = fetch_html("https://www.dwd.de/DE/leistungen/hobbymet_wk_europa/hobbyeuropakarten.html", 'utf-8')
@@ -50,29 +66,32 @@ def main():
         if not u.startswith("http"): u = "https://www.dwd.de" + u
         links['dwd_europa'] = u
 
-    # 4. IMGW Public Data (Synoptyczna, CAPPI)
-    # Szukamy najnowszego pliku po API
-    try:
-        # Mapa synoptyczna
-        synop_json = fetch_html("https://danepubliczne.imgw.pl/api/data/datastore/Zjawiska_Meteo/Mapa_synoptyczna")
-        if synop_json:
-            files = json.loads(synop_json)
-            # Find png files
-            png_files = [f for f in files if f.endswith('.png')]
-            if png_files:
-                png_files.sort(reverse=True)
-                links['imgw_synoptyczna'] = f"https://danepubliczne.imgw.pl/datastore/getfiledown/Zjawiska_Meteo/Mapa_synoptyczna/{png_files[0]}"
+    # 4. IMGW Datastore
+    # Mapa synoptyczna
+    syn_url = get_latest_imgw_datastore("Zjawiska_Meteo/Mapa_synoptyczna")
+    if syn_url: links['imgw_synoptyczna'] = syn_url
+    
+    # CAPPI
+    cappi_url = get_latest_imgw_datastore("Dane_radarowe/COMPO_CAPPI.comp.cappi")
+    if cappi_url: links['imgw_cappi'] = cappi_url
+    
+    # LTS2005
+    lts_url = get_latest_imgw_datastore("Dane_radarowe/COMPO_LTS2005.comp.lts")
+    if lts_url: links['imgw_lts'] = lts_url
+
+    # 5. Sat24 PL (Obejście iframe iframe protection przez pobranie najnowszego statycznego gifa)
+    links['sat24'] = "https://api.sat24.com/animated/PL/visual/1/Central%20European%20Standard%20Time"
+    
+    # 6. Modele IMGW (Sondaże, Prognoza)
+    html_sondaze = fetch_html("https://modele.imgw.pl/?page_id=49533")
+    match_sondaz = re.search(r'src="([^"]*upload[^"]*\.png)"', html_sondaze, re.IGNORECASE)
+    if match_sondaz:
+        links['sondaze_imgw'] = match_sondaz.group(1)
         
-        # CAPPI
-        cappi_json = fetch_html("https://danepubliczne.imgw.pl/api/data/datastore/Dane_radarowe/COMPO_CAPPI.comp.cappi")
-        if cappi_json:
-            files = json.loads(cappi_json)
-            png_files = [f for f in files if f.endswith('.png')]
-            if png_files:
-                png_files.sort(reverse=True)
-                links['imgw_cappi'] = f"https://danepubliczne.imgw.pl/datastore/getfiledown/Dane_radarowe/COMPO_CAPPI.comp.cappi/{png_files[0]}"
-    except Exception as e:
-        print("Błąd pobierania datastore:", e)
+    html_prognoza = fetch_html("https://modele.imgw.pl/?page_id=27337")
+    match_prognoza = re.search(r'src="([^"]*upload[^"]*\.png)"', html_prognoza, re.IGNORECASE)
+    if match_prognoza:
+        links['prognoza_burz_imgw'] = match_prognoza.group(1)
 
 
     out_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "js")

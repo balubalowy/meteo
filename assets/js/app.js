@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   renderHistoricalCases();
   initLiveCalculators();
   initLeafletMap();
+  initForecastMatrix();
+  initRepoStats();
 });
 
 // ─── 1. Nawigacja (top-nav + module cards) ───
@@ -323,6 +325,53 @@ function initLiveCalculators() {
     [dcapeIn, mucapeIn, dlsIn, meanwindIn].forEach(el => el.addEventListener("input", calcDCP));
     calcDCP();
   }
+
+
+  // E. Kalkulator Wilgotności / Punktu Rosy (Magnus-Tetens)
+  const rhTempIn = document.getElementById("calc-rh-temp");
+  const rhRhIn = document.getElementById("calc-rh-rh");
+  const rhTdIn = document.getElementById("calc-rh-td");
+  const rhResVal = document.getElementById("res-rh-val");
+
+  let lastEdited = 'rh';
+
+  function calcMagnus() {
+    if (!rhTempIn || !rhRhIn || !rhTdIn || !rhResVal) return;
+    let t = parseFloat(rhTempIn.value) || 0;
+    
+    // Wzory stałe
+    const a = 17.27;
+    const b = 237.7;
+    
+    if (lastEdited === 'rh') {
+       let rh = parseFloat(rhRhIn.value) || 0;
+       if (rh < 1) rh = 1; if (rh > 100) rh = 100;
+       
+       let alpha = ((a * t) / (b + t)) + Math.log(rh / 100.0);
+       let td = (b * alpha) / (a - alpha);
+       
+       rhTdIn.value = td.toFixed(1);
+       rhResVal.textContent = `T: ${t.toFixed(1)}°C, RH: ${rh.toFixed(0)}% => Td: ${td.toFixed(1)}°C`;
+    } else {
+       let td = parseFloat(rhTdIn.value) || 0;
+       let exp1 = Math.exp((a * td) / (b + td));
+       let exp2 = Math.exp((a * t) / (b + t));
+       let rh = (exp1 / exp2) * 100.0;
+       if (rh > 100) rh = 100;
+       if (rh < 0) rh = 0;
+       
+       rhRhIn.value = rh.toFixed(1);
+       rhResVal.textContent = `T: ${t.toFixed(1)}°C, Td: ${td.toFixed(1)}°C => RH: ${rh.toFixed(1)}%`;
+    }
+  }
+
+  if (rhTempIn) {
+    rhTempIn.addEventListener("input", calcMagnus);
+    rhRhIn.addEventListener("input", () => { lastEdited = 'rh'; calcMagnus(); });
+    rhTdIn.addEventListener("input", () => { lastEdited = 'td'; calcMagnus(); });
+    calcMagnus();
+  }
+
 }
 
 // ─── 9. Interaktywna Mapa Leaflet ───
@@ -361,4 +410,110 @@ function initLeafletMap() {
       .addTo(map)
       .bindPopup(`<b>${pt.title}</b><br>${pt.desc}`);
   });
+}
+
+
+// 💡 10. Interaktywna Tabela Prognoz (Forecast Matrix SOB)
+function initForecastMatrix() {
+  const cells = document.querySelectorAll(".selectable-cell");
+  const resultDiv = document.getElementById("matrix-result");
+  const descDiv = document.getElementById("matrix-desc");
+  
+  if (!cells.length) return;
+  
+  const state = {
+    wind: 0,
+    torn: 0,
+    hail: 0,
+    rain: 0
+  };
+  
+  const levels = {
+    "MRG": { val: 1, color: "var(--accent-info)", name: "MARGINAL (MRG)" },
+    "NWL": { val: 2, color: "var(--accent-success)", name: "NISKI (NWL)" },
+    "SRD": { val: 3, color: "var(--accent-warning)", name: "ŚREDNI (SRD)" },
+    "DZ":  { val: 4, color: "var(--accent-danger)", name: "DUŻY (DZ)" },
+    "EXT": { val: 5, color: "#9333ea", name: "EKSTREMALNY (EXT)" }
+  };
+  
+  cells.forEach(cell => {
+    cell.addEventListener("click", () => {
+      const col = cell.getAttribute("data-col");
+      const valCode = cell.getAttribute("data-val");
+      const levelObj = levels[valCode];
+      
+      // Clear column
+      document.querySelectorAll(`.selectable-cell[data-col="${col}"]`).forEach(c => {
+         c.classList.remove("selected");
+         c.style.backgroundColor = "";
+         c.style.color = "";
+      });
+      
+      // Select
+      cell.classList.add("selected");
+      cell.style.backgroundColor = levelObj.color;
+      cell.style.color = "#fff";
+      
+      state[col] = levelObj.val;
+      
+      updateMatrixResult();
+    });
+  });
+  
+  function updateMatrixResult() {
+    let maxLevel = Math.max(state.wind, state.torn, state.hail, state.rain);
+    
+    if (maxLevel === 0) {
+      resultDiv.textContent = "Brak wyboru";
+      resultDiv.style.color = "var(--border-strong)";
+      descDiv.textContent = "Wybierz prawdopodobieństwa dla wszystkich 4 zagrożeń.";
+      return;
+    }
+    
+    // Find name
+    let finalCode = "";
+    for (let k in levels) {
+      if (levels[k].val === maxLevel) finalCode = k;
+    }
+    
+    resultDiv.textContent = levels[finalCode].name;
+    resultDiv.style.color = levels[finalCode].color;
+    descDiv.textContent = `Wybrano stopień na podstawie najwyższego wytypowanego ryzyka.`;
+  }
+}
+
+// 📊 11. Statystyki z local_stats.js
+function initRepoStats() {
+  const container = document.getElementById("repo-stats-grid");
+  if (!container) return;
+  
+  if (typeof window.meteoStats === "undefined") {
+     container.innerHTML = `<div class="card" style="grid-column: span 3; text-align:center; color: var(--accent-danger)">Brak pliku statystyk. Uruchom sync.bat</div>`;
+     return;
+  }
+  
+  const s = window.meteoStats;
+  
+  container.innerHTML = `
+    <div class="card" style="text-align: center; padding: 2rem;">
+      <i data-lucide="file-code" style="width: 48px; height: 48px; color: var(--accent-primary); margin-bottom: 1rem;"></i>
+      <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">${s.pythonFiles}</h3>
+      <p style="color: var(--text-secondary);">Skrypty Python (.py)</p>
+    </div>
+    <div class="card" style="text-align: center; padding: 2rem;">
+      <i data-lucide="layout" style="width: 48px; height: 48px; color: var(--accent-success); margin-bottom: 1rem;"></i>
+      <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">${s.htmlFiles}</h3>
+      <p style="color: var(--text-secondary);">Szablony HTML (.html)</p>
+    </div>
+    <div class="card" style="text-align: center; padding: 2rem;">
+      <i data-lucide="database" style="width: 48px; height: 48px; color: var(--accent-warning); margin-bottom: 1rem;"></i>
+      <h3 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-primary);">${s.excelFiles}</h3>
+      <p style="color: var(--text-secondary);">Arkusze Analityczne (.xlsx)</p>
+    </div>
+    <div class="card" style="grid-column: span 3; text-align: center; padding: 1.5rem; background: var(--bg-tertiary);">
+       <p style="color: var(--text-muted); font-size: 0.9rem;">Ostatnia synchronizacja (sync.bat): <strong>${s.lastSync}</strong></p>
+    </div>
+  `;
+  
+  if (typeof lucide !== 'undefined') lucide.createIcons();
 }

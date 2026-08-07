@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Centrum Meteo Bartka — Baza Wiedzy i Narzędzia Prognostyczne</title>
   <meta name="description" content="Centrum analiz meteorologicznych: stacje IMGW, prognozy ensemble, narzędzia radarowe, baza wiedzy burzowej, kalkulatory IF/DCP/Wmax/LCL.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
 
   <!-- B-Core Design System -->
   <link rel="stylesheet" href="assets/css/bcore.css?v=3">
@@ -28,10 +29,14 @@
           <a href="#" class="btn btn-ghost nav-link active" data-tab="overview"><i data-lucide="layout-dashboard"></i> Pulpit</a>
           <a href="#" class="btn btn-ghost nav-link" data-tab="if-evaluator"><i data-lucide="tornado"></i> Skala IF</a>
           <a href="#" class="btn btn-ghost nav-link" data-tab="calculators"><i data-lucide="calculator"></i> Kalkulatory</a>
-          <a href="#" class="btn btn-ghost nav-link" data-tab="aerology"><i data-lucide="thermometer"></i> Aerologia</a>
-          <a href="#" class="btn btn-ghost nav-link" data-tab="radars"><i data-lucide="radar"></i> Sygnatury</a>
+          <a href="#" class="btn btn-ghost nav-link" data-tab="knowledge"><i data-lucide="book-open"></i> Baza Wiedzy</a>
           <a href="#" class="btn btn-ghost nav-link" data-tab="alert-rules"><i data-lucide="alert-triangle"></i> Ostrzeżenia</a>
           <a href="#" class="btn btn-ghost nav-link" data-tab="maps"><i data-lucide="map"></i> Mapy</a>
+          <a href="#" class="btn btn-ghost nav-link" data-tab="stats"><i data-lucide="bar-chart-2"></i> Statystyki</a>
+          
+          <span style="color: var(--border-strong);">|</span>
+          <a href="prognoza/dashboard.html" target="_blank" class="btn btn-ghost"><i data-lucide="cloud-rain"></i> Ensembles</a>
+          <a href="stacje/dashboard.html" target="_blank" class="btn btn-ghost"><i data-lucide="thermometer-sun"></i> Stacje Live</a>
       </div>
   </header>
 
@@ -73,36 +78,57 @@
           </a>
         </div>
 
-        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Sytuacja Synoptyczna (Live)</h2>
+        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Sytuacja Synoptyczna i Lotnicza (Live)</h2>
         
-        <div class="grid-2" style="margin-bottom: 2rem;">
+        <div class="grid-3" style="margin-bottom: 2rem;">
           <!-- DWD Europa -->
           <div class="card" style="padding: 1rem;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Europa (DWD Bodendruck)</h3>
             <img id="dash-dwd" src="https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png" alt="DWD Europa" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
           </div>
-          <!-- SIGWX -->
+          <!-- SIGWX IMGW -->
           <div class="card" style="padding: 1rem;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Polska (SIGWX IMGW)</h3>
-            <img id="dash-sigwx" src="" alt="Ładowanie SIGWX..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
-          </div>
-        </div>
-
-        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="zap"></i> Zjawiska i Ostrzeżenia</h2>
-        <div class="grid-2" style="margin-bottom: 2rem;">
-          <!-- Estofex -->
-          <div class="card" style="padding: 1rem;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">ESTOFEX (Prognoza)</h3>
-            <img id="dash-estofex" src="https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest" alt="Estofex" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+            <iframe src="https://awiacja.imgw.pl/prognozy-lotnicze/sigwx" style="width: 100%; height: 350px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: white;"></iframe>
           </div>
           <!-- Meteo.pl Wrocław -->
           <div class="card" style="padding: 1rem;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Wrocław (UM Meteo.pl)</h3>
-            <img id="dash-meteo" src="" alt="Ładowanie Meteorogramu..." style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+            <iframe src="https://www.meteo.pl/um/php/meteorogram_list.php?ntype=0u&row=436&col=181&lang=pl&cname=Wroc%B3aw" style="width: 100%; height: 350px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: white;"></iframe>
+          </div>
+        </div>
+
+        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="map"></i> IMGW Datastore i Interpolacje</h2>
+        <div class="grid-2" style="margin-bottom: 2rem;">
+          <div class="card" style="padding: 1rem; height: 500px;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Aktualna Temperatura (Live Map)</h3>
+            <iframe src="stacje/dashboard.html" style="width: 100%; height: calc(100% - 40px); border: none; border-radius: var(--radius-sm);"></iframe>
+          </div>
+          <div class="card" style="padding: 1rem; height: 500px; display: flex; flex-direction: column; gap: 10px;">
+            <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem; color: var(--text-secondary);">Dostęp do Datastore IMGW (Katalog)</h3>
+            <a href="https://danepubliczne.imgw.pl/pl/datastore?product=Mapa%20synoptyczna" target="_blank" class="btn btn-ghost" style="border: 1px solid var(--border-subtle); padding: 1rem;"><i data-lucide="external-link"></i> Najnowsza Mapa Synoptyczna</a>
+            <a href="https://danepubliczne.imgw.pl/pl/datastore?product=COMPO_CAPPI.comp.cappi" target="_blank" class="btn btn-ghost" style="border: 1px solid var(--border-subtle); padding: 1rem;"><i data-lucide="external-link"></i> COMPO CAPPI (Radar PNG)</a>
+            <a href="https://danepubliczne.imgw.pl/pl/datastore?product=LTS2005" target="_blank" class="btn btn-ghost" style="border: 1px solid var(--border-subtle); padding: 1rem;"><i data-lucide="external-link"></i> LTS2005 (Wyładowania)</a>
+            <a href="https://modele.imgw.pl/?page_id=49533" target="_blank" class="btn btn-ghost" style="border: 1px solid var(--border-subtle); padding: 1rem;"><i data-lucide="external-link"></i> Sondaże Aerologiczne IMGW</a>
+            <a href="https://modele.imgw.pl/?page_id=27337" target="_blank" class="btn btn-ghost" style="border: 1px solid var(--border-subtle); padding: 1rem;"><i data-lucide="external-link"></i> Prognoza Burzowa IMGW</a>
+          </div>
+        </div>
+
+        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="zap"></i> Ostrzeżenia i Zjawiska</h2>
+        <div class="grid-2" style="margin-bottom: 2rem;">
+          <!-- Estofex -->
+          <div class="card" style="padding: 1rem;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">ESTOFEX (Prognoza Konwekcyjna)</h3>
+            <img id="dash-estofex" src="https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest" alt="Estofex" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+          </div>
+          <!-- Łowcy Burz -->
+          <div class="card" style="padding: 1rem; height: 500px;">
+             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Prognozy Skywarn (Łowcy Burz)</h3>
+             <iframe src="https://lowcyburz.pl/" style="width: 100%; height: calc(100% - 40px); border: none; border-radius: var(--radius-sm); background: white;"></iframe>
           </div>
         </div>
         
-        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="radar"></i> Interaktywne Radary</h2>
+        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="radar"></i> Interaktywne Radary Live</h2>
         <div class="grid-2">
           <!-- Blitzortung -->
           <div class="card" style="padding: 1rem; height: 500px;">
@@ -111,21 +137,19 @@
           </div>
           <!-- Sat24 -->
           <div class="card" style="padding: 1rem; height: 500px;">
-             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Satelita (Sat24)</h3>
-             <iframe src="https://en.sat24.com/en" style="width: 100%; height: calc(100% - 40px); border: none; border-radius: var(--radius-sm);"></iframe>
+             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);">Satelita Animacja (Sat24)</h3>
+             <img src="https://api.sat24.com/animated/PL/visual/1/Central%20European%20Standard%20Time" alt="Sat24" style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-sm);">
           </div>
         </div>
         
         <script>
-          // Pobieranie linkow do obrazow wygenerowanych przez GitHub Actions scraper
+          // Linki z JSON s w wikszoci statyczne lub obsugiwane przez iframy. Skrypt podmienia DWD jeli co ulegnie zmianie.
           fetch('assets/js/dashboard_links.json?v=' + new Date().getTime())
             .then(res => res.json())
             .then(data => {
-              if(data.sigwx_polska) document.getElementById('dash-sigwx').src = data.sigwx_polska;
-              if(data.meteo_wroclaw) document.getElementById('dash-meteo').src = data.meteo_wroclaw;
               if(data.dwd_europa) document.getElementById('dash-dwd').src = data.dwd_europa;
             })
-            .catch(e => console.error("Nie udalo sie pobrac aktualnych linkow obrazow", e));
+            .catch(e => console.error("Nie udalo sie pobrac zaktualizowanych linkow obrazow", e));
         </script>
       </div>
 
@@ -281,103 +305,136 @@
             <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-info); margin-top: 0.1rem;" id="res-lcl-height">875 m n.p.g.</div>
           </div>
           <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-            Źródło: Wzór Espy'ego — h<sub>LCL</sub> ≈ 125 × (T − T<sub>d</sub>) [m]
+            Źródło: Wzór Espy'edy — h<sub>LCL</sub> ≈ 125 × (T − T<sub>d</sub>) [m]
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2 mt-2">
+        <!-- Kalkulator Wilgotności / Punktu Rosy -->
+        <div class="card">
+          <div class="card-header-bar">
+            <div class="card-title">5. Wilgotność / Punkt Rosy (Magnus)</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Temperatura (T) [°C]:</label>
+            <input type="number" id="calc-rh-temp" class="form-input" value="20.0" step="0.5">
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Wilgotność (RH) [%]:</label>
+              <input type="number" id="calc-rh-rh" class="form-input" value="50" step="1" min="1" max="100">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Punkt Rosy (T<sub>d</sub>) [°C]:</label>
+              <input type="number" id="calc-rh-td" class="form-input" value="9.3" step="0.5">
+            </div>
+          </div>
+          <div class="result-box mt-1">
+            <div class="stat-label">Ostatnio wyliczono:</div>
+            <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-success); margin-top: 0.1rem;" id="res-rh-val">Wpisz dane aby przeliczyć...</div>
+          </div>
+          <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
+            Wpisz RH aby otrzymać T<sub>d</sub>, lub wpisz T<sub>d</sub> aby otrzymać RH. (Wzór Magnusa-Tetensa).
           </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB 4: AEROLOGIA -->
-    <div id="tab-aerology" class="tab-view">
-      <h2 class="section-title">Pojęcia Aerologiczne i Profile Cząstki</h2>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Źródła: dr M. Zięba, dr hab. M. Taszarek, K. Ostrowski</p>
-      <div id="thermo-concepts-grid" class="grid-2"></div>
-    </div>
-
-    <!-- TAB 5: SYGNATURY RADAROWE -->
-    <div id="tab-radars" class="tab-view">
-      <h2 class="section-title">Atlas Sygnatur Radarowych</h2>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Źródło: Wojciech Pilorz / Meteo</p>
-      <div id="radar-signatures-grid" class="grid-2"></div>
-    </div>
-
-    <!-- TAB 6: OSTRZEŻENIA -->
-    <div id="tab-alert-rules" class="tab-view">
-      <h2 class="section-title" style="border-color: var(--accent-danger);">Progi Wydawania Ostrzeżeń</h2>
-      <div id="alert-warnings-grid" class="grid-3 mb-3"></div>
+    <!-- TAB 4: BAZA WIEDZY (Złączona Aerologia i Sygnatury) -->
+    <div id="tab-knowledge" class="tab-view">
+      <h2 class="section-title"><i data-lucide="book-open" style="margin-right: 10px;"></i> Baza Wiedzy (Aerologia i Sygnatury)</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 2rem;">Źródła: dr M. Zięba, dr hab. M. Taszarek, K. Ostrowski, W. Pilorz</p>
       
-      <div class="card mt-2">
-        <div class="card-header-bar">
-          <div class="card-title">Tabela Prognostyczna (Forecast Matrix)</div>
+      <div class="grid-2">
+        <!-- Akordeon: Aerologia -->
+        <div class="card" style="padding: 1.5rem;">
+          <h3 style="margin-bottom: 1rem; color: var(--accent-primary);"><i data-lucide="thermometer"></i> Parametry Aerologiczne</h3>
+          <div id="thermo-concepts-grid" style="display: flex; flex-direction: column; gap: 1rem;">
+             <!-- Wypełniane przez app.js jako akordeony -->
+          </div>
         </div>
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Nowe kryteria wydawania stopni zagrożenia, dostosowane do warunków występujących w Polsce.</p>
-        
-        <table class="data-table" style="margin-top: 1rem;">
+
+        <!-- Akordeon: Sygnatury -->
+        <div class="card" style="padding: 1.5rem;">
+          <h3 style="margin-bottom: 1rem; color: var(--accent-primary);"><i data-lucide="radar"></i> Atlas Sygnatur Radarowych</h3>
+          <div id="radar-signatures-grid" style="display: flex; flex-direction: column; gap: 1rem;">
+             <!-- Wypełniane przez app.js jako akordeony -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: OSTRZEŻENIA (Interaktywna Tabela) -->
+    <div id="tab-alert-rules" class="tab-view">
+      <h2 class="section-title" style="border-color: var(--accent-danger);"><i data-lucide="alert-triangle" style="margin-right: 10px;"></i> Progi Wydawania Ostrzeżeń SOB</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Zaznacz odpowiednie prawdopodobieństwa w tabeli (kliknij w komórkę wiersza 1, 2 lub 3 dla każdej kolumny), aby algorytm zasugerował stopień zagrożenia.</p>
+      
+      <div class="card mb-3" style="overflow-x: auto;">
+        <table class="data-table interactive-matrix" id="forecast-matrix" style="margin-top: 0;">
           <thead>
             <tr>
-              <th style="width: 20%;">Prawdop.</th>
+              <th style="width: 20%;">Prawdopodobieństwo</th>
               <th style="width: 20%;">Wiatr</th>
-              <th style="width: 20%;">Tornado / Trąba pow.</th>
+              <th style="width: 20%;">Tornado / Trąba</th>
               <th style="width: 20%;">Grad</th>
-              <th style="width: 20%;">Opad</th>
+              <th style="width: 20%;">Nawalny Opad</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td style="font-weight: 600;">Niskie (5-15% / 10-30%)</td>
-              <td style="font-size: 0.85rem;"><strong>10-30%:</strong> Szanse niewielkie, lokalne porywy. Niska szansa na rozwój burz o danej sile porywów jest wliczona.</td>
-              <td style="font-size: 0.85rem;"><strong>2-5%:</strong> Ryzyko niewielkie, lecz niezerowe. Jeżeli wystąpi, najpewniej będzie to pojedynczy przypadek.</td>
-              <td style="font-size: 0.85rem;"><strong>5-15%:</strong> Grad tylko w przypadku pojedynczych silnych superkomórek lub interakcji.</td>
-              <td style="font-size: 0.85rem;"><strong>5-15%:</strong> Brak zagrożenia akumulacją, ew. lokalne przypadki związane z topografią.</td>
+            <tr data-level="1">
+              <td style="font-weight: 600;">Niskie<br><span style="font-size:0.75rem; color:var(--text-subtle)">(5-15% / 10-30%)</span></td>
+              <td class="selectable-cell" data-col="wind" data-val="MRG"><strong>10-30%:</strong> Lokalne porywy. Szansa na rozwój jest wliczona.</td>
+              <td class="selectable-cell" data-col="torn" data-val="MRG"><strong>2-5%:</strong> Ryzyko niewielkie, pojedyncze przypadki.</td>
+              <td class="selectable-cell" data-col="hail" data-val="MRG"><strong>5-15%:</strong> Grad tylko z pojedynczych silnych superkomórek.</td>
+              <td class="selectable-cell" data-col="rain" data-val="MRG"><strong>5-15%:</strong> Brak powodzi, lokalne przypadki z topografią.</td>
             </tr>
-            <tr>
-              <td style="font-weight: 600;">Średnie (15-45% / 30-60%)</td>
-              <td style="font-size: 0.85rem;"><strong>30-60%:</strong> Warunki dogodne. Spodziewany rozwój paru superkomórek bądź układu burzowego.</td>
-              <td style="font-size: 0.85rem;"><strong>5-15%:</strong> Trąby prawdopodobne, spodziewane maksymalnie 1-2 przypadki.</td>
-              <td style="font-size: 0.85rem;"><strong>15-45%:</strong> Większość burz wygeneruje grad o danym rozmiarze, lecz ilość burz będzie niewielka.</td>
-              <td style="font-size: 0.85rem;"><strong>15-45%:</strong> Większość burz wygeneruje daną ilość opadu w przeciągu godziny.</td>
+            <tr data-level="2">
+              <td style="font-weight: 600;">Średnie<br><span style="font-size:0.75rem; color:var(--text-subtle)">(15-45% / 30-60%)</span></td>
+              <td class="selectable-cell" data-col="wind" data-val="NWL"><strong>30-60%:</strong> Warunki dogodne. Parę superkomórek / mały układ.</td>
+              <td class="selectable-cell" data-col="torn" data-val="NWL"><strong>5-15%:</strong> Trąby prawdopodobne, max 1-2 przypadki.</td>
+              <td class="selectable-cell" data-col="hail" data-val="NWL"><strong>15-45%:</strong> Większość burz wygeneruje grad, lecz ich ilość b. mała.</td>
+              <td class="selectable-cell" data-col="rain" data-val="NWL"><strong>15-45%:</strong> Większość burz wygeneruje zalanio-twórczy opad.</td>
             </tr>
-            <tr>
-              <td style="font-weight: 600; color: var(--accent-danger);">Wysokie (&gt;45% / &gt;60%)</td>
-              <td style="font-size: 0.85rem;"><strong>&gt;60%:</strong> Duża szansa na porywy na rozległym obszarze (rozległy układ burzowy / dużo superkomórek).</td>
-              <td style="font-size: 0.85rem;"><strong>&gt;15%:</strong> Znaczne ryzyko trąb w warunkach polskich. Mogą występować seryjnie lub na dużym obszarze.</td>
-              <td style="font-size: 0.85rem;"><strong>&gt;45%:</strong> Znaczna ilość superkomórek generujących duży grad.</td>
-              <td style="font-size: 0.85rem;"><strong>&gt;45%:</strong> Znaczne zagrożenie opadem, rozległe burze lub na terenach narażonych na akumulację (np. góry).</td>
+            <tr data-level="3">
+              <td style="font-weight: 600; color: var(--accent-danger);">Wysokie<br><span style="font-size:0.75rem; color:var(--text-subtle)">(&gt;45% / &gt;60%)</span></td>
+              <td class="selectable-cell" data-col="wind" data-val="SRD"><strong>&gt;60%:</strong> Duża szansa na rozległym obszarze (MCS/linia).</td>
+              <td class="selectable-cell" data-col="torn" data-val="SRD"><strong>&gt;15%:</strong> Znaczne ryzyko dla PL, liczne tornada lub superkomórka.</td>
+              <td class="selectable-cell" data-col="hail" data-val="SRD"><strong>&gt;45%:</strong> Rozległy obszar z wieloma burzami gradowymi.</td>
+              <td class="selectable-cell" data-col="rain" data-val="SRD"><strong>&gt;45%:</strong> Bardzo rozległy obszar ulew (Train-effect / MCS z wbud. superk).</td>
             </tr>
           </tbody>
         </table>
       </div>
+      
+      <div class="card" style="text-align: center; padding: 2rem;">
+        <h3 style="margin-bottom: 1rem; color: var(--text-secondary);">Sugerowany Stopień Zagrożenia:</h3>
+        <div id="matrix-result" style="font-size: 3rem; font-weight: 800; color: var(--border-strong);">Brak wyboru</div>
+        <p id="matrix-desc" style="color: var(--text-subtle); margin-top: 1rem;">Wybierz parametry powyżej aby wyliczyć stopień.</p>
+      </div>
+      
+      <div id="alert-warnings-grid" class="grid-3 mt-3"></div>
     </div>
 
-    <!-- TAB 7: CENTRUM MAP -->
+    <!-- TAB 6: MAPY -->
     <div id="tab-maps" class="tab-view">
-      <div class="card mb-3">
-        <div class="card-header-bar">
-          <div class="card-title">Interaktywna Mapa Pogodowa (Leaflet / OpenStreetMap)</div>
-        </div>
-        <div id="leaflet-map"></div>
+      <h2 class="section-title"><i data-lucide="map" style="margin-right: 10px;"></i> Interaktywne Mapy (IMGW Interpolacja)</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 2rem;">System map w czasie rzeczywistym bazujący na Twoim skrypcie Pythona (Firebase Map Data).</p>
+      
+      <div class="card" style="height: 80vh; padding: 0; overflow: hidden; border: 1px solid var(--border-subtle);">
+         <iframe src="stacje/dashboard.html" style="width: 100%; height: 100%; border: none;"></iframe>
       </div>
+    </div>
 
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-header-bar">
-            <div class="card-title">Mapa Polski (300 DPI)</div>
-          </div>
-          <div class="map-img-container">
-            <a href="mapy/wygenerowane/mapa_polski_ostrzezenia.png" target="_blank">
-              <img src="mapy/wygenerowane/mapa_polski_ostrzezenia.png" alt="Mapa Polski" loading="lazy">
-            </a>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-header-bar">
-            <div class="card-title">Mapa Europy (300 DPI)</div>
-          </div>
-          <div class="map-img-container">
-            <a href="mapy/wygenerowane/mapa_europy_synoptyczna.png" target="_blank">
-              <img src="mapy/wygenerowane/mapa_europy_synoptyczna.png" alt="Mapa Europy" loading="lazy">
-            </a>
-          </div>
+    <!-- TAB 7: STATYSTYKI -->
+    <div id="tab-stats" class="tab-view">
+      <h2 class="section-title"><i data-lucide="bar-chart-2" style="margin-right: 10px;"></i> Statystyki Bazy i Repozytorium</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 2rem;">Dane synchronizowane automatycznie przez skrypt <code>sync.bat</code>.</p>
+      
+      <div id="repo-stats-grid" class="grid-3">
+        <!-- Generowane dynamicznie -->
+        <div class="card" style="text-align: center; padding: 3rem;">
+           <div class="loader">Ładowanie statystyk...</div>
         </div>
       </div>
     </div>
@@ -452,6 +509,7 @@
   
   <!-- Data & Logic -->
   <script src="assets/js/data.js?v=2"></script>
-  <script src="assets/js/app.js?v=2"></script>
+  <script src="assets/js/local_stats.js?v=1"></script>
+  <script src="assets/js/app.js?v=4"></script>
 </body>
 </html>
