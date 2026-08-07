@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-07 23:23:29",
+  "timestamp": "2026-08-07 23:25:01",
   "estofex": "https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest",
   "blitzortung": "https://images.blitzortung.org/Images/image_b_pl.png",
   "sat24": "https://sat24.mobi/Image/satvis/europa/pl",
@@ -8,6 +8,7 @@
   "lowcyburz": "https://lowcyburz.pl/wp-content/uploads/2026/08/07_08_08_26.png",
   "imgw_synoptyczna": "https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/mapasynoptyczna/mapasynop_202608071200.png",
   "imgw_cappi": "https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Polrad/Produkty/POLCOMP/COMPO_CAPPI.comp.cappi/2026080721200000dBZ.cappi.png",
+  "imgw_lts": "https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/Perun/LTS2005/DISCH_20260807_212400.gif",
   "meteo_wroclaw": "https://www.meteo.pl/um/metco/mgram_pict.php?ntype=0u&row=436&col=181&lang=pl",
   "dwd_europa": "https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png",
   "cmm_temp": "https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/CMM_mapy/synop/TEMPERATURA_2026080723.png",

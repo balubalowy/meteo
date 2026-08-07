@@ -241,6 +241,8 @@ def generate_dashboard():
     print(f"  Wysyłanie map_data do bazy {FIREBASE_URL}/imgw_map_data.json")
     try:
         resp_put = requests.put(f"{FIREBASE_URL}/imgw_map_data.json{auth_param}", json=final_payload)
+        if not resp_put.ok:
+            print(f"  [!] Firebase zwrócił błąd {resp_put.status_code}: {resp_put.text}")
         resp_put.raise_for_status()
         print("  [OK] Dane przestrzenne zaktualizowane w Firebase!")
     except Exception as e:
