@@ -6,25 +6,31 @@
  */
 
 function initApp() {
-  if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
-  }
-  initNavigation();
-  renderIFClassesTable();
-  renderDamageEvaluator();
-  renderThermoConcepts();
-  renderRadarSignatures();
-  renderMeteoWarnings();
-  renderHistoricalCases();
-  initLiveCalculators();
-  initLeafletMap();
-  initForecastMatrix();
-  initRepoStats();
-  loadDashboardLinks();
-  initSortableGrid();
-  initLightbox();
-  initCmmSynop();
-  renderLocalStats();
+  const safeRun = (name, fn) => {
+    try {
+      fn();
+    } catch(e) {
+      console.error(`Błąd w ${name}:`, e);
+    }
+  };
+
+  safeRun('lucide', () => { if (typeof lucide !== 'undefined') lucide.createIcons(); });
+  safeRun('initNavigation', initNavigation);
+  safeRun('renderIFClassesTable', renderIFClassesTable);
+  safeRun('renderDamageEvaluator', renderDamageEvaluator);
+  safeRun('renderThermoConcepts', renderThermoConcepts);
+  safeRun('renderRadarSignatures', renderRadarSignatures);
+  safeRun('renderMeteoWarnings', renderMeteoWarnings);
+  safeRun('renderHistoricalCases', renderHistoricalCases);
+  safeRun('initLiveCalculators', initLiveCalculators);
+  safeRun('initLeafletMap', initLeafletMap);
+  safeRun('initForecastMatrix', initForecastMatrix);
+  safeRun('initRepoStats', initRepoStats);
+  safeRun('loadDashboardLinks', loadDashboardLinks);
+  safeRun('initSortableGrid', initSortableGrid);
+  safeRun('initLightbox', initLightbox);
+  safeRun('initCmmSynop', initCmmSynop);
+  safeRun('renderLocalStats', renderLocalStats);
 }
 
 if (document.readyState === "loading") {
@@ -599,11 +605,7 @@ function initForecastMatrix() {
     1: { code: "MRG", color: "#22c55e", name: "MRG (Marginalne - 1/5)", desc: "Niskie ryzyko zjawisk burzowych." },
     2: { code: "NWL", color: "#eab308", name: "NWL (Niewielkie - 2/5)", desc: "Umiarkowanie groźne burze." },
     3: { code: "SRD", color: "#f97316", name: "SRD (Średnie - 3/5)", desc: "Niebezpieczne, silne burze." },
-    4: { code: "DZ",  color: "#ef4444", name: "DZ (Duże - 4/5)", desc: "Gwałtowne, bardzo niebezpieczne burze." },
-    5: { code: "EXT", color: "#d946ef", name: "EXT (Ekstremalne - 5/5)", desc: "Ekstremalnie groźne i niszczycielskie burze." }
-  };
-  
-  cells.forEach(cell => {
+    4: { code: "DZ",  color: "#ef4444", name: "DZ (Duże - 4/5  cells.forEach(cell => {
     cell.addEventListener("click", () => {
       const table = cell.closest("table");
       if (!table) return;
@@ -638,96 +640,7 @@ function initForecastMatrix() {
     const countSelected = Object.values(state).filter(v => v > 0).length;
     descDiv.innerHTML = `Najwyższy wytypowany stopień: <strong style="color:${info.color}">${info.code}</strong> (${info.desc}).<br><span style="font-size:0.8rem; opacity:0.8">Zaznaczono ${countSelected} z 4 kategorii.</span>`;
   }
-}
-
-// ─── 8. Kalkulatory Na Żywo & Statystyki z Excela ───
-function renderLocalStats() {
-  if (!window.meteoStats) return;
-  const s = window.meteoStats;
-  
-  const container = document.getElementById('storm-stats-container');
-  if (container && s.summary) {
-    const items = [
-      { title: "Burze (Łowy / Aktywne)", val: s.summary.burze_lowy.val, icon: "cloud-lightning", color: "var(--accent-primary)", info: s.summary.burze_lowy.info, stan: s.summary.burze_lowy.stan },
-      { title: "Dni Burzowe (Łowy)", val: s.summary.dni_burzowe_lowy.val, icon: "calendar", color: "var(--accent-primary)", info: s.summary.dni_burzowe_lowy.info, stan: s.summary.dni_burzowe_lowy.stan },
-      { title: "Ogólna Liczba Burz", val: s.summary.burze_ogolem.val, icon: "zap", color: "var(--accent-warning)", info: s.summary.burze_ogolem.info, stan: s.summary.burze_ogolem.stan },
-      { title: "Ogólna Liczba Dni Burzowych", val: s.summary.dni_burzowe_ogolem.val, icon: "cloud-rain", color: "var(--accent-warning)", info: s.summary.dni_burzowe_ogolem.info, stan: s.summary.dni_burzowe_ogolem.stan },
-      { title: "Suma Kilometrów", val: s.summary.km_suma.val + " km", icon: "map-pin", color: "#f59e0b", info: s.summary.km_suma.info, stan: s.summary.km_suma.stan },
-      
-      { title: "Max Grad", val: s.summary.grad_max.val, icon: "circle-dot", color: "#3b82f6", info: s.summary.grad_max.info, stan: s.summary.grad_max.stan },
-      { title: "Max Poryw Wiatru", val: s.summary.wiatr_max.val, icon: "wind", color: "#ef4444", info: s.summary.wiatr_max.info, stan: s.summary.wiatr_max.stan },
-      { title: "Max Opad Deszczu", val: s.summary.opad_max.val, icon: "droplets", color: "#06b6d4", info: s.summary.opad_max.info, stan: s.summary.opad_max.stan },
-      { title: "Max Temperatura", val: s.summary.temp_max.val, icon: "thermometer-sun", color: "#f97316", info: s.summary.temp_max.info, stan: s.summary.temp_max.stan },
-      { title: "Min Temperatura", val: s.summary.temp_min.val, icon: "snowflake", color: "#38bdf8", info: s.summary.temp_min.info, stan: s.summary.temp_min.stan }
-    ];
-
-    container.innerHTML = items.map(item => `
-      <div class="card stat-card" style="text-align: center; padding: 1.5rem; position: relative;">
-        <i data-lucide="${item.icon}" style="width: 36px; height: 36px; color: ${item.color}; margin: 0 auto 0.8rem auto; opacity: 0.9;"></i>
-        <h3 style="font-size: 2.2rem; color: var(--text-primary); margin-bottom: 0.3rem;">${item.val}</h3>
-        <p style="color: var(--text-primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem;">${item.title}</p>
-        ${item.info ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">${item.info}</div>` : ''}
-        ${item.stan ? `<div style="font-size: 0.7rem; color: var(--accent-primary); margin-top: 0.4rem; font-weight: 500;">${item.stan}</div>` : ''}
-      </div>
-    `).join('');
-  }
-
-  // Render Ratings Table (Sheet 'Skala')
-  const ratingsContainer = document.getElementById('storm-ratings-container');
-  if (ratingsContainer && s.ratings) {
-    ratingsContainer.innerHTML = `
-      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
-        <h3 style="margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 10px;">
-          <i data-lucide="award" style="color: var(--accent-warning);"></i> Podsumowanie Ocen (Arkusz Skala)
-        </h3>
-        <table class="data-table" style="margin: 0; width: 100%;">
-          <thead>
-            <tr>
-              <th>Nazwa oceny</th>
-              <th style="text-align: center;">Zagrożenia (suma)</th>
-              <th style="text-align: center;">Wygląd (suma)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${s.ratings.map(r => `
-              <tr>
-                <td><strong>${r.name}</strong></td>
-                <td style="text-align: center; font-weight: 700; color: var(--accent-warning);">${r.zagrozenia}</td>
-                <td style="text-align: center; font-weight: 700; color: var(--accent-primary);">${r.wyglad}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-  }
-
-  initRepoStats();
-}
-
-function initRepoStats() {
-  const container = document.getElementById("repo-stats-grid");
-  if (!container) return;
-  
-  if (typeof window.meteoStats === "undefined") {
-     container.innerHTML = `<div class="card" style="grid-column: span 3; text-align:center; color: var(--accent-danger)">Brak pliku statystyk. Uruchom sync.bat</div>`;
-     return;
-  }
-  
-  const s = window.meteoStats;
-  
-  container.innerHTML = `
-    <div class="card" style="text-align: center; padding: 1.5rem;">
-      <i data-lucide="file-code" style="width: 36px; height: 36px; color: var(--accent-primary); margin-bottom: 0.8rem;"></i>
-      <h3 style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--text-primary);">${s.pythonFiles ?? 33}</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem;">Skrypty Python (.py)</p>
-    </div>
-    <div class="card" style="text-align: center; padding: 1.5rem;">
-      <i data-lucide="layout" style="width: 36px; height: 36px; color: var(--accent-success); margin-bottom: 0.8rem;"></i>
-      <h3 style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--text-primary);">${s.htmlFiles ?? 12}</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem;">Szablony HTML (.html)</p>
-  if (rhTempIn) {
-    rhTempIn.addEventListener("input", calcMagnus);
+}entListener("input", calcMagnus);
     rhRhIn.addEventListener("input", () => { lastEdited = 'rh'; calcMagnus(); });
     rhTdIn.addEventListener("input", () => { lastEdited = 'td'; calcMagnus(); });
     calcMagnus();
@@ -735,204 +648,7 @@ function initRepoStats() {
 
 }
 
-// ─── 9. Interaktywna Mapa Leaflet ───
-function initLeafletMap() {
-  const mapElement = document.getElementById("leaflet-map");
-  if (!mapElement || typeof L === "undefined") return;
 
-  const map = L.map("leaflet-map").setView([52.0, 19.5], 6);
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 18,
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
-
-  // Przykładowa strefa ostrzeżenia
-  L.polygon([
-    [51.0, 16.5],
-    [52.8, 18.2],
-    [52.4, 21.0],
-    [50.5, 20.0]
-  ], {
-    color: "#EF4444",
-    fillColor: "#EF4444",
-    fillOpacity: 0.15,
-    weight: 2
-  }).addTo(map).bindPopup("<b>Stopień 2:</b> Strefa silnych superkomórek burzowych.");
-
-  const points = [
-    { lat: 52.23, lon: 21.01, title: "Warszawa", desc: "Stacja Synoptyczna" },
-    { lat: 50.06, lon: 19.94, title: "Kraków", desc: "Punkt Obserwacji Aerologicznej" },
-    { lat: 51.11, lon: 17.03, title: "Wrocław", desc: "Stacja Aerologiczna 12425" }
-  ];
-
-  points.forEach(pt => {
-    L.marker([pt.lat, pt.lon])
-      .addTo(map)
-      .bindPopup(`<b>${pt.title}</b><br>${pt.desc}`);
-  });
-}
-
-
-// 💡 10. Interaktywna Tabela Prognoz (Forecast Matrix SOB)
-function initForecastMatrix() {
-  const cells = document.querySelectorAll(".sob-cell:not(.disabled)");
-  const resultDiv = document.getElementById("matrix-result");
-  const descDiv = document.getElementById("matrix-desc");
-  
-  if (!cells.length) return;
-  
-  const state = {
-    wind: 0,
-    torn: 0,
-    hail: 0,
-    rain: 0
-  };
-  
-  const levelDetails = {
-    1: { code: "MRG", color: "#22c55e", name: "MRG (Marginalne - 1/5)", desc: "Niskie ryzyko zjawisk burzowych." },
-    2: { code: "NWL", color: "#eab308", name: "NWL (Niewielkie - 2/5)", desc: "Umiarkowanie groźne burze." },
-    3: { code: "SRD", color: "#f97316", name: "SRD (Średnie - 3/5)", desc: "Niebezpieczne, silne burze." },
-    4: { code: "DZ",  color: "#ef4444", name: "DZ (Duże - 4/5)", desc: "Gwałtowne, bardzo niebezpieczne burze." },
-    5: { code: "EXT", color: "#d946ef", name: "EXT (Ekstremalne - 5/5)", desc: "Ekstremalnie groźne i niszczycielskie burze." }
-  };
-  
-  cells.forEach(cell => {
-    cell.addEventListener("click", () => {
-      const table = cell.closest("table");
-      if (!table) return;
-      const cat = table.getAttribute("data-cat");
-      const val = parseInt(cell.getAttribute("data-val")) || 0;
-      
-      // Clear selection in this table
-      table.querySelectorAll(".sob-cell").forEach(c => c.classList.remove("selected"));
-      
-      // Select clicked cell
-      cell.classList.add("selected");
-      state[cat] = val;
-      
-      updateMatrixResult();
-    });
-  });
-  
-  function updateMatrixResult() {
-    let maxVal = Math.max(state.wind, state.torn, state.hail, state.rain);
-    
-    if (maxVal === 0) {
-      resultDiv.textContent = "Brak wyboru";
-      resultDiv.style.color = "var(--border-strong)";
-      descDiv.textContent = "Kliknij wybrane komórki w powyższych tabelach, aby wyznaczyć stopień.";
-      return;
-    }
-    
-    const info = levelDetails[maxVal];
-    resultDiv.textContent = info.name;
-    resultDiv.style.color = info.color;
-    
-    const countSelected = Object.values(state).filter(v => v > 0).length;
-    descDiv.innerHTML = `Najwyższy wytypowany stopień: <strong style="color:${info.color}">${info.code}</strong> (${info.desc}).<br><span style="font-size:0.8rem; opacity:0.8">Zaznaczono ${countSelected} z 4 kategorii.</span>`;
-  }
-}
-
-// ─── 8. Kalkulatory Na Żywo & Statystyki z Excela ───
-function renderLocalStats() {
-  if (!window.meteoStats) return;
-  const s = window.meteoStats;
-  
-  const container = document.getElementById('storm-stats-container');
-  if (container && s.summary) {
-    const items = [
-      { title: "Burze (Łowy / Aktywne)", val: s.summary.burze_lowy.val, icon: "cloud-lightning", color: "var(--accent-primary)", info: s.summary.burze_lowy.info, stan: s.summary.burze_lowy.stan },
-      { title: "Dni Burzowe (Łowy)", val: s.summary.dni_burzowe_lowy.val, icon: "calendar", color: "var(--accent-primary)", info: s.summary.dni_burzowe_lowy.info, stan: s.summary.dni_burzowe_lowy.stan },
-      { title: "Ogólna Liczba Burz", val: s.summary.burze_ogolem.val, icon: "zap", color: "var(--accent-warning)", info: s.summary.burze_ogolem.info, stan: s.summary.burze_ogolem.stan },
-      { title: "Ogólna Liczba Dni Burzowych", val: s.summary.dni_burzowe_ogolem.val, icon: "cloud-rain", color: "var(--accent-warning)", info: s.summary.dni_burzowe_ogolem.info, stan: s.summary.dni_burzowe_ogolem.stan },
-      { title: "Suma Kilometrów", val: s.summary.km_suma.val + " km", icon: "map-pin", color: "#f59e0b", info: s.summary.km_suma.info, stan: s.summary.km_suma.stan },
-      
-      { title: "Max Grad", val: s.summary.grad_max.val, icon: "circle-dot", color: "#3b82f6", info: s.summary.grad_max.info, stan: s.summary.grad_max.stan },
-      { title: "Max Poryw Wiatru", val: s.summary.wiatr_max.val, icon: "wind", color: "#ef4444", info: s.summary.wiatr_max.info, stan: s.summary.wiatr_max.stan },
-      { title: "Max Opad Deszczu", val: s.summary.opad_max.val, icon: "droplets", color: "#06b6d4", info: s.summary.opad_max.info, stan: s.summary.opad_max.stan },
-      { title: "Max Temperatura", val: s.summary.temp_max.val, icon: "thermometer-sun", color: "#f97316", info: s.summary.temp_max.info, stan: s.summary.temp_max.stan },
-      { title: "Min Temperatura", val: s.summary.temp_min.val, icon: "snowflake", color: "#38bdf8", info: s.summary.temp_min.info, stan: s.summary.temp_min.stan }
-    ];
-
-    container.innerHTML = items.map(item => `
-      <div class="card stat-card" style="text-align: center; padding: 1.5rem; position: relative;">
-        <i data-lucide="${item.icon}" style="width: 36px; height: 36px; color: ${item.color}; margin: 0 auto 0.8rem auto; opacity: 0.9;"></i>
-        <h3 style="font-size: 2.2rem; color: var(--text-primary); margin-bottom: 0.3rem;">${item.val}</h3>
-        <p style="color: var(--text-primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 0.4rem;">${item.title}</p>
-        ${item.info ? `<div style="font-size: 0.75rem; color: var(--text-secondary);">${item.info}</div>` : ''}
-        ${item.stan ? `<div style="font-size: 0.7rem; color: var(--accent-primary); margin-top: 0.4rem; font-weight: 500;">${item.stan}</div>` : ''}
-      </div>
-    `).join('');
-  }
-
-  // Render Ratings Table (Sheet 'Skala')
-  const ratingsContainer = document.getElementById('storm-ratings-container');
-  if (ratingsContainer && s.ratings) {
-    ratingsContainer.innerHTML = `
-      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
-        <h3 style="margin-bottom: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 10px;">
-          <i data-lucide="award" style="color: var(--accent-warning);"></i> Podsumowanie Ocen (Arkusz Skala)
-        </h3>
-        <table class="data-table" style="margin: 0; width: 100%;">
-          <thead>
-            <tr>
-              <th>Nazwa oceny</th>
-              <th style="text-align: center;">Zagrożenia (suma)</th>
-              <th style="text-align: center;">Wygląd (suma)</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${s.ratings.map(r => `
-              <tr>
-                <td><strong>${r.name}</strong></td>
-                <td style="text-align: center; font-weight: 700; color: var(--accent-warning);">${r.zagrozenia}</td>
-                <td style="text-align: center; font-weight: 700; color: var(--accent-primary);">${r.wyglad}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-  }
-
-  initRepoStats();
-}
-
-function initRepoStats() {
-  const container = document.getElementById("repo-stats-grid");
-  if (!container) return;
-  
-  if (typeof window.meteoStats === "undefined") {
-     container.innerHTML = `<div class="card" style="grid-column: span 3; text-align:center; color: var(--accent-danger)">Brak pliku statystyk. Uruchom sync.bat</div>`;
-     return;
-  }
-  
-  const s = window.meteoStats;
-  
-  container.innerHTML = `
-    <div class="card" style="text-align: center; padding: 1.5rem;">
-      <i data-lucide="file-code" style="width: 36px; height: 36px; color: var(--accent-primary); margin-bottom: 0.8rem;"></i>
-      <h3 style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--text-primary);">${s.pythonFiles ?? 33}</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem;">Skrypty Python (.py)</p>
-    </div>
-    <div class="card" style="text-align: center; padding: 1.5rem;">
-      <i data-lucide="layout" style="width: 36px; height: 36px; color: var(--accent-success); margin-bottom: 0.8rem;"></i>
-      <h3 style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--text-primary);">${s.htmlFiles ?? 12}</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem;">Szablony HTML (.html)</p>
-    </div>
-    <div class="card" style="text-align: center; padding: 1.5rem;">
-      <i data-lucide="database" style="width: 36px; height: 36px; color: var(--accent-warning); margin-bottom: 0.8rem;"></i>
-      <h3 style="font-size: 2rem; margin-bottom: 0.3rem; color: var(--text-primary);">${s.excelFiles ?? 2}</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem;">Arkusze Analityczne (.xlsx)</p>
-    </div>
-    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 1rem; background: var(--bg-tertiary);">
-       <p style="color: var(--text-muted); font-size: 0.85rem;">Ostatnia synchronizacja (sync.bat): <strong>${s.lastSync ?? 'Brak'}</strong></p>
-    </div>
-  `;
-  
-  if (typeof lucide !== 'undefined') lucide.createIcons();
-}
 
 window.triggerEnsFromTab = function() {
   const thresh = document.getElementById('tab-ens-thresh')?.value || '30';
