@@ -112,17 +112,25 @@ function initLightbox() {
 
 function loadDashboardLinks() {
   fetch('assets/js/dashboard_links.json?v=' + new Date().getTime())
-    .then(r => r.json())
+    .then(r => {
+      if (!r.ok) throw new Error("HTTP error " + r.status);
+      return r.json();
+    })
     .then(links => {
-       if (links.dwd_europa) document.getElementById('dash-dwd').src = links.dwd_europa;
-       if (links.imgw_synoptyczna) document.getElementById('dash-synopt').src = links.imgw_synoptyczna;
-       if (links.imgw_cappi) document.getElementById('dash-cappi').src = links.imgw_cappi;
-       if (links.imgw_lts) {
-         const ltsEl = document.getElementById('dash-lts');
-         if (ltsEl) ltsEl.src = links.imgw_lts;
-       }
-       if (links.sigwx_imgw) document.getElementById('dash-sigwx-pl').src = links.sigwx_imgw;
-       if (links.sigwx_chmi) document.getElementById('dash-sigwx-cz').src = links.sigwx_chmi;
+       if (!links) return;
+       window._cmmLinks = links;
+
+       const setSrc = (id, url) => {
+         const el = document.getElementById(id);
+         if (el && url) el.src = url;
+       };
+
+       setSrc('dash-dwd', links.dwd_europa);
+       setSrc('dash-synopt', links.imgw_synoptyczna);
+       setSrc('dash-cappi', links.imgw_cappi);
+       setSrc('dash-lts', links.imgw_lts);
+       setSrc('dash-sigwx-pl', links.sigwx_imgw);
+       setSrc('dash-sigwx-cz', links.sigwx_chmi);
        
        if (links.meteo_wroclaw) {
           const mw = document.getElementById('img-meteo-wroclaw');
@@ -141,11 +149,13 @@ function loadDashboardLinks() {
           if(l) l.innerText = "Brak mapy w najnowszym wpisie.";
        }
 
-       // Store CMM links and trigger load
-       window._cmmLinks = links;
-       if (window._cmmLoadFn) window._cmmLoadFn();
+       if (typeof window._cmmLoadFn === 'function') {
+          window._cmmLoadFn();
+       }
     })
-    .catch(e => console.error("Error loading dashboard links:", e));
+    .catch(err => {
+       console.error("Błąd wczytywania dashboard_links.json:", err);
+    });
 }
 
 // ─── 1. Nawigacja (top-nav + module cards) ───
@@ -155,11 +165,14 @@ function initNavigation() {
 
   navLinks.forEach(link => {
     link.addEventListener("click", (e) => {
-      e.preventDefault();
       const targetTab = link.getAttribute("data-tab");
-      if (!targetTab) return;
+      if (!targetTab) return; // Pozwól na normalne otwieranie odnośników zewnętrznych (np. B-Core)
+      
+      e.preventDefault();
 
-      navLinks.forEach(n => n.classList.remove("active"));
+      navLinks.forEach(n => {
+        if (n.getAttribute("data-tab")) n.classList.remove("active");
+      });
       tabViews.forEach(v => v.classList.remove("active"));
 
       link.classList.add("active");
