@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prognoza Ensemble — Mapa Temperatur</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Prognoza Ensemble — Generowanie i Mapa Temperatur</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -15,7 +16,7 @@
             line-height: 1.6;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
         header {
@@ -24,7 +25,9 @@
             padding-bottom: 1rem;
         }
         .back-link {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             margin-bottom: 1rem;
             color: #1E40AF;
             text-decoration: none;
@@ -36,76 +39,256 @@
         h1 {
             font-size: 2rem;
             margin: 0;
-            font-weight: 600;
+            font-weight: 700;
+            color: #111827;
         }
         p {
-            font-size: 1.1rem;
-            color: #4A5568;
+            font-size: 1.05rem;
+            color: #4B5563;
         }
         .card {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             margin-bottom: 2rem;
+            border: 1px solid #E5E7EB;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: left;
+        }
+        label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #374151;
+        }
+        input, select {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #D1D5DB;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus, select:focus {
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             background-color: #1E40AF;
             color: white;
-            padding: 1rem 2rem;
-            border-radius: 6px;
+            padding: 0.85rem 1.75rem;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 1.1rem;
-            transition: background-color 0.2s;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
         }
         .btn:hover {
             background-color: #1E3A8A;
         }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn-success {
+            background-color: #059669;
+        }
+        .btn-success:hover {
+            background-color: #047857;
+        }
         .section {
             background: white;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            border: 1px solid #E5E7EB;
         }
         h2 {
             font-size: 1.25rem;
             margin-top: 0;
-            color: #2D3748;
+            color: #1F2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         code {
-            background: #EDF2F7;
-            padding: 0.2rem 0.4rem;
+            background: #F3F4F6;
+            padding: 0.2rem 0.5rem;
             border-radius: 4px;
             font-size: 0.9em;
-            color: #C53030;
+            color: #DC2626;
+            font-family: monospace;
         }
+        .status-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .status-info { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
+        .status-success { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+        .status-error { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <a href="../index.html" class="back-link">← Powrót do Centrum</a>
-            <h1>Prognoza Ensemble — Mapa Temperatur</h1>
+            <h1>Prognoza Ensemble — Generator i Mapa Temperatur</h1>
         </header>
 
-        <p>Mapa oczekiwanej temperatury maksymalnej i prawdopodobieństwa przekroczenia progu, na podstawie 169 wiązek z 4 modeli globalnych: ECMWF IFS (50), ECMWF AIFS (50), NCEP GEFS (30), ICON-EU EPS (39).</p>
+        <p>Generuj mapę oczekiwanej temperatury maksymalnej oraz prawdopodobieństwa przekroczenia wybranego progu na podstawie <b>169 wiązek z 4 modeli globalnych</b> (ECMWF IFS 50, ECMWF AIFS 50, NCEP GEFS 30, ICON-EU EPS 39).</p>
 
+        <!-- FORMULARZ GENEROWANIA PROGNOZY -->
         <div class="card">
-            <a href="dashboard.html" class="btn">Otwórz Dashboard Prognozy</a>
+            <h2 style="margin-bottom: 1.5rem;"><i data-lucide="sliders" style="color: #2563EB;"></i> Wylicz Nową Prognozę Ensemble</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="ens-threshold">Próg temperatury (°C):</label>
+                    <input type="number" id="ens-threshold" value="30" step="1" min="-30" max="50">
+                    <span style="font-size: 0.8rem; color: #6B7280;">Wylicza szansę przekroczenia np. 30°C (upał) lub 0°C (mróz)</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ens-days">Horyzont czasowy (wybieg):</label>
+                    <select id="ens-days" onchange="syncDateFromDays()">
+                        <option value="0">Dzisiaj (+0 dni)</option>
+                        <option value="1" selected>Jutro (+1 dzień)</option>
+                        <option value="2">Pojutrze (+2 dni)</option>
+                        <option value="3">+3 dni</option>
+                        <option value="4">+4 dni</option>
+                        <option value="5">+5 dni</option>
+                        <option value="7">+7 dni (tydzień)</option>
+                        <option value="10">+10 dni</option>
+                        <option value="14">+14 dni (2 tygodnie)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ens-date">Lub Wybierz Konkretną Datę:</label>
+                    <input type="date" id="ens-date" onchange="syncDaysFromDate()">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem;">
+                <button class="btn btn-success" onclick="triggerGitHubAction()">
+                    <i data-lucide="zap"></i> Generuj w chmurze (GitHub Actions)
+                </button>
+                <a href="dashboard.html" class="btn" target="_blank">
+                    <i data-lucide="map"></i> Otwórz Aktualną Mapę HTML
+                </a>
+            </div>
+
+            <div id="status-box" class="status-box"></div>
         </div>
 
         <div class="section">
-            <h2>Aktualizacja danych (Pipeline)</h2>
-            <p>Aby przeliczyć prognozy na nowo:</p>
-            <ol>
-                <li><code>python pobierz_ensemble.py</code> - pobiera najnowsze wiązki modeli</li>
-                <li><code>python generuj_dashboard.py</code> - generuje wizualizację do pliku HTML</li>
-            </ol>
+            <h2><i data-lucide="terminal" style="color: #4B5563;"></i> Lokalne uruchamianie (Skrypt Python)</h2>
+            <p>Możesz także przeliczyć prognozę ręcznie w konsoli używając polecenia:</p>
+            <p style="text-align: center; margin: 1rem 0;">
+                <code id="python-cmd">python pobierz_ensemble.py 30 1</code>
+            </p>
         </div>
     </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Ustaw domyślną datę w kalendarzu na jutro
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('ens-date').value = tomorrow.toISOString().split('T')[0];
+
+        function syncDateFromDays() {
+            const days = parseInt(document.getElementById('ens-days').value) || 0;
+            const target = new Date();
+            target.setDate(target.getDate() + days);
+            document.getElementById('ens-date').value = target.toISOString().split('T')[0];
+            updatePythonCmd();
+        }
+
+        function syncDaysFromDate() {
+            const dateVal = document.getElementById('ens-date').value;
+            if (!dateVal) return;
+            const selDate = new Date(dateVal);
+            const todayReset = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const selReset = new Date(selDate.getFullYear(), selDate.getMonth(), selDate.getDate());
+            const diffDays = Math.round((selReset - todayReset) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays >= 0) {
+                const select = document.getElementById('ens-days');
+                select.value = diffDays.toString();
+            }
+            updatePythonCmd();
+        }
+
+        function updatePythonCmd() {
+            const thresh = document.getElementById('ens-threshold').value || 30;
+            const days = document.getElementById('ens-days').value || 1;
+            document.getElementById('python-cmd').innerText = `python pobierz_ensemble.py ${thresh} ${days}`;
+        }
+
+        document.getElementById('ens-threshold').addEventListener('input', updatePythonCmd);
+
+        function triggerGitHubAction() {
+            const thresh = document.getElementById('ens-threshold').value || '30';
+            const days = document.getElementById('ens-days').value || '1';
+            const statusBox = document.getElementById('status-box');
+            
+            statusBox.style.display = 'block';
+            statusBox.className = 'status-box status-info';
+            statusBox.innerHTML = `⚡ Wysyłanie zlecenia wyliczenia Ensemble dla <b>${thresh}°C</b> na <b>+${days} dni</b> do GitHub Actions...`;
+
+            // Sprawdzamy czy mamy podany token lub wywołujemy API
+            fetch('https://api.github.com/repos/balubalowy/meteo/actions/workflows/generate-ensemble.yml/dispatches', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/vnd.github+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ref: 'main',
+                    inputs: {
+                        threshold: thresh.toString(),
+                        days_ahead: days.toString()
+                    }
+                })
+            })
+            .then(res => {
+                if (res.ok || res.status === 204) {
+                    statusBox.className = 'status-box status-success';
+                    statusBox.innerHTML = `✅ Zlecenie przyjęte! GitHub Actions rozpoczął przeliczanie 169 wiązek modeli dla próg ${thresh}°C (+${days} dni). Za około 1-2 minuty nowa mapa pojawi się w systemie.`;
+                } else {
+                    statusBox.className = 'status-box status-info';
+                    statusBox.innerHTML = `ℹ️ Wyślij zlecenie bezpośrednio w panelu GitHub Actions lub uruchom lokalnie poleceniem:<br><code>python pobierz_ensemble.py ${thresh} ${days}</code>`;
+                }
+            })
+            .catch(err => {
+                statusBox.className = 'status-box status-info';
+                statusBox.innerHTML = `ℹ️ Aby przeliczyć lokalnie, uruchom konsolę i wpisz:<br><code>python pobierz_ensemble.py ${thresh} ${days}</code>`;
+            });
+        }
+    </script>
 </body>
 </html>
