@@ -102,13 +102,17 @@ def fetch_and_upload():
         "stacje": processed
     }
 
+    import os
+    secret = os.environ.get("FIREBASE_SECRET", "")
+    auth_param = f"?auth={secret}" if secret else ""
+
     # Upload latest snapshot
     print(f"Wysyłanie {len(processed)} stacji do {FIREBASE_URL}/imgw_latest.json")
-    resp_latest = requests.put(f"{FIREBASE_URL}/imgw_latest.json", json=snapshot)
+    resp_latest = requests.put(f"{FIREBASE_URL}/imgw_latest.json{auth_param}", json=snapshot)
     resp_latest.raise_for_status()
 
     # Get history, append, and upload
-    resp_hist = requests.get(f"{FIREBASE_URL}/imgw_historia.json")
+    resp_hist = requests.get(f"{FIREBASE_URL}/imgw_historia.json{auth_param}")
     historia = resp_hist.json() or []
     if not isinstance(historia, list):
         historia = []
@@ -122,7 +126,7 @@ def fetch_and_upload():
     ]
 
     print(f"Wysyłanie historii ({len(historia_filtered)} wpisów) do {FIREBASE_URL}/imgw_historia.json")
-    resp_hist_put = requests.put(f"{FIREBASE_URL}/imgw_historia.json", json=historia_filtered)
+    resp_hist_put = requests.put(f"{FIREBASE_URL}/imgw_historia.json{auth_param}", json=historia_filtered)
     resp_hist_put.raise_for_status()
     
     print("Zakończono pomyślnie!")

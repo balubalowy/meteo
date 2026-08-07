@@ -194,9 +194,13 @@ def generate_dashboard():
     print("  POBIERANIE HISTORII Z FIREBASE")
     print("=" * 65)
 
+    import os
+    secret = os.environ.get("FIREBASE_SECRET", "")
+    auth_param = f"?auth={secret}" if secret else ""
+
     historia = []
     try:
-        resp = requests.get(f"{FIREBASE_URL}/imgw_historia.json", timeout=30)
+        resp = requests.get(f"{FIREBASE_URL}/imgw_historia.json{auth_param}", timeout=30)
         if resp.status_code == 200:
             historia = resp.json() or []
     except Exception as e:
@@ -383,7 +387,7 @@ def generate_dashboard():
 
     print(f"  Wysyłanie map_data do bazy {FIREBASE_URL}/imgw_map_data.json")
     try:
-        resp_put = requests.put(f"{FIREBASE_URL}/imgw_map_data.json", json=final_payload)
+        resp_put = requests.put(f"{FIREBASE_URL}/imgw_map_data.json{auth_param}", json=final_payload)
         resp_put.raise_for_status()
         print("  [OK] Dane przestrzenne zaktualizowane w Firebase!")
     except Exception as e:
