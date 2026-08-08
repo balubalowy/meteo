@@ -104,6 +104,89 @@
               <img x-show="!loading" :src="sobImg" alt="Prognoza SOB" class="zoomable" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary);" x-transition>
           </div>
 
+          
+          <!-- Burze.dzis.net - Widgets -->
+          <div class="card tile-item" data-id="tile-burze-widgets" style="padding: 1rem; cursor: grab; grid-column: span 2;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+              <h3 style="font-size: 1.1rem; color: var(--text-secondary); margin: 0;"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Ostrzeżenia i Burze (B.D.N)</h3>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+                <!-- Animacja -->
+                <div style="text-align: center;">
+                    <h4 style="color: var(--accent-primary); font-size: 0.9rem; margin-bottom: 5px;">Wyładowania (Animacja)</h4>
+                    <a href="https://burze.dzis.net/?page=mapa&animacja=on" target="_blank">
+                        <img src="https://burze.dzis.net/img/mapa_burzowa_anim.gif" alt="Mapa burzowa" style="width: 100%; max-width: 400px; border-radius: 8px; border: 1px solid var(--border-subtle);" />
+                    </a>
+                </div>
+                
+                <!-- Zagrożenia -->
+                <div style="text-align: center;">
+                    <h4 style="color: var(--accent-warning); font-size: 0.9rem; margin-bottom: 5px;">Ostrzeżenia Pogodowe</h4>
+                    <a href="https://burze.dzis.net/?page=mapa_ostrzezen" target="_blank">
+                        <img src="https://burze.dzis.net/img/zagrozenia.gif" alt="Mapa ostrzeżeń" style="width: 100%; max-width: 400px; border-radius: 8px; border: 1px solid var(--border-subtle);" />
+                    </a>
+                </div>
+            </div>
+
+            <!-- Ramka ostrzeżeń -->
+            <div style="margin-top: 20px; border-top: 1px solid var(--border-subtle); padding-top: 15px;">
+                <h4 style="color: var(--text-primary); font-size: 0.95rem; margin-bottom: 10px; display:flex; align-items:center; gap:6px;">
+                    <i data-lucide="alert-circle" style="width:16px;height:16px;"></i> Komunikaty dla miast
+                </h4>
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; flex-wrap: wrap;">
+                    <input type="text" id="burze-city-input" class="form-select" placeholder="Wpisz miasto (np. Wrocław)" value="Wrocław" style="width: 200px; padding: 6px 10px; font-size:0.9rem;" />
+                    <button onclick="updateBurzeRamka()" class="btn btn-primary" style="padding: 6px 12px; font-size:0.85rem;">Sprawdź</button>
+                </div>
+                <div id="burze-ramka-container" style="background: var(--bg-tertiary); min-height: 100px; border-radius: 8px; padding: 10px; border: 1px solid var(--border-subtle); font-size: 0.85rem; overflow-x: auto;">
+                    <!-- Script loaded here -->
+                </div>
+            </div>
+            
+            <script>
+                function updateBurzeRamka() {
+                    const city = document.getElementById('burze-city-input')?.value.trim() || 'Wrocław';
+                    const container = document.getElementById('burze-ramka-container');
+                    if(!container) return;
+                    
+                    // Create a unique iframe to avoid document.write issues from their script
+                    const htmlContent = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="utf-8">
+                            <style>
+                                body { font-family: sans-serif; color: #fff; background: transparent; margin: 0; padding: 0; }
+                                a { color: #3b82f6; text-decoration: none; }
+                                table { width: 100%; border-collapse: collapse; }
+                                td { padding: 4px; border: 1px dotted #475569; text-align: center; }
+                                .yes { color: #22c55e; font-weight: bold; }
+                                .no { color: #ef4444; font-weight: bold; }
+                            </style>
+                        </head>
+                        <body>
+                            <script src="https://burze.dzis.net/ramka.php?wersja=2&miejscowosc=${encodeURIComponent(city)}&kolor_odnosnika=3b82f6&kolor_tla=0f172a&kolor_naglowka=1e293b&kolor_ostrzezenia=334155"><\/script>
+                        </body>
+                        </html>
+                    `;
+                    
+                    const iframe = document.createElement('iframe');
+                    iframe.style.width = '100%';
+                    iframe.style.height = '250px';
+                    iframe.style.border = 'none';
+                    container.innerHTML = '';
+                    container.appendChild(iframe);
+                    
+                    iframe.contentWindow.document.open();
+                    iframe.contentWindow.document.write(htmlContent);
+                    iframe.contentWindow.document.close();
+                }
+                
+                // Initialize on load
+                setTimeout(updateBurzeRamka, 1500);
+            </script>
+          </div>
+
           <!-- Burze.dzis.net - Mapa API -->
           <div class="card tile-item" data-id="tile-dzis-api" style="padding: 1rem; cursor: grab; grid-column: span 2;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
