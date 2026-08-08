@@ -247,8 +247,8 @@ function renderLocalStats() {
       ratings.forEach(r => {
         rHtml += `<tr>
             <td>${r.name}</td>
-            <td style="color: var(--accent-warning); font-weight: bold;">${r.zagrozenia}/10</td>
-            <td style="color: var(--accent-info); font-weight: bold;">${r.wyglad}/10</td>
+            <td style="color: var(--accent-warning); font-weight: bold;">${r.zagrozenia}</td>
+            <td style="color: var(--accent-info); font-weight: bold;">${r.wyglad}</td>
         </tr>`;
       });
       rHtml += `</tbody></table>`;
