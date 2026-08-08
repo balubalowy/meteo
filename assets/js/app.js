@@ -212,9 +212,10 @@ function getMeteoData() {
 
 
 // ─── 8. Kalkulatory Na Żywo ───
+
 function renderLocalStats() {
   if (window.meteoStats) {
-    const { total_storms, max_wind, max_cape, total_km, lastSync } = window.meteoStats;
+    const { total_storms, max_wind, max_cape, total_km, lastSync, ratings, pythonFiles, htmlFiles, excelFiles } = window.meteoStats;
     
     const container = document.getElementById('storm-stats-container');
     if (container) {
@@ -234,6 +235,40 @@ function renderLocalStats() {
         <div class="card" style="padding: 1.2rem; text-align: center;">
           <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Przejechane Dystanse</div>
           <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-green); margin-top: 0.4rem;">${total_km ?? '-'}</div>
+        </div>
+      `;
+    }
+
+    const ratingsContainer = document.getElementById('storm-ratings-container');
+    if (ratingsContainer && ratings) {
+      let rHtml = `<h3 style="margin-top:2rem; margin-bottom:1rem; color: var(--accent-primary);">Oceny Burz</h3>`;
+      rHtml += `<table class="sob-table" style="width: 100%; font-size:0.9rem;">
+        <thead><tr><th>Nazwa / Klasa</th><th>Zagrożenia</th><th>Wygląd</th></tr></thead><tbody>`;
+      ratings.forEach(r => {
+        rHtml += `<tr>
+            <td>${r.name}</td>
+            <td style="color: var(--accent-warning); font-weight: bold;">${r.zagrozenia}/10</td>
+            <td style="color: var(--accent-info); font-weight: bold;">${r.wyglad}/10</td>
+        </tr>`;
+      });
+      rHtml += `</tbody></table>`;
+      ratingsContainer.innerHTML = rHtml;
+    }
+
+    const repoStatsGrid = document.getElementById('repo-stats-grid');
+    if (repoStatsGrid) {
+      repoStatsGrid.innerHTML = `
+        <div class="card" style="padding: 1.2rem; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Pliki Python</div>
+          <div style="font-size: 2rem; font-weight: 800; color: #3b82f6; margin-top: 0.4rem;">${pythonFiles ?? 0}</div>
+        </div>
+        <div class="card" style="padding: 1.2rem; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Pliki HTML</div>
+          <div style="font-size: 2rem; font-weight: 800; color: #f97316; margin-top: 0.4rem;">${htmlFiles ?? 0}</div>
+        </div>
+        <div class="card" style="padding: 1.2rem; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Zbiory Danych</div>
+          <div style="font-size: 2rem; font-weight: 800; color: #22c55e; margin-top: 0.4rem;">${excelFiles ?? 0}</div>
         </div>
       `;
     }
