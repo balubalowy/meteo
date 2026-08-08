@@ -15,6 +15,7 @@ echo 2. Wypychanie na GitHub...
 cd /d "E:\meteo"
 git add .
 git commit -m "auto: aktualizacja danych i zmian w aplikacji"
+git pull --rebase origin main
 git push origin main
 
 echo =======================================
