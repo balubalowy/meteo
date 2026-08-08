@@ -25,7 +25,7 @@
 
     <!-- Kreator Map -->
     <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css" />
-    <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.min.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 </head>
@@ -164,6 +164,7 @@
                 <option value="uslonecznienie">Usłonecznienie</option>
                 <option value="podstawa">Podstawa chmur</option>
               </select>
+              <button onclick=\'fallbackCmmMap()\' style=\'padding: 2px 6px; font-size: 0.75rem; margin-left: 5px; background: var(--accent-primary); color: white; border-radius: 4px; border: none; cursor: pointer;\' title=\'Wymuś załadowanie dynamicznej mapy API\'>API</button>
             </div>
             
             <div id="cmm-map-container" style="position: relative; width: 100%; min-height: 300px; border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-tertiary);">
@@ -207,7 +208,7 @@
           <!-- SAT24 -->
           <div class="card tile-item" data-id="tile-sat24" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Satelita IR (IMGW)</h3>
-            <img id="dash-sat24" class="zoomable" src="https://sat24.mobi/Image/satvis/europa/pl" alt="SAT24 Polska" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+            <iframe sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" src="https://widgets.meteox.com/en-GB/widgets/radar/country/pl/satellite?z=6" style="width:100%!important;max-width:1080px!important;height:450px!important;padding:0px;border:none!important;box-sizing:border-box!important; border-radius: 8px;" scrolling="no" frameborder="0"></iframe>
           </div>
           
           <!-- Polscy Łowcy Burz -->
@@ -925,6 +926,7 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.min.js"></script>
     
     <!-- Firebase SDKs -->
     <script type="module">
@@ -1156,7 +1158,7 @@
               const tabId = e.currentTarget.getAttribute('data-tab');
               if (tabId === 'tab-kreator') {
                   setTimeout(() => {
-                      initKreator();
+                      // initKreator(); removed to avoid early init
                       if(kMap) kMap.invalidateSize(); // Fix map rendering issues when hidden
                   }, 100);
               }
