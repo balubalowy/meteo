@@ -116,7 +116,7 @@
                 <div style="text-align: center;">
                     <h4 style="color: var(--accent-primary); font-size: 0.9rem; margin-bottom: 5px;">Wyładowania (Animacja)</h4>
                     <a href="https://burze.dzis.net/?page=mapa&animacja=on" target="_blank">
-                        <img src="https://burze.dzis.net/img/mapa_burzowa_anim.gif" alt="Mapa burzowa" style="width: 100%; max-width: 400px; border-radius: 8px; border: 1px solid var(--border-subtle);" />
+                        <img src="https://burze.dzis.net/img/mapa_burzowa_anim.gif" alt="Mapa burzowa" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-subtle); image-rendering: pixelated; /* To avoid blur if stretched slightly */" />
                     </a>
                 </div>
                 
@@ -124,7 +124,7 @@
                 <div style="text-align: center;">
                     <h4 style="color: var(--accent-warning); font-size: 0.9rem; margin-bottom: 5px;">Ostrzeżenia Pogodowe</h4>
                     <a href="https://burze.dzis.net/?page=mapa_ostrzezen" target="_blank">
-                        <img src="https://burze.dzis.net/img/zagrozenia.gif" alt="Mapa ostrzeżeń" style="width: 100%; max-width: 400px; border-radius: 8px; border: 1px solid var(--border-subtle);" />
+                        <img src="https://burze.dzis.net/img/zagrozenia.gif" alt="Mapa ostrzeżeń" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-subtle); image-rendering: pixelated; /* To avoid blur if stretched slightly */" />
                     </a>
                 </div>
             </div>
@@ -918,6 +918,7 @@
 
       <!-- TAB 6: MAPY -->
       
+      
       <!-- TAB KREATOR -->
       <div id="tab-kreator" class="tab-view">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -926,27 +927,51 @@
             </h2>
             <button onclick="exportMap()" class="btn btn-primary"><i data-lucide="download"></i> Eksportuj Mapę</button>
         </div>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Rysuj strefy zagrożeń (poligony) używając narzędzi po lewej stronie mapy. Wybierz kolor narzędzia poniżej przed rysowaniem.</p>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Wybierz obszar, a następnie rysuj strefy zagrożeń używając narzędzi na mapie.</p>
 
-        <div style="display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap;">
-            <button class="btn btn-ghost threat-btn" style="border: 2px solid #22c55e; color: #22c55e;" onclick="setDrawingColor('#22c55e')">MRG (1)</button>
-            <button class="btn btn-ghost threat-btn" style="border: 1px solid #eab308; color: #eab308; box-shadow: 0 0 10px #eab308;" onclick="setDrawingColor('#eab308')">NWL (2)</button>
-            <button class="btn btn-ghost threat-btn" style="border: 1px solid #f97316; color: #f97316;" onclick="setDrawingColor('#f97316')">SRD (3)</button>
-            <button class="btn btn-ghost threat-btn" style="border: 1px solid #ef4444; color: #ef4444;" onclick="setDrawingColor('#ef4444')">DZ (4)</button>
-            <button class="btn btn-ghost threat-btn" style="border: 1px solid #d946ef; color: #d946ef;" onclick="setDrawingColor('#d946ef')">EXT (5)</button>
-            <button class="btn btn-ghost" style="margin-left: auto; color: var(--accent-danger);" onclick="clearMap()"><i data-lucide="trash-2"></i> Wyczyść</button>
-        </div>
+        <div style="display: flex; gap: 15px; align-items: flex-start;">
+            <!-- Panel boczny z obszarami i narzędziami -->
+            <div style="width: 200px; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0;">
+                
+                <div class="card" style="padding: 10px;">
+                    <h4 style="margin-bottom: 10px; font-size: 0.9rem; color: var(--text-secondary);">Wybierz Obszar</h4>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([52.069, 19.480], 6);">Polska (Całość)</button>
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([53.5, 18.5], 7);">Polska Północna</button>
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([50.5, 19.5], 7);">Polska Południowa</button>
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([52.0, 16.5], 7);">Polska Zachodnia</button>
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([52.0, 22.5], 7);">Polska Wschodnia</button>
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([49.5, 17.5], 5);">Europa Środkowa</button>
+                    </div>
+                </div>
 
-        <div id="export-container" style="position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-subtle);">
-            <div id="kreator-map" style="height: 600px; width: 100%;"></div>
-            <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(15, 23, 42, 0.85); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); z-index: 999; pointer-events: none;">
-                <div style="font-weight: bold; color: var(--text-primary); margin-bottom: 5px; font-size: 0.9rem;">B-Meteo Prognoza</div>
-                <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem;">
-                    <span style="color: #22c55e;">■ MRG (Marginalne)</span>
-                    <span style="color: #eab308;">■ NWL (Niewielkie)</span>
-                    <span style="color: #f97316;">■ SRD (Średnie)</span>
-                    <span style="color: #ef4444;">■ DZ (Duże)</span>
-                    <span style="color: #d946ef;">■ EXT (Ekstremalne)</span>
+                <div class="card" style="padding: 10px;">
+                    <h4 style="margin-bottom: 10px; font-size: 0.9rem; color: var(--text-secondary);">Zagrożenia</h4>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <button class="btn btn-ghost threat-btn" style="border: 1px solid #22c55e; color: #22c55e; text-align: left; padding: 6px;" onclick="setDrawingColor('#22c55e')">MRG (1)</button>
+                        <button class="btn btn-ghost threat-btn" style="border: 2px solid #eab308; color: #eab308; text-align: left; padding: 6px; box-shadow: 0 0 8px #eab308;" onclick="setDrawingColor('#eab308')">NWL (2)</button>
+                        <button class="btn btn-ghost threat-btn" style="border: 1px solid #f97316; color: #f97316; text-align: left; padding: 6px;" onclick="setDrawingColor('#f97316')">SRD (3)</button>
+                        <button class="btn btn-ghost threat-btn" style="border: 1px solid #ef4444; color: #ef4444; text-align: left; padding: 6px;" onclick="setDrawingColor('#ef4444')">DZ (4)</button>
+                        <button class="btn btn-ghost threat-btn" style="border: 1px solid #d946ef; color: #d946ef; text-align: left; padding: 6px;" onclick="setDrawingColor('#d946ef')">EXT (5)</button>
+                        <hr style="border-color: var(--border-subtle); margin: 5px 0;" />
+                        <button class="btn btn-ghost" style="color: var(--accent-danger); text-align: left; padding: 6px;" onclick="clearMap()"><i data-lucide="trash-2" style="width:16px; height:16px;"></i> Wyczyść</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Kontener mapy -->
+            <div id="export-container" style="position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-subtle); flex-grow: 1; min-width: 0;">
+                <div id="kreator-map" style="height: 600px; width: 100%;"></div>
+                <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(15, 23, 42, 0.85); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); z-index: 999; pointer-events: none;">
+                    <div style="font-weight: bold; color: var(--text-primary); margin-bottom: 5px; font-size: 0.9rem;">B-Meteo Prognoza</div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem;">
+                        <span style="color: #22c55e;">■ MRG (Marginalne)</span>
+                        <span style="color: #eab308;">■ NWL (Niewielkie)</span>
+                        <span style="color: #f97316;">■ SRD (Średnie)</span>
+                        <span style="color: #ef4444;">■ DZ (Duże)</span>
+                        <span style="color: #d946ef;">■ EXT (Ekstremalne)</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1213,6 +1238,7 @@
       }
   }
 
+  
   function exportMap() {
       const container = document.getElementById('export-container');
       
@@ -1220,9 +1246,17 @@
       const controls = document.querySelector('.leaflet-control-container');
       if (controls) controls.style.display = 'none';
 
+      const rect = container.getBoundingClientRect();
+      
+      // html2canvas fix for Leaflet bounds issue
       html2canvas(container, {
           useCORS: true,
           allowTaint: true,
+          width: rect.width,
+          height: rect.height,
+          scale: 1, // Prevent scaling up on high DPI causing offset
+          windowWidth: document.documentElement.offsetWidth,
+          windowHeight: document.documentElement.offsetHeight,
           backgroundColor: '#0f172a'
       }).then(canvas => {
           // Show controls again
@@ -1233,6 +1267,9 @@
           link.download = 'b-meteo-forecast.png';
           link.href = canvas.toDataURL('image/png');
           link.click();
+      }).catch(err => {
+          console.error("html2canvas error: ", err);
+          if (controls) controls.style.display = 'block';
       });
   }
 
