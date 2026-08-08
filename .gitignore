@@ -33,3 +33,6 @@ firebase-debug.log
 # Ignoruj wszystkie excely z pamietnika itd
 *.xlsx
 *.csv
+
+# Prywatne pliki lokalne
+.private/
