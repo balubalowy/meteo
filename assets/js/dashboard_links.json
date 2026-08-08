@@ -2,7 +2,7 @@
   "timestamp": "2026-08-08 07:13:16",
   "estofex": "https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest",
   "blitzortung": "https://images.blitzortung.org/Images/image_b_pl.png",
-  "sat24": "https://sat24.mobi/Image/satvis/europa/pl",
+  "sat24": "https://danepubliczne.imgw.pl/datastore/getfiledown/Oper/CMM_mapy/satelita/SAT_IR_POLSKA.png",
   "sigwx_imgw": "https://aviation-api.imgw.pl/image/significant/pl",
   "sigwx_chmi": "https://aviation-api.imgw.pl/image/significant/cz",
   "lowcyburz": "https://lowcyburz.pl/wp-content/uploads/2026/08/07_08_08_26.png",

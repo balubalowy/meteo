@@ -96,33 +96,70 @@ const METEO_DATA = {
   ],
 
   // 2. KOMPLEKSOWA TERMODYNAMIKA & KINEMATYKA (Zięba, Taszarek, Ostrowski)
+  
+  cloudTypes: [
+    {
+      name: "Arcus (Wał Szkwałowy)",
+      type: "Chmura",
+      desc: "Charakterystyczny wał chmurowy na czele burzy, zwiastujący gwałtowny wzrost prędkości wiatru (szkwał) i intensywne opady.",
+      risk: "Silne porywy wiatru (Downburst / Derecho).",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Shelf_cloud_panorama.jpg/800px-Shelf_cloud_panorama.jpg"
+    },
+    {
+      name: "Mammatus",
+      type: "Chmura",
+      desc: "Wypukłości w kształcie wymion na spodniej stronie kowadła burzowego (Incus). Powstają w strefach osiadania chłodnego, wilgotnego powietrza.",
+      risk: "Często towarzyszą silnym superkomórkom gradowym, choć same w sobie nie są groźne.",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Mammatus_clouds_over_Regina%2C_Saskatchewan.jpg/800px-Mammatus_clouds_over_Regina%2C_Saskatchewan.jpg"
+    },
+    {
+      name: "Wall Cloud (Chmura Stropowa)",
+      type: "Chmura",
+      desc: "Wyraźne obniżenie podstawy chmury pod prądem wstępującym (mezocyklonem). Jeśli szybko rotuje, jest głównym wskaźnikiem formowania się tornada.",
+      risk: "Wysokie ryzyko zejścia tornada mezocyklonalnego.",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Wall_cloud.jpg/800px-Wall_cloud.jpg"
+    },
+    {
+      name: "Chmura Lejkowa (Funnel Cloud)",
+      type: "Zjawisko",
+      desc: "Rotująca kolumna powietrza wyrastająca z podstawy chmury (zazwyczaj chmury stropowej), która nie dotyka ziemi. Jeśli dotknie powierzchni ziemi, staje się tornadem.",
+      risk: "Zalążek tornada, wymaga natychmiastowej obserwacji.",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Funnel_cloud.jpg/800px-Funnel_cloud.jpg"
+    }
+  ],
+
   thermoConcepts: [
     {
       name: "SBCAPE / MLCAPE / MUCAPE",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Supercell_thunderstorm.jpg/800px-Supercell_thunderstorm.jpg",
       type: "Profil Cząstki",
       desc: "Zależność energii konwekcyjnej od poziomu startowego cząstki: SB (powierzchniowa), ML (uśredniona 100 hPa - najlepsza w dzień), MU (najbardziej niestabilna - kluczowa dla burz nocnych).",
       formula: "W_max = √(2 * CAPE) [m/s]"
     },
     {
       name: "Derecho Composite Parameter (DCP)",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Derecho_cloud.jpg/800px-Derecho_cloud.jpg",
       type: "Wskaźnik Złożony Nawałnic",
       desc: "Ocenia ryzyko gwałtownych nawałnic wiatrowych (Derecho) na podstawie chwiejności (MUCAPE), energii prądów zstępujących (DCAPE), średniego wiatru i uskoków DLS.",
       formula: "DCP = (DCAPE/980) * (MUCAPE/2000) * (DLS/20kts) * (MeanWind/16kts)"
     },
     {
       name: "Significant Tornado Parameter (STP)",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Tornado_in_Elie%2C_Manitoba_in_2007.jpg/800px-Tornado_in_Elie%2C_Manitoba_in_2007.jpg",
       type: "Wskaźnik Złożony Tornad",
       desc: "Szacuje prawdopodobieństwo powstania tornada mezocyklonalnego na podstawie SBCAPE, LCL, LLS (0-1km), DLS (0-6km) i CIN.",
       formula: "STP = (SBCAPE/1500) * ((2000-LCL)/1000) * (LLS/10) * (DLS/20) * ((200+CIN)/150)"
     },
     {
       name: "Supercell Composite Parameter (SCP)",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Storm_supercell_near_Leoti%2C_Kansas.jpg/800px-Storm_supercell_near_Leoti%2C_Kansas.jpg",
       type: "Wskaźnik Złożony Superkomórek",
       desc: "Ocenia szanse uformowania mezocyklonu i trwałej superkomórki burzowej na podstawie MUCAPE, SRH3 i DLS.",
       formula: "SCP = (MUCAPE/1000) * (SRH3/50) * (DLS/20)"
     },
     {
       name: "Wektor Corfidiego (MCS Propagation Vector)",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Shelf_cloud_panorama.jpg/800px-Shelf_cloud_panorama.jpg",
       type: "Kinematyka Układów MCS",
       desc: "Wyznacza prędkość i kierunek ruchu mezoskalowych układów konwekcyjnych (MCS/Bow Echo) dla wariantów Downwind (z wiatrem) oraz Upwind (pod wiatr).",
       formula: "V_vector = 2 * V_mean(0-6km) - V_850hPa"
@@ -151,18 +188,21 @@ const METEO_DATA = {
   radarSignatures: [
     {
       name: "Hook Echo (Haczyk Mezocyklonu)",
+      image: "https://upload.wikimedia.org/wikipedia/commons/2/23/Hook_echo.gif",
       type: "Superkomórka",
       desc: "Zakrzywienie odbiciowości w kształcie haczyka w tylno-prawej części burzy. Świadczy o silnej rotacji prądu wstępującego.",
       risk: "Tornada, bardzo duży grad."
     },
     {
       name: "Bow Echo & Rear Inflow Jet (RIJ)",
+      image: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Bow_echo_radar.gif",
       type: "Układ Wielokomórkowy / MCS",
       desc: "Wygięcie linii opadów w wyrazisty łuk pod wpływem silnego prądu zstępującego wciskającego się z tyłu (RIJ).",
       risk: "Niszczycielskie wiatry prostoliniowe (Derecho / Downburst > 130-150 km/h)."
     },
     {
       name: "BWER (Bounded Weak Echo Region)",
+      image: "https://upload.wikimedia.org/wikipedia/commons/4/4b/BWER_radar.gif",
       type: "Superkomórka",
       desc: "Strefa obniżonej odbiciowości otoczona ze wszystkich stron silnym echem opadowym. Oznacza ekstremalnie silny prąd wstępujący.",
       risk: "Gwałtowny grad > 5 cm, superkomórka."

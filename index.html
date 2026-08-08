@@ -73,6 +73,43 @@
          <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Widoki Synoptyczne, Radary i Zjawiska (Live)</h2>
         
         <div id="dashboard-tiles" class="dashboard-grid">
+          <!-- SOB Prognoza -->
+          <div class="card tile-item" data-id="tile-sob" style="padding: 1rem; cursor: grab;" x-data="{
+              sobImg: '',
+              loading: true,
+              async fetchSOB() {
+                  try {
+                      const res = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://obserwatorzy.info/prognoza-burz/'));
+                      const data = await res.json();
+                      const parser = new DOMParser();
+                      const doc = parser.parseFromString(data.contents, 'text/html');
+                      const imgs = Array.from(doc.querySelectorAll('img'));
+                      const targetImg = imgs.find(img => img.src && (img.src.includes('forecast') || img.src.includes('sob') || img.src.includes('prognoza')));
+                      if(targetImg) this.sobImg = targetImg.src;
+                      else this.sobImg = 'https://obserwatorzy.info/wp-content/uploads/2026/08/forecast-20260807.png';
+                  } catch(e) {
+                      this.sobImg = 'https://obserwatorzy.info/wp-content/uploads/2026/08/forecast-20260807.png';
+                  }
+                  this.loading = false;
+              }
+          }" x-init="fetchSOB()">
+              <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Prognoza SOB (Live)</h3>
+              <div x-show="loading" class="skeleton-loader" style="height: 200px;"></div>
+              <img x-show="!loading" :src="sobImg" alt="Prognoza SOB" class="zoomable" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary);" x-transition>
+          </div>
+
+          <!-- Burze.dzis.net - Ostrzeżenia -->
+          <div class="card tile-item" data-id="tile-dzis-warn" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Ostrzeżenia (burze.dzis.net)</h3>
+            <img class="zoomable" src="https://burze.dzis.net/img/zagrozenia.gif" alt="Zagrożenia" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary);">
+          </div>
+
+          <!-- Burze.dzis.net - Mapa Burzowa -->
+          <div class="card tile-item" data-id="tile-dzis-storm" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Burze (burze.dzis.net)</h3>
+            <img class="zoomable" src="https://burze.dzis.net/img/mapa_burzowa_europa.gif" alt="Mapa Burzowa" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary);">
+          </div>
+
           <!-- DWD Europa -->
           <div class="card tile-item" data-id="tile-dwd" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Europa (DWD)</h3>
@@ -140,14 +177,14 @@
           </div>
           
           <!-- Blitzortung -->
-          <div class="card tile-item" data-id="tile-blitzortung" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wyładowania (Blitzortung PL)</h3>
-            <img id="dash-blitzortung" class="zoomable" src="https://images.blitzortung.org/Images/image_b_pl.png" alt="Blitzortung Polska" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+          <div class="card tile-item" data-id="tile-blitzortung" style="padding: 1rem; cursor: grab; grid-column: span 2;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wyładowania Live (Blitzortung)</h3>
+            <iframe src="https://map.blitzortung.org/#6/52.000/19.000" style="width: 100%; height: 400px; border: none; border-radius: var(--radius-sm);"></iframe>
           </div>
           
           <!-- SAT24 -->
           <div class="card tile-item" data-id="tile-sat24" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Satelita (SAT24 PL/EU)</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Satelita IR (IMGW)</h3>
             <img id="dash-sat24" class="zoomable" src="https://sat24.mobi/Image/satvis/europa/pl" alt="SAT24 Polska" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
           
