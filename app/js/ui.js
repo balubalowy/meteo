@@ -60,6 +60,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 if(window.kMap) window.kMap.invalidateSize();
                             }, 100);
                         }
+                        if (targetTab === 'tab-mapa' && typeof window.initMapa === 'function') {
+                            setTimeout(() => {
+                                window.initMapa();
+                                if(window.premiumMap) window.premiumMap.invalidateSize();
+                            }, 100);
+                        }
                     })
                     .catch(err => {
                         activeView.innerHTML = `<div style="padding: 2rem; color: var(--accent-danger); text-align: center;">Nie udało się załadować widoku: ${err.message}</div>`;
@@ -72,6 +78,12 @@ document.addEventListener('DOMContentLoaded', function() {
                      setTimeout(() => {
                          window.initKreator();
                          if(window.kMap) window.kMap.invalidateSize();
+                     }, 100);
+                }
+                if (targetTab === 'tab-mapa' && typeof window.initMapa === 'function') {
+                     setTimeout(() => {
+                         window.initMapa();
+                         if(window.premiumMap) window.premiumMap.invalidateSize();
                      }, 100);
                 }
             }
