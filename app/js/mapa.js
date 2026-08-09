@@ -190,7 +190,7 @@ window.initMapa = function() {
             const minLat = 48.5, maxLat = 55.5;
             const minLon = 13.5, maxLon = 24.5;
             
-            const radiusScale = parseFloat(document.getElementById('radius-bg').value) || 15;
+            const radiusScale = 15; // stały promień po usunięciu z UI
             const maxD2 = radiusScale * radiusScale; // kwadrat promienia, wpływa na gładkość
             
             const pts = [];
