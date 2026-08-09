@@ -518,7 +518,9 @@ def generate_dashboard():
             mapbox: {{ style: "carto-darkmatter", center: {{lat: 52.0, lon: 19.2}}, zoom: 5.5 }}
         }};
         
-        Plotly.newPlot('plot', traces, layout, {{responsive: true}});
+        Plotly.newPlot('plot', traces, layout, {{responsive: true}}).then(() => {{
+            updateMap();
+        }});
 
         function updateMap() {{
             const z_key = document.getElementById("sel-zmienna").value;

@@ -39,7 +39,14 @@
                       
                       <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                         <img :src="item.image" alt="Ilustracja" class="zoomable" style="width: 100%; max-width: 300px; height: auto; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-subtle);" onerror="this.src='data:image/svg+xml,<svg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'300\\\' height=\\\'200\\\'><rect width=\\\'100%\\\' height=\\\'100%\\\' fill=\\\'#1e293b\\\'/><text x=\\\'50%\\\' y=\\\'50%\\\' fill=\\\'#64748b\\\' text-anchor=\\\'middle\\\' alignment-baseline=\\\'middle\\\'>Brak Obrazu</text></svg>'">
-                        <p style="flex: 1; min-width: 250px; line-height: 1.6; color: var(--text-secondary);" x-text="item.desc"></p>
+                        <div style="flex: 1; min-width: 250px; line-height: 1.6; color: var(--text-secondary);">
+                          <p x-text="item.desc" style="margin-bottom: 10px;"></p>
+                          <template x-if="item.url">
+                            <a :href="item.url" target="_blank" style="color: var(--accent-primary); text-decoration: underline; font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                                <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> Przejdź do strony
+                            </a>
+                          </template>
+                        </div>
                       </div>
                     </div>
                   </template>
