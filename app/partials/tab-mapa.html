@@ -1,47 +1,173 @@
-<div style="height: 85vh; width: 100%; display: flex; flex-direction: column; position: relative;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0 1rem; flex-wrap: wrap; gap: 10px;">
-        <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
-            <i data-lucide="map" style="color: var(--accent-primary);"></i> Wielki Pulpit (Radar + IMGW)
-        </h2>
+<div style="height: 100%; width: 100%; display: flex; flex-direction: row; position: relative; overflow: hidden;">
+    
+    <!-- PANEL BOCZNY (SIDEBAR) -->
+    <div id="map-sidebar" style="width: 320px; background: var(--bg-primary); border-right: 1px solid var(--border-subtle); display: flex; flex-direction: column; overflow-y: auto; z-index: 1000; box-shadow: 2px 0 10px rgba(0,0,0,0.5);">
         
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <!-- Odtwarzacz Radaru RainViewer -->
-            <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-secondary); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border-subtle);">
-                <span style="font-size: 0.8rem; color: var(--text-secondary);"><i data-lucide="cloud-rain"></i> Radar:</span>
+        <div style="padding: 15px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; gap: 10px; background: var(--bg-secondary);">
+            <i data-lucide="map" style="color: var(--accent-primary);"></i>
+            <h2 style="margin: 0; font-size: 1.1rem;">Wielki Pulpit</h2>
+        </div>
+
+        <!-- SEKCJA: Radar -->
+        <div style="padding: 15px; border-bottom: 1px solid var(--border-subtle);">
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="cloud-rain" style="width: 16px; height: 16px;"></i> Radar Opadów (Live)
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-secondary); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                 <button id="rv-play-btn" class="btn btn-ghost" style="padding: 5px; border-radius: 50%; color: var(--accent-primary);">
                     <i data-lucide="play"></i>
                 </button>
-                <span id="rv-time" style="font-family: monospace; font-size: 0.9rem; font-weight: bold; width: 60px; text-align: center;">--:--</span>
-                <input type="range" id="rv-slider" min="0" max="10" value="10" style="width: 120px; accent-color: var(--accent-primary);">
+                <span id="rv-time" style="font-family: monospace; font-size: 0.9rem; font-weight: bold; width: 50px; text-align: center;">--:--</span>
+                <input type="range" id="rv-slider" min="0" max="10" value="10" style="flex: 1; accent-color: var(--accent-primary);">
             </div>
+        </div>
 
-            <!-- Kontroler Czasu IMGW -->
-            <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-secondary); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border-subtle);">
-                <span style="font-size: 0.8rem; color: var(--text-secondary);"><i data-lucide="thermometer"></i> Dane IMGW:</span>
-                <select id="imgw-okres" class="form-select" style="padding: 4px 8px; font-size: 0.85rem; border-radius: 12px; border: none; background: var(--bg-tertiary); color: var(--text-primary);">
-                    <option value="now">Aktualne (Teraz)</option>
-                    <option value="max3">Maksimum 3h</option>
-                    <option value="min3">Minimum 3h</option>
-                    <option value="max6">Maksimum 6h</option>
-                    <option value="min6">Minimum 6h</option>
-                    <option value="max12">Maksimum 12h</option>
-                    <option value="min12">Minimum 12h</option>
-                    <option value="max24">Maksimum 24h</option>
-                    <option value="min24">Minimum 24h</option>
-                </select>
-                <select id="imgw-zmienna" class="form-select" style="padding: 4px 8px; font-size: 0.85rem; border-radius: 12px; border: none; background: var(--bg-tertiary); color: var(--text-primary);">
-                    <option value="temp">Temperatura</option>
-                    <option value="wiatr">Wiatr Porywy</option>
-                    <option value="rosy">Punkt Rosy</option>
-                    <option value="wilg">Wilgotność</option>
-                </select>
+        <!-- SEKCJA: Baza Danych IMGW -->
+        <div style="padding: 15px; border-bottom: 1px solid var(--border-subtle);">
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="thermometer" style="width: 16px; height: 16px;"></i> Baza Danych IMGW
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div>
+                    <label style="font-size: 0.75rem; color: var(--text-secondary);">Parametr:</label>
+                    <select id="imgw-zmienna" class="form-select" onchange="renderIMGW()" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
+                        <option value="temp">Temperatura</option>
+                        <option value="wiatr">Wiatr Porywy</option>
+                        <option value="rosy">Punkt Rosy</option>
+                        <option value="wilg">Wilgotność</option>
+                        <option value="grunt">Temperatura Gruntu</option>
+                        <option value="wiatr_sr">Średnia Prędkość Wiatru</option>
+                        <option value="synop">Model Synoptyczny (Wszystko)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 0.75rem; color: var(--text-secondary);">Horyzont Czasowy:</label>
+                    <select id="imgw-okres" class="form-select" onchange="renderIMGW()" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
+                        <option value="now">Aktualne (Teraz)</option>
+                        <option value="max3">Maksimum - ost. 3h</option>
+                        <option value="min3">Minimum - ost. 3h</option>
+                        <option value="max6">Maksimum - ost. 6h</option>
+                        <option value="min6">Minimum - ost. 6h</option>
+                        <option value="max12">Maksimum - ost. 12h</option>
+                        <option value="min12">Minimum - ost. 12h</option>
+                        <option value="max24">Maksimum - ost. 24h</option>
+                        <option value="min24">Minimum - ost. 24h</option>
+                    </select>
+                </div>
+                
+                <!-- Checkboxy IMGW (Jak na screenie) -->
+                <div style="background: var(--bg-secondary); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-top: 5px;">
+                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px; display: block;">Warstwy Mapy:</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8rem;">
+                        <label><input type="checkbox" id="chk-inter" onchange="renderIMGW()" checked> Interpolacja</label>
+                        <label><input type="checkbox" id="chk-iso" onchange="renderIMGW()" disabled> Izolinie</label>
+                        <label><input type="checkbox" id="chk-pt" onchange="renderIMGW()"> Punkty</label>
+                        <label><input type="checkbox" id="chk-txt" onchange="renderIMGW()" checked> Wartości</label>
+                    </div>
+                </div>
+
+                <!-- Suwaki Przezroczystości IMGW -->
+                <div style="background: var(--bg-secondary); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px; display: block;">Wygląd i Przezroczystość:</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+                            <span>Przezrocz. Tła (Interpolacji):</span> <span id="val-opa-bg">70%</span>
+                        </div>
+                        <input type="range" id="opa-bg" min="0" max="100" value="70" onchange="renderIMGW(); document.getElementById('val-opa-bg').textContent = this.value + '%'" style="width: 100%; accent-color: #22c55e;">
+                        
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">
+                            <span>Rozmiar Rozmycia (IDW):</span> <span id="val-radius-bg">15</span>
+                        </div>
+                        <input type="range" id="radius-bg" min="5" max="50" value="15" onchange="renderIMGW(); document.getElementById('val-radius-bg').textContent = this.value" style="width: 100%; accent-color: #22c55e;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEKCJA: Kreator Map Ostrzeżeń -->
+        <div style="padding: 15px; border-bottom: 1px solid var(--border-subtle);">
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i> Kreator Map Ostrzeżeń
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                     <button class="btn btn-ghost" style="font-size: 0.75rem; padding: 4px;" onclick="if(window.premiumMap) window.premiumMap.setView([52.069, 19.480], 6);">Cała PL</button>
+                     <button class="btn btn-ghost" style="font-size: 0.75rem; padding: 4px;" onclick="if(window.premiumMap) window.premiumMap.setView([49.5, 17.5], 5);">Europa Śr.</button>
+                </div>
+                <hr style="border-color: var(--border-subtle); margin: 5px 0;">
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Rysuj strefy zagrożeń (kliknij i rysuj na mapie):</div>
+                <button class="btn btn-ghost" style="border: 1px solid #22c55e; color: #22c55e; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#22c55e')">■ MRG (1)</button>
+                <button class="btn btn-ghost" style="border: 1px solid #eab308; color: #eab308; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#eab308')">■ NWL (2)</button>
+                <button class="btn btn-ghost" style="border: 1px solid #f97316; color: #f97316; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#f97316')">■ SRD (3)</button>
+                <button class="btn btn-ghost" style="border: 1px solid #ef4444; color: #ef4444; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#ef4444')">■ DZ (4)</button>
+                <button class="btn btn-ghost" style="border: 1px solid #d946ef; color: #d946ef; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#d946ef')">■ EXT (5)</button>
+                
+                <div style="display: flex; gap: 5px; margin-top: 5px;">
+                     <button class="btn btn-primary" style="flex: 1; font-size: 0.8rem; padding: 6px;" onclick="exportMap()"><i data-lucide="download" style="width: 14px; height:14px;"></i> Eksportuj</button>
+                     <button class="btn btn-ghost" style="flex: 1; font-size: 0.8rem; padding: 6px; color: var(--accent-danger);" onclick="clearMap()"><i data-lucide="trash-2" style="width: 14px; height:14px;"></i> Wyczyść</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SEKCJA: Prognoza Ensemble -->
+        <div style="padding: 15px; border-bottom: 1px solid var(--border-subtle);">
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="sliders" style="width: 16px; height: 16px;"></i> Prognoza Ensemble (T_max)
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                 <div>
+                      <label style="font-size: 0.75rem; color: var(--text-secondary);">Próg Temp:</label>
+                      <select id="ens-thresh" class="form-select" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
+                         <option value="30">30°C (Upał)</option>
+                         <option value="32">32°C (Silny Upał)</option>
+                         <option value="35">35°C (Ekstremum)</option>
+                      </select>
+                 </div>
+                 <div>
+                      <label style="font-size: 0.75rem; color: var(--text-secondary);">Dni do przodu:</label>
+                      <select id="ens-days" class="form-select" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
+                         <option value="1">+1 dzień</option>
+                         <option value="2">+2 dni</option>
+                         <option value="3">+3 dni</option>
+                      </select>
+                 </div>
+                 <button class="btn btn-primary" style="width: 100%; font-size: 0.85rem; padding: 8px;" onclick="openEnsembleModal()"><i data-lucide="zap"></i> Otwórz Mapę Ensemble</button>
+            </div>
+        </div>
+
+    </div>
+    
+    <!-- GŁÓWNA MAPA -->
+    <div id="premium-map" style="flex: 1; height: 100%; background: #111; position: relative;">
+        <div id="imgw-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; color: white; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <i data-lucide="loader" class="spin"></i> Łączenie z bazą danych (Live)...
+        </div>
+        
+        <!-- Legenda Kreatora -->
+        <div id="kreator-legend" style="display: none; position: absolute; bottom: 10px; right: 10px; background: rgba(15, 23, 42, 0.85); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); z-index: 999; pointer-events: none;">
+            <div style="font-weight: bold; color: var(--text-primary); margin-bottom: 5px; font-size: 0.9rem;">B-Meteo Prognoza</div>
+            <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem;">
+                <span style="color: #22c55e;">■ MRG (Marginalne)</span>
+                <span style="color: #eab308;">■ NWL (Niewielkie)</span>
+                <span style="color: #f97316;">■ SRD (Średnie)</span>
+                <span style="color: #ef4444;">■ DZ (Duże)</span>
+                <span style="color: #d946ef;">■ EXT (Ekstremalne)</span>
             </div>
         </div>
     </div>
-    
-    <div id="premium-map" style="flex: 1; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: #111;">
-        <div id="imgw-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; color: white; display: flex; flex-direction: column; align-items: center; gap: 10px;">
-            <i data-lucide="loader" class="spin"></i> Pobieranie danych stacji...
+</div>
+
+<!-- Modal Ensemble -->
+<div id="ensemble-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; padding: 20px; box-sizing: border-box;">
+    <div style="width: 100%; height: 100%; background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.7);">
+        <div style="padding: 10px 20px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+             <h3 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="cloud-lightning"></i> Prognoza Ensemble</h3>
+             <button class="btn btn-ghost" style="padding: 5px; color: var(--text-secondary);" onclick="document.getElementById('ensemble-modal').style.display='none'"><i data-lucide="x"></i></button>
+        </div>
+        <div id="ensemble-iframe-container" style="flex: 1; width: 100%; position: relative;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-secondary);"><i data-lucide="loader" class="spin"></i> Wczytywanie danych z chmury...</div>
         </div>
     </div>
 </div>
@@ -78,6 +204,64 @@
         map.createPane('labelsPane');
         map.getPane('labelsPane').style.zIndex = 650;
         map.getPane('labelsPane').style.pointerEvents = 'none';
+
+        // Geoman Setup (Kreator)
+        if(map.pm) {
+            map.pm.addControls({
+                position: 'topleft',
+                drawCircleMarker: false,
+                drawPolyline: false,
+                drawRectangle: false,
+                drawCircle: false,
+                editMode: true,
+                dragMode: true,
+                cutPolygon: false,
+                removalMode: true,
+            });
+            
+            map.pm.setGlobalOptions({
+                pathOptions: { color: '#ef4444', weight: 3, fillOpacity: 0.4 }
+            });
+
+            map.on('pm:create', e => {
+                const layer = e.layer;
+                layer.on('click', () => {
+                    if (map.pm.globalRemovalModeEnabled()) {
+                        map.removeLayer(layer);
+                    }
+                });
+            });
+        }
+        
+        window.setDrawingColor = function(color) {
+            if(map.pm) {
+                map.pm.setGlobalOptions({ pathOptions: { color: color, weight: 3, fillOpacity: 0.4 } });
+                map.pm.enableDraw('Polygon');
+            }
+        };
+        
+        window.clearMap = function() {
+            if(!map) return;
+            map.eachLayer(layer => {
+                if (layer instanceof L.Polygon && !layer._url) map.removeLayer(layer);
+            });
+        };
+        
+        window.exportMap = function() {
+            alert('Funkcja eksportu wymaga html2canvas i odpowiedniego skonfigurowania proxy dla kafelków mapy. (Do zaimplementowania w kolejnym kroku)');
+        };
+
+        window.openEnsembleModal = function() {
+            const modal = document.getElementById('ensemble-modal');
+            modal.style.display = 'block';
+            
+            const thresh = document.getElementById('ens-thresh').value;
+            const days = document.getElementById('ens-days').value;
+            
+            // Wgrywamy iframe z prognozą
+            const container = document.getElementById('ensemble-iframe-container');
+            container.innerHTML = `<iframe src="prognoza/dashboard.html?v=3&thresh=${thresh}&days=${days}" style="width: 100%; height: 100%; border: none;"></iframe>`;
+        };
 
         // Warstwa bazowa (Tylko lądy/wody, bez napisów)
         const darkBase = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { 
@@ -180,6 +364,9 @@
             const minLat = 48.5, maxLat = 55.5;
             const minLon = 13.5, maxLon = 24.5;
             
+            const radiusScale = parseFloat(document.getElementById('radius-bg').value) || 15;
+            const maxD2 = radiusScale * radiusScale; // kwadrat promienia, wpływa na gładkość
+            
             const pts = [];
             for(let i=0; i<lats.length; i++) {
                 const px = ((lons[i] - minLon) / (maxLon - minLon)) * canvas.width;
@@ -229,15 +416,34 @@
             
             const data = ds[okres];
             const zInfo = imgwData.ZMIENNE[zmienna];
-            const scale = imgwData.COLORS[zInfo.cscale];
             
-            if(data.pt_lats) {
+            // Fallbacks w przypadku braku cscale
+            let scale;
+            if (zInfo && zInfo.cscale && imgwData.COLORS[zInfo.cscale]) {
+                scale = imgwData.COLORS[zInfo.cscale];
+            } else {
+                scale = imgwData.COLORS['temp'] || [[0, '#000000'], [1, '#ffffff']]; // Domyślna skala
+            }
+            
+            const cmin = zInfo && zInfo.cmin !== undefined ? zInfo.cmin : 0;
+            const cmax = zInfo && zInfo.cmax !== undefined ? zInfo.cmax : 100;
+            
+            const showTxt = document.getElementById('chk-txt').checked;
+            const showPt = document.getElementById('chk-pt').checked;
+            const showInter = document.getElementById('chk-inter').checked;
+            const opacityBg = parseInt(document.getElementById('opa-bg').value) / 100;
+            
+            if(data.pt_lats && (showTxt || showPt)) {
                 for(let i=0; i<data.pt_lats.length; i++) {
+                    let htmlContent = '';
+                    if(showTxt) htmlContent += `<div>${data.pt_txts[i]}</div>`;
+                    if(showPt) htmlContent += `<div style="width:6px;height:6px;background:white;border-radius:50%;margin:2px auto;box-shadow:0 0 2px black;"></div>`;
+                    
                     const icon = L.divIcon({
                         className: 'imgw-station-marker',
-                        html: `<div>${data.pt_txts[i]}</div>`,
-                        iconSize: [30, 15],
-                        iconAnchor: [15, 7]
+                        html: htmlContent,
+                        iconSize: [30, 25],
+                        iconAnchor: [15, 12]
                     });
                     
                     L.marker([data.pt_lats[i], data.pt_lons[i]], {icon: icon})
@@ -246,10 +452,10 @@
                 }
             }
             
-            if(data.pt_lats && data.pt_lats.length > 5) {
-                const dataUrl = generateIDWImage(data.pt_lats, data.pt_lons, data.pt_vals, scale, zInfo.cmin, zInfo.cmax);
+            if(data.pt_lats && data.pt_lats.length > 5 && showInter) {
+                const dataUrl = generateIDWImage(data.pt_lats, data.pt_lons, data.pt_vals, scale, cmin, cmax);
                 const bounds = [[48.5, 13.5], [55.5, 24.5]];
-                idwOverlay = L.imageOverlay(dataUrl, bounds, { opacity: 0.65, pane: 'weatherPane' }).addTo(map);
+                idwOverlay = L.imageOverlay(dataUrl, bounds, { opacity: opacityBg, pane: 'weatherPane' }).addTo(map);
             }
         }
 

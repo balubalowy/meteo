@@ -74,15 +74,12 @@
       <div class="top-stats">
           <nav class="nav-links">
           <a href="#" class="nav-link btn btn-ghost tab-btn active" data-tab="tab-overview"><i data-lucide="layout-dashboard"></i> Pulpit</a>
-          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-mapa" style="color: var(--accent-primary);"><i data-lucide="map"></i> Radar Live</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-mapa" style="color: var(--accent-primary);"><i data-lucide="map"></i> Mapy</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-if-evaluator"><i data-lucide="tornado"></i> Skala IF</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-calculators"><i data-lucide="calculator"></i> Kalkulatory</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-knowledge"><i data-lucide="book-open"></i> Baza Wiedzy</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-alert-rules"><i data-lucide="alert-triangle"></i> Ostrzeżenia</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-stats"><i data-lucide="bar-chart-2"></i> Statystyki</a>
-          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-ensembles"><i data-lucide="cloud-rain"></i> Ensembles</a>
-          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-stacje"><i data-lucide="thermometer"></i> Stacje Live</a>
-          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-kreator"><i data-lucide="edit-3"></i> Kreator Map</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-cloud-identifier"><i data-lucide="cloud"></i> Kreator Chmur</a>
           <a href="https://balubalowy.github.io/system/" target="_blank" class="nav-link btn btn-ghost" style="opacity: 0.75; font-size: 0.85rem;" title="Otwórz System B-Core"><i data-lucide="command" style="width: 14px; height: 14px; color: var(--accent-primary);"></i> B-Core</a>
         </nav>
@@ -318,19 +315,12 @@
   </div>
 </div>
 
-      <!-- TAB 6: MAPY -->
-      <div id="tab-mapa" class="tab-view dynamic-tab" data-src="partials/tab-mapa.html">
+      <!-- TAB 6: MAPY (Złączony Radar, IMGW, Kreator i Ensemble) -->
+      <div id="tab-mapa" class="tab-view dynamic-tab" data-src="partials/tab-mapa.html" style="height: calc(100vh - 70px); padding: 0;">
         <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
           <i data-lucide="loader" class="spin"></i> Ładowanie Mapy Premium...
         </div>
       </div>
-      
-      <!-- TAB KREATOR -->
-      <div id="tab-kreator" class="tab-view dynamic-tab" data-src="partials/tab-kreator.html">
-  <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
-    <i data-lucide="loader" class="spin"></i> Ładowanie widoku...
-  </div>
-</div>
 
       <!-- TAB CLOUD IDENTIFIER -->
       <div id="tab-cloud-identifier" class="tab-view dynamic-tab" data-src="partials/tab-cloud-identifier.html">
@@ -349,52 +339,6 @@
         <div id="storm-ratings-container"></div>
         <div id="repo-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;"></div>
       </div>
-      
-      <div id="tab-ensembles" class="tab-view">
-         <div class="card" style="margin-bottom: 1rem; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
-            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-               <h3 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; color: var(--text-primary);">
-                  <i data-lucide="sliders" style="color: var(--accent-primary);"></i> Wylicz Prognozę Ensemble:
-               </h3>
-               <div style="display: flex; align-items: center; gap: 8px;">
-                  <label style="font-size: 0.85rem; color: var(--text-secondary);">Próg Temp:</label>
-                  <select id="tab-ens-thresh" class="form-select" style="width: auto; padding: 4px 8px; font-size: 0.85rem;">
-                     <option value="30">30°C (Upał)</option>
-                     <option value="32">32°C (Silny Upał)</option>
-                     <option value="35">35°C (Ekstremum)</option>
-                     <option value="25">25°C (Ciepło)</option>
-                     <option value="20">20°C</option>
-                  </select>
-               </div>
-               <div style="display: flex; align-items: center; gap: 8px;">
-                  <label style="font-size: 0.85rem; color: var(--text-secondary);">Dni do przodu:</label>
-                  <select id="tab-ens-days" class="form-select" style="width: auto; padding: 4px 8px; font-size: 0.85rem;">
-                     <option value="1">+1 dzień</option>
-                     <option value="2">+2 dni</option>
-                     <option value="3">+3 dni</option>
-                     <option value="4">+4 dni</option>
-                     <option value="5">+5 dni</option>
-                  </select>
-               </div>
-            </div>
-            <div style="display: flex; gap: 10px;">
-               <button onclick="triggerEnsFromTab()" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">
-                  <i data-lucide="zap"></i> Wylicz w Chmurze
-               </button>
-               <a href="prognoza/index.html" target="_blank" class="btn btn-ghost" style="padding: 8px 16px; font-size: 0.9rem; border: 1px solid var(--border-subtle);">
-                  <i data-lucide="external-link"></i> Pełny Generator
-               </a>
-            </div>
-         </div>
-         <div id="tab-ens-status" style="display: none; padding: 10px; margin-bottom: 1rem; border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 500;"></div>
-         <div style="height: 94vh; width: 100%;">
-            <iframe id="iframe-ensemble" src="prognoza/dashboard.html?v=3" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
-         </div>
-      </div>
-      
-      <div id="tab-stacje" class="tab-view" style="height: 94vh;">
-          <iframe src="stacje/dashboard.html?v=3" style="width: 100%; height: 100%; border: none; border-radius: var(--radius-sm); background: var(--bg-secondary);"></iframe>
-       </div>
     </div>
 
     <!-- Leaflet JS -->
