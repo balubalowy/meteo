@@ -1,4 +1,4 @@
-# Centrum Wiedzy Meteo Bartka
+# B-Meteo
 
 <p align="left">
   <img src="https://img.shields.io/badge/html5-%23E34F26.svg?style=flat&logo=html5&logoColor=white" alt="HTML5">
