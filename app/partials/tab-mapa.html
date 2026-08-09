@@ -77,6 +77,14 @@
                             <span>Przezrocz. Tła (Interpolacji):</span> <span id="val-opa-bg">70%</span>
                         </div>
                         <input type="range" id="opa-bg" min="0" max="100" value="70" onchange="renderIMGW(); document.getElementById('val-opa-bg').textContent = this.value + '%'" style="width: 100%; accent-color: #22c55e;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">
+                            <span>Kolor Punktów:</span>
+                        </div>
+                        <select id="pt-color-mode" class="form-select" onchange="window.renderIMGW()" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); color: var(--text-primary);">
+                            <option value="scale">Zależny od Skali</option>
+                            <option value="white">Białe</option>
+                            <option value="black">Czarne</option>
+                        </select>
                     </div>
                 </div>
             </div>

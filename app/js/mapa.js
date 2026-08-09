@@ -80,24 +80,46 @@ window.initMapa = function() {
             maxZoom: 20, pane: 'basePane' 
         });
         
-        // Warstwa górna (Tylko Etykiety miast)
-        const darkLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', { 
-            maxZoom: 20, pane: 'labelsPane' 
-        });
-
         const lightBase = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', { 
             maxZoom: 20, pane: 'basePane' 
         });
-        const lightLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', { 
-            maxZoom: 20, pane: 'labelsPane' 
+
+        // Własna warstwa z głównymi miastami (zamiast brzydkich z CartoDB)
+        const majorCities = [
+            { name: "Warszawa", lat: 52.2297, lon: 21.0122 },
+            { name: "Kraków", lat: 50.0647, lon: 19.9450 },
+            { name: "Łódź", lat: 51.7592, lon: 19.4560 },
+            { name: "Wrocław", lat: 51.1079, lon: 17.0385 },
+            { name: "Poznań", lat: 52.4064, lon: 16.9252 },
+            { name: "Gdańsk", lat: 54.3520, lon: 18.6466 },
+            { name: "Szczecin", lat: 53.4285, lon: 14.5528 },
+            { name: "Bydgoszcz", lat: 53.1235, lon: 18.0084 },
+            { name: "Lublin", lat: 51.2465, lon: 22.5684 },
+            { name: "Białystok", lat: 53.1325, lon: 23.1688 },
+            { name: "Katowice", lat: 50.2649, lon: 19.0238 },
+            { name: "Rzeszów", lat: 50.0412, lon: 21.9991 },
+            { name: "Olsztyn", lat: 53.7799, lon: 20.4942 },
+            { name: "Kielce", lat: 50.8661, lon: 20.6286 },
+            { name: "Opole", lat: 50.6711, lon: 17.9253 },
+            { name: "Zielona Góra", lat: 51.9355, lon: 15.5062 },
+            { name: "Toruń", lat: 53.0137, lon: 18.5984 },
+            { name: "Gorzów Wlkp.", lat: 52.7368, lon: 15.2288 }
+        ];
+
+        const cityLabelsGroup = L.layerGroup();
+        majorCities.forEach(city => {
+            const icon = L.divIcon({
+                className: 'custom-city-label',
+                html: `<div style="font-weight: bold; font-size: 0.85rem; color: white; text-shadow: 0 0 3px black, 0 0 4px black, 0 0 5px black; white-space: nowrap; pointer-events: none;">${city.name}</div>`,
+                iconSize: [80, 20],
+                iconAnchor: [40, 10]
+            });
+            L.marker([city.lat, city.lon], {icon: icon, interactive: false}).addTo(cityLabelsGroup);
         });
 
-        // Tło dla etykiet żeby były czytelne niezależnie od interpolacji
-        map.getPane('labelsPane').style.filter = 'drop-shadow(0px 0px 3px rgba(255,255,255,0.8)) drop-shadow(0px 0px 1px rgba(0,0,0,1))';
-
         const basemaps = {
-            "Ciemny (Dark)": L.layerGroup([darkBase, darkLabels]),
-            "Jasny (Voyager)": L.layerGroup([lightBase, lightLabels])
+            "Ciemny (Dark)": L.layerGroup([darkBase, cityLabelsGroup]),
+            "Jasny (Voyager)": L.layerGroup([lightBase, cityLabelsGroup])
         };
         basemaps["Ciemny (Dark)"].addTo(map);
 
@@ -286,6 +308,14 @@ window.initMapa = function() {
                     const lon = parseFloat(st.lon);
                     if(isNaN(lat) || isNaN(lon)) continue;
                     const nazwa = st.nazwa_stacji;
+                    
+                    const isDataValid = (dateStr) => {
+                        if(!dateStr) return false;
+                        // Format API: YYYY-MM-DD HH:mm:ss
+                        const dataDate = new Date(dateStr.replace(' ', 'T'));
+                        const diffHours = (new Date() - dataDate) / (1000 * 60 * 60);
+                        return diffHours <= 2.5 && diffHours >= -1; // max 2.5h stare, -1 na ewentualne różnice stref czasowych
+                    };
 
                     const temp = parseFloat(st.temperatura_powietrza);
                     const temp_t = st.temperatura_powietrza_data;
@@ -316,8 +346,8 @@ window.initMapa = function() {
                     const wiatr_poryw_kmh = porywy.length ? Math.max(...porywy) : NaN;
                     const wiatr_sr_kmh = !isNaN(wiatr_sr) ? wiatr_sr * 3.6 : NaN;
 
-                    const addData = (zmienna, val, txt, hov, dir) => {
-                        if(isNaN(val)) return;
+                    const addData = (zmienna, val, txt, hov, dir, t_str) => {
+                        if(isNaN(val) || !isDataValid(t_str)) return;
                         dataObj[zmienna].pt_lats.push(lat);
                         dataObj[zmienna].pt_lons.push(lon);
                         dataObj[zmienna].pt_vals.push(val);
@@ -326,15 +356,15 @@ window.initMapa = function() {
                         dataObj[zmienna].pt_hov.push(`<b>${nazwa}</b><br>${hov}`);
                     };
 
-                    addData('temp', temp, temp?.toFixed(1) + '°', `Temperatura: ${temp?.toFixed(1)}°C${formatTime(temp_t)}`);
-                    addData('grunt', temp_grunt, temp_grunt?.toFixed(1) + '°', `Temp. Gruntu: ${temp_grunt?.toFixed(1)}°C${formatTime(grunt_t)}`);
-                    addData('wilg', wilg, wilg?.toFixed(0) + '%', `Wilgotność: ${wilg?.toFixed(0)}%${formatTime(wilg_t)}`);
-                    addData('rosy', dewPoint, dewPoint?.toFixed(1) + '°', `Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`);
-                    addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}`, wiatr_kier);
-                    addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`, wiatr_kier);
+                    addData('temp', temp, temp?.toFixed(1) + '°', `Temperatura: ${temp?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
+                    addData('grunt', temp_grunt, temp_grunt?.toFixed(1) + '°', `Temp. Gruntu: ${temp_grunt?.toFixed(1)}°C${formatTime(grunt_t)}`, undefined, grunt_t);
+                    addData('wilg', wilg, wilg?.toFixed(0) + '%', `Wilgotność: ${wilg?.toFixed(0)}%${formatTime(wilg_t)}`, undefined, wilg_t);
+                    addData('rosy', dewPoint, dewPoint?.toFixed(1) + '°', `Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
+                    addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}`, wiatr_kier, wiatr_por_t);
+                    addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`, wiatr_kier, wiatr_sr_t);
                     
                     // synop: display temp as value, but text contains more info
-                    if(!isNaN(temp) && !isNaN(wiatr_sr_kmh) && !isNaN(wilg)) {
+                    if(!isNaN(temp) && !isNaN(wiatr_sr_kmh) && !isNaN(wilg) && isDataValid(temp_t)) {
                         addData('synop', temp, temp?.toFixed(1) + '°', `Temp: ${temp?.toFixed(1)}°C${formatTime(temp_t)}<br>Wiatr: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}<br>Wilg: ${wilg}%${formatTime(wilg_t)}`);
                     }
                 }
@@ -402,15 +432,19 @@ window.initMapa = function() {
             const showPt = document.getElementById('chk-pt').checked;
             const showInter = document.getElementById('chk-inter').checked;
             const showIso = document.getElementById('chk-iso') ? document.getElementById('chk-iso').checked : false;
+            const ptColorMode = document.getElementById('pt-color-mode') ? document.getElementById('pt-color-mode').value : 'scale';
             const opacityBg = parseInt(document.getElementById('opa-bg').value) / 100;
             
             if(data.pt_lats && (showTxt || showPt)) {
                 for(let i=0; i<data.pt_lats.length; i++) {
                     let htmlContent = '';
                     const val = data.pt_vals[i];
-                    const ptColor = "rgb(" + getColorRGBA(val, scale, cmin, cmax).slice(0,3).join(',') + ")";
                     
-                    if(showTxt) htmlContent += `<div style="text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}</div>`;
+                    let ptColor = "white";
+                    if (ptColorMode === 'scale') ptColor = "rgb(" + getColorRGBA(val, scale, cmin, cmax).slice(0,3).join(',') + ")";
+                    else if (ptColorMode === 'black') ptColor = "black";
+                    
+                    if(showTxt) htmlContent += `<div style="color: white; text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}</div>`;
                     if(showPt) {
                         if ((zmienna === 'wiatr' || zmienna === 'wiatr_sr') && data.pt_dirs && !isNaN(data.pt_dirs[i]) && data.pt_dirs[i] !== null) {
                             const dir = data.pt_dirs[i] + 180; // Wiatr wieje Z podanego kierunku (np. 0° = z Północy), więc strzałka leci na Południe
