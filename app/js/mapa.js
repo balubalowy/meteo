@@ -272,13 +272,13 @@ window.initMapa = function() {
                 const rawData = await res.json();
                 
                 const dataObj = {
-                    'temp': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
-                    'wiatr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
-                    'wiatr_sr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
-                    'rosy': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
-                    'wilg': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
-                    'grunt': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
-                    'synop': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] }
+                    'temp': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
+                    'wiatr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
+                    'wiatr_sr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
+                    'rosy': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
+                    'wilg': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
+                    'grunt': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
+                    'synop': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] }
                 };
 
                 for(let st of rawData) {
@@ -298,6 +298,8 @@ window.initMapa = function() {
                     const wiatr_poryw = parseFloat(st.wiatr_poryw_10min);
                     const wiatr_max = parseFloat(st.wiatr_predkosc_maksymalna);
                     
+                    const wiatr_kier = parseFloat(st.wiatr_kierunek);
+                    
                     // Weź nowszy czas z porywów
                     const wiatr_por_t = st.wiatr_poryw_10min_data || st.wiatr_predkosc_maksymalna_data;
                     
@@ -314,11 +316,12 @@ window.initMapa = function() {
                     const wiatr_poryw_kmh = porywy.length ? Math.max(...porywy) : NaN;
                     const wiatr_sr_kmh = !isNaN(wiatr_sr) ? wiatr_sr * 3.6 : NaN;
 
-                    const addData = (zmienna, val, txt, hov) => {
+                    const addData = (zmienna, val, txt, hov, dir) => {
                         if(isNaN(val)) return;
                         dataObj[zmienna].pt_lats.push(lat);
                         dataObj[zmienna].pt_lons.push(lon);
                         dataObj[zmienna].pt_vals.push(val);
+                        dataObj[zmienna].pt_dirs.push(dir !== undefined ? dir : null);
                         dataObj[zmienna].pt_txts.push(txt);
                         dataObj[zmienna].pt_hov.push(`<b>${nazwa}</b><br>${hov}`);
                     };
@@ -327,8 +330,8 @@ window.initMapa = function() {
                     addData('grunt', temp_grunt, temp_grunt?.toFixed(1) + '°', `Temp. Gruntu: ${temp_grunt?.toFixed(1)}°C${formatTime(grunt_t)}`);
                     addData('wilg', wilg, wilg?.toFixed(0) + '%', `Wilgotność: ${wilg?.toFixed(0)}%${formatTime(wilg_t)}`);
                     addData('rosy', dewPoint, dewPoint?.toFixed(1) + '°', `Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`);
-                    addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}`);
-                    addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`);
+                    addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}`, wiatr_kier);
+                    addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`, wiatr_kier);
                     
                     // synop: display temp as value, but text contains more info
                     if(!isNaN(temp) && !isNaN(wiatr_sr_kmh) && !isNaN(wilg)) {
@@ -404,8 +407,23 @@ window.initMapa = function() {
             if(data.pt_lats && (showTxt || showPt)) {
                 for(let i=0; i<data.pt_lats.length; i++) {
                     let htmlContent = '';
+                    const val = data.pt_vals[i];
+                    const ptColor = "rgb(" + getColorRGBA(val, scale, cmin, cmax).slice(0,3).join(',') + ")";
+                    
                     if(showTxt) htmlContent += `<div style="text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}</div>`;
-                    if(showPt) htmlContent += `<div style="width:6px;height:6px;background:white;border-radius:50%;margin:2px auto;box-shadow:0 0 2px black;"></div>`;
+                    if(showPt) {
+                        if ((zmienna === 'wiatr' || zmienna === 'wiatr_sr') && data.pt_dirs && !isNaN(data.pt_dirs[i]) && data.pt_dirs[i] !== null) {
+                            const dir = data.pt_dirs[i] + 180; // Wiatr wieje Z podanego kierunku (np. 0° = z Północy), więc strzałka leci na Południe
+                            htmlContent += `<div style="width:18px; height:18px; margin:2px auto; transform: rotate(${dir}deg); color: ${ptColor}; text-shadow: 0 0 2px black;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 1px black);">
+                                    <line x1="12" y1="21" x2="12" y2="3"></line>
+                                    <polyline points="5 10 12 3 19 10"></polyline>
+                                </svg>
+                            </div>`;
+                        } else {
+                            htmlContent += `<div style="width:10px;height:10px;background:${ptColor};border-radius:50%;margin:2px auto;box-shadow:0 0 2px black; border:1px solid rgba(255,255,255,0.7);"></div>`;
+                        }
+                    }
                     
                     const icon = L.divIcon({
                         className: 'imgw-station-marker',
