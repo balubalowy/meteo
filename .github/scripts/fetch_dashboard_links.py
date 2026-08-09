@@ -143,7 +143,9 @@ def main():
     except Exception as e:
         print(f"  CMM błąd: {e}")
 
-    out_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "app", "assets", "js")
+    # Correctly navigate up from .github/scripts to the root, then to app/assets/js
+    repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    out_dir = os.path.join(repo_root, "app", "assets", "js")
     os.makedirs(out_dir, exist_ok=True)
     out_file = os.path.join(out_dir, "dashboard_links.json")
     
