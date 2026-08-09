@@ -1101,21 +1101,21 @@ window.KNOWLEDGE_BASE = [
         "danger": "Ekstremalne",
         "desc": "Niszcząca i rozległa burza (np. przypadek z 23.07.2009 w Polsce). Układ w postaci linii szkwału ewoluujący w bow echo. Wiatry >26 m/s (lokalnie >33 m/s). Trwa ponad 5 godzin i przemierza >500 km.",
         "url": "",
-        "image": ""
+        "image": "assets/img/knowledge/pdf_ekstremalne/Zrzut ekranu 2026-08-09 192109.png"
       },
       {
         "name": "Duży Grad (Large Hail)",
         "danger": "Wysokie",
         "desc": "Opad w postaci lodowych brył >5 mm powstający w chmurach Cb z bardzo silnym prądem wstępującym. Największe kule gradowe tworzą się w superkomórkach. Rekord w Polsce: 10 cm (2010 r.).",
         "url": "",
-        "image": ""
+        "image": "assets/img/knowledge/pdf_ekstremalne/Zrzut ekranu 2026-08-09 192150.png"
       },
       {
         "name": "Trąba Powietrzna (Tornado)",
         "danger": "Ekstremalne",
         "desc": "Wirujący słup powietrza wyrastający z chmury Cb i dotykający ziemi. Formuje się najczęściej w superkomórkach (wymaga uskoków wiatru i obniżonego LCL/niedosytu wilgoci). Klasyfikowana w skali IF.",
         "url": "",
-        "image": ""
+        "image": "assets/img/knowledge/pdf_ekstremalne/Zrzut ekranu 2026-08-09 192442.png"
       }
     ]
   }
