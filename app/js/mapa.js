@@ -250,11 +250,25 @@ window.initMapa = function() {
                     const nazwa = st.nazwa_stacji;
 
                     const temp = parseFloat(st.temperatura_powietrza);
+                    const temp_t = st.temperatura_powietrza_data;
                     const temp_grunt = parseFloat(st.temperatura_gruntu);
+                    const grunt_t = st.temperatura_gruntu_data;
                     const wilg = parseFloat(st.wilgotnosc_wzgledna);
+                    const wilg_t = st.wilgotnosc_wzgledna_data;
                     const wiatr_sr = parseFloat(st.wiatr_srednia_predkosc);
+                    const wiatr_sr_t = st.wiatr_srednia_predkosc_data;
                     const wiatr_poryw = parseFloat(st.wiatr_poryw_10min);
                     const wiatr_max = parseFloat(st.wiatr_predkosc_maksymalna);
+                    
+                    // Weź nowszy czas z porywów
+                    const wiatr_por_t = st.wiatr_poryw_10min_data || st.wiatr_predkosc_maksymalna_data;
+                    
+                    const formatTime = (dateStr) => {
+                        if(!dateStr) return '';
+                        const parts = dateStr.split(' ');
+                        if(parts.length > 1) return ` <span style="font-size:0.75rem; color:#a1a1aa;">(${parts[1].substring(0, 5)})</span>`;
+                        return '';
+                    };
                     
                     const dewPoint = calculateDewPoint(temp, wilg);
                     
@@ -271,16 +285,16 @@ window.initMapa = function() {
                         dataObj[zmienna].pt_hov.push(`<b>${nazwa}</b><br>${hov}`);
                     };
 
-                    addData('temp', temp, temp?.toFixed(1) + '°', `Temperatura: ${temp?.toFixed(1)}°C`);
-                    addData('grunt', temp_grunt, temp_grunt?.toFixed(1) + '°', `Temp. Gruntu: ${temp_grunt?.toFixed(1)}°C`);
-                    addData('wilg', wilg, wilg?.toFixed(0) + '%', `Wilgotność: ${wilg?.toFixed(0)}%`);
-                    addData('rosy', dewPoint, dewPoint?.toFixed(1) + '°', `Punkt Rosy: ${dewPoint?.toFixed(1)}°C`);
-                    addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h`);
-                    addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h`);
+                    addData('temp', temp, temp?.toFixed(1) + '°', `Temperatura: ${temp?.toFixed(1)}°C${formatTime(temp_t)}`);
+                    addData('grunt', temp_grunt, temp_grunt?.toFixed(1) + '°', `Temp. Gruntu: ${temp_grunt?.toFixed(1)}°C${formatTime(grunt_t)}`);
+                    addData('wilg', wilg, wilg?.toFixed(0) + '%', `Wilgotność: ${wilg?.toFixed(0)}%${formatTime(wilg_t)}`);
+                    addData('rosy', dewPoint, dewPoint?.toFixed(1) + '°', `Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`);
+                    addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}`);
+                    addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`);
                     
                     // synop: display temp as value, but text contains more info
                     if(!isNaN(temp) && !isNaN(wiatr_sr_kmh) && !isNaN(wilg)) {
-                        addData('synop', temp, temp?.toFixed(1) + '°', `Temp: ${temp?.toFixed(1)}°C<br>Wiatr: ${wiatr_poryw_kmh?.toFixed(0)} km/h<br>Wilg: ${wilg}%`);
+                        addData('synop', temp, temp?.toFixed(1) + '°', `Temp: ${temp?.toFixed(1)}°C${formatTime(temp_t)}<br>Wiatr: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}<br>Wilg: ${wilg}%${formatTime(wilg_t)}`);
                     }
                 }
                 
