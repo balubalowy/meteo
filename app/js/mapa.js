@@ -143,6 +143,42 @@ window.initMapa = function() {
                         ]
                     }).addTo(map);
                     layer._myDecorator = decorator;
+                } else if (window.currentDrawingMode === 'wyz') {
+                    layer.setIcon(L.divIcon({
+                        className: 'meteo-icon-wyz',
+                        html: '<div style="color: #3b82f6; font-weight: bold; font-family: sans-serif; font-size: 32px; text-shadow: 0px 0px 4px white, 0px 0px 4px white; transform: translate(-50%, -50%);">W</div>',
+                        iconSize: [0, 0]
+                    }));
+                } else if (window.currentDrawingMode === 'niz') {
+                    layer.setIcon(L.divIcon({
+                        className: 'meteo-icon-niz',
+                        html: '<div style="color: #ef4444; font-weight: bold; font-family: sans-serif; font-size: 32px; text-shadow: 0px 0px 4px white, 0px 0px 4px white; transform: translate(-50%, -50%);">N</div>',
+                        iconSize: [0, 0]
+                    }));
+                } else if (window.currentDrawingMode === 'burza') {
+                    layer.setIcon(L.divIcon({
+                        className: 'meteo-icon-burza',
+                        html: '<div style="color: #ef4444; font-size: 32px; text-shadow: 0px 0px 4px white; transform: translate(-50%, -50%);">☈</div>',
+                        iconSize: [0, 0]
+                    }));
+                } else if (window.currentDrawingMode === 'deszcz') {
+                    layer.setIcon(L.divIcon({
+                        className: 'meteo-icon-deszcz',
+                        html: '<div style="color: #22c55e; font-size: 32px; font-weight: bold; text-shadow: 0px 0px 4px white; transform: translate(-50%, -50%);">●</div>',
+                        iconSize: [0, 0]
+                    }));
+                } else if (window.currentDrawingMode === 'snieg') {
+                    layer.setIcon(L.divIcon({
+                        className: 'meteo-icon-snieg',
+                        html: '<div style="color: #3b82f6; font-size: 32px; text-shadow: 0px 0px 4px white; transform: translate(-50%, -50%);">✱</div>',
+                        iconSize: [0, 0]
+                    }));
+                } else if (window.currentDrawingMode === 'mgla') {
+                    layer.setIcon(L.divIcon({
+                        className: 'meteo-icon-mgla',
+                        html: '<div style="color: #eab308; font-size: 32px; font-weight: bold; text-shadow: 0px 0px 4px white; transform: translate(-50%, -50%);">≡</div>',
+                        iconSize: [0, 0]
+                    }));
                 }
                 
                 layer.on('click', () => {
@@ -190,13 +226,15 @@ window.initMapa = function() {
             } else if(mode === 'kolko') {
                 map.pm.setGlobalOptions({ pathOptions: { color: '#22c55e', weight: 3, fillOpacity: 0.3, dashArray: '' } });
                 map.pm.enableDraw('Circle');
+            } else if(['wyz', 'niz', 'burza', 'deszcz', 'snieg', 'mgla'].includes(mode)) {
+                map.pm.enableDraw('Marker');
             }
         };
         
         window.clearMap = function() {
             if(!map) return;
             map.eachLayer(layer => {
-                if ((layer instanceof L.Polygon || layer instanceof L.Polyline || layer instanceof L.Circle) && !layer._url) {
+                if ((layer instanceof L.Polygon || layer instanceof L.Polyline || layer instanceof L.Circle || layer instanceof L.Marker) && !layer._url && layer.options.icon?.options?.className !== 'leaflet-div-icon leaflet-editing-icon') {
                     map.removeLayer(layer);
                     if(layer._myDecorator) map.removeLayer(layer._myDecorator);
                 }
