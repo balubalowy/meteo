@@ -67,36 +67,26 @@ Repozytorium może działać globalnie jako statyczna baza wiedzy (kalkulatory, 
 
 ## 📁 Struktura Katalogów i Plików
 
-System, po potężnym refaktorze z sierpnia 2026, został posprzątany z gigantycznych plików spaghetti i działa w architekturze modułowej.
+System, po potężnym refaktorze z sierpnia 2026, został całkowicie posprzątany z gigantycznych plików spaghetti i działa w ultraczystej architekturze modułowej. Wszystko zostało podzielone na warstwę jawną (`app/`) i niejawną (`.private/`).
+
+### 📂 /app (Frontend)
+Katalog zawierający całą publiczną stronę aplikacji webowej (statyczny SPA - Single Page Application).
+* `index.html` - Lekki, odchudzony plik główny, opierający się o dynamiczne pobieranie danych.
+* `/css/` - Główne źródło prawdy dla designu. Styl Dark Mode Glassmorphism (B-Core).
+* `/js/` - Logika zakładek, podłączanie ikon Lucide, Alpine.js, obsługa kalkulatorów i logowania. Tutaj też jest baza zjawisk `clouds-data.js`.
+* `/assets/` - Obrazy statyczne używane w aplikacji i pobrane cache danych z IMGW.
+* `/partials/` - Rozbite, modułowe pliki HTML, które ładują się na żądanie w ułamku sekundy, drastycznie zmniejszając wagę pliku `index.html`.
+
+### 📂 /.private (Backend i Archiwum)
+Pliki i skrypty niewidoczne dla systemu GitHub Pages (dzięki prefiksowi kropki i plikowi .gitignore).
+* `AGENTS.md` - Notatki administracyjne.
+* `/archiwum/` - Wszystkie historyczne foldery (`klimatologia`, `mapy`, `radar`, `wiedza`, `stacje`), które służyły jako zaszłe repozytorium wiedzy.
+* `*.py` - Skrypty backendowe (np. `fetch_imgw_firebase.py`, `generate_map_data_firebase.py`), odpalane cyklicznie przez serwery Microsoftu.
 
 ### 📂 /.github
-Katalog skryptów automatyzacji i Github Actions.
-* `workflows/firebase-sync.yml` - zautomatyzowane pobieranie stacji IMGW do bazy chmurowej
-
-### 📂 /assets
-Wszystkie pliki statyczne odpowiedzialne za design systemu.
-* `/css/bcore.css` - Główne źródło prawdy dla designu. Styl Dark Mode Glassmorphism zapożyczony z mojego głównego systemu produktywności.
-* `/js/app.js` - Logika zakładek, podłączanie ikon Lucide, obsługa kalkulatorów (LCL, Wmax, DCP).
-* `/js/data.js` - Statyczne bazy wiedzy o sygnaturach radarowych, Skali IF i aerologii.
-* `/js/firebase-config.js` - Konfiguracja logowania do bazy chmurowej.
-
-### 📂 /prognoza
-Moduł modeli predykcyjnych i numerycznych.
-* `dashboard.html` - Lekki (po refaktorze) dashboard modeli numerycznych działający z danymi JSON.
-* `generuj_dashboard.py` - Skrypt Pythona wyciągający dane z excela `Dane_Mapy_Polska.xlsx` do dynamicznego JSONa wyświetlanego w `dashboard.html`. Zredukowany z megabajtowego pliku potwora HTML!
-
-### 📂 /stacje
-Interaktywne mapy IMGW.
-* `dashboard.html` - Wizualizacja mapy z izoliniami z danych historycznych (Firebase Live).
-
-### 📂 /scripts
-Główne "zaplecze" (backend) agregujące i przeliczające dane środowiskowe.
-* `/core/` - Wydzielone sub-moduły Clean Code (`config.py`, `grid_math.py`). W nich leżą definicje skal kolorystycznych map i skomplikowana trygonometria/interpolacja danych SciPy.
-* `fetch_imgw_firebase.py` - Pobiera dane z publicznego API IMGW i zasila bazę danych o nowe parametry, budując okno historyczne (max, min dla ostatnich 3, 6, 12 i 24h).
-* `generate_map_data_firebase.py` - Uruchamiany, aby zinterpolować gęstą siatkę na konturach Polski z rzadkich punktów IMGW, wygenerować izolinie i opublikować JSONa mapowego.
-
-### 📂 Pozostałe zbiory (Klimatologia, Radar, Wiedza, Pamiętnik)
-Są to sekcje bazy wiedzy w postaci plików MarkDown lub mniejszych narzędzi do ręcznej analizy Excelów (weryfikowane przyrostowo).
+Katalog skryptów automatyzacji i Github Actions. Odpala skrypty z folderu `.private` i karmi nimi folder `app/`.
+* `workflows/fetch-imgw.yml` - zautomatyzowane pobieranie stacji IMGW do bazy chmurowej i aktualizacja linków.
+* `workflows/pages.yml` - oficjalny skrypt deploymentu dla GitHub Pages (ustawia folder `app/` jako publiczny korzeń).
 
 ---
 
