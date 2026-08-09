@@ -43,19 +43,93 @@ window.initMapa = function() {
                 if (window.currentDrawingMode === 'front_chlodny') {
                     const decorator = L.polylineDecorator(layer, {
                         patterns: [
-                            { offset: 25, repeat: 60, symbol: L.Symbol.arrowHead({pixelSize: 15, polygon: true, pathOptions: {stroke: true, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 1, weight: 2}}) }
+                            { offset: 15, repeat: 40, symbol: L.Symbol.marker({
+                                rotate: true,
+                                markerOptions: {
+                                    icon: L.divIcon({
+                                        className: 'front-chlodny-icon',
+                                        html: '<svg viewBox="0 0 20 10" style="width:20px;height:10px;"><path d="M 0 10 L 10 0 L 20 10 Z" fill="#3b82f6"/></svg>',
+                                        iconSize: [20, 10],
+                                        iconAnchor: [10, 10]
+                                    })
+                                }
+                            })}
+                        ]
+                    }).addTo(map);
+                    layer._myDecorator = decorator;
+                } else if (window.currentDrawingMode === 'front_chlodny_2') {
+                    const decorator = L.polylineDecorator(layer, {
+                        patterns: [
+                            { offset: 15, repeat: 40, symbol: L.Symbol.marker({
+                                rotate: true,
+                                markerOptions: {
+                                    icon: L.divIcon({
+                                        className: 'front-chlodny-icon',
+                                        html: '<svg viewBox="0 0 20 10" style="width:20px;height:10px;"><path d="M 0 10 L 10 0 L 20 10 Z" fill="#3b82f6"/></svg>',
+                                        iconSize: [20, 10],
+                                        iconAnchor: [10, 10]
+                                    })
+                                }
+                            })}
                         ]
                     }).addTo(map);
                     layer._myDecorator = decorator;
                 } else if (window.currentDrawingMode === 'front_cieply') {
                     const decorator = L.polylineDecorator(layer, {
                         patterns: [
-                            { offset: 25, repeat: 60, symbol: L.Symbol.marker({
+                            { offset: 15, repeat: 40, symbol: L.Symbol.marker({
+                                rotate: true,
                                 markerOptions: {
                                     icon: L.divIcon({
-                                        className: 'warm-front-icon',
-                                        html: '<div style="width: 12px; height: 12px; background: #ef4444; border-radius: 50%; border: 2px solid white; transform: translate(-20%, -20%);"></div>',
-                                        iconSize: [0, 0]
+                                        className: 'front-cieply-icon',
+                                        html: '<svg viewBox="0 0 20 10" style="width:20px;height:10px;"><path d="M 0 10 A 10 10 0 0 1 20 10 Z" fill="#ef4444"/></svg>',
+                                        iconSize: [20, 10],
+                                        iconAnchor: [10, 10]
+                                    })
+                                }
+                            })}
+                        ]
+                    }).addTo(map);
+                    layer._myDecorator = decorator;
+                } else if (window.currentDrawingMode === 'front_zokludowany') {
+                    const decorator = L.polylineDecorator(layer, {
+                        patterns: [
+                            { offset: 15, repeat: 60, symbol: L.Symbol.marker({
+                                rotate: true,
+                                markerOptions: {
+                                    icon: L.divIcon({
+                                        className: 'front-zokl-icon',
+                                        html: '<svg viewBox="0 0 20 10" style="width:20px;height:10px;"><path d="M 0 10 L 10 0 L 20 10 Z" fill="#d946ef"/></svg>',
+                                        iconSize: [20, 10],
+                                        iconAnchor: [10, 10]
+                                    })
+                                }
+                            })},
+                            { offset: 45, repeat: 60, symbol: L.Symbol.marker({
+                                rotate: true,
+                                markerOptions: {
+                                    icon: L.divIcon({
+                                        className: 'front-zokl-icon',
+                                        html: '<svg viewBox="0 0 20 10" style="width:20px;height:10px;"><path d="M 0 10 A 10 10 0 0 1 20 10 Z" fill="#d946ef"/></svg>',
+                                        iconSize: [20, 10],
+                                        iconAnchor: [10, 10]
+                                    })
+                                }
+                            })}
+                        ]
+                    }).addTo(map);
+                    layer._myDecorator = decorator;
+                } else if (window.currentDrawingMode === 'zbieznosc') {
+                    const decorator = L.polylineDecorator(layer, {
+                        patterns: [
+                            { offset: 10, repeat: 20, symbol: L.Symbol.marker({
+                                rotate: true,
+                                markerOptions: {
+                                    icon: L.divIcon({
+                                        className: 'zbieznosc-icon',
+                                        html: '<svg viewBox="0 0 10 10" style="width:10px;height:10px;"><path d="M 10 10 L 0 0" stroke="#f97316" stroke-width="2" fill="none"/></svg>',
+                                        iconSize: [10, 10],
+                                        iconAnchor: [10, 10]
                                     })
                                 }
                             })}
@@ -96,13 +170,19 @@ window.initMapa = function() {
             if(!map.pm) return;
             window.currentDrawingMode = mode;
             if(mode === 'zbieznosc') {
-                map.pm.setGlobalOptions({ pathOptions: { color: '#f97316', weight: 4, fillOpacity: 0, dashArray: '10, 10' } });
+                map.pm.setGlobalOptions({ pathOptions: { color: '#f97316', weight: 3, fillOpacity: 0, dashArray: '' } });
                 map.pm.enableDraw('Line');
             } else if(mode === 'front_chlodny') {
                 map.pm.setGlobalOptions({ pathOptions: { color: '#3b82f6', weight: 3, fillOpacity: 0, dashArray: '' } });
                 map.pm.enableDraw('Line');
+            } else if(mode === 'front_chlodny_2') {
+                map.pm.setGlobalOptions({ pathOptions: { color: '#3b82f6', weight: 3, fillOpacity: 0, dashArray: '8, 8' } });
+                map.pm.enableDraw('Line');
             } else if(mode === 'front_cieply') {
                 map.pm.setGlobalOptions({ pathOptions: { color: '#ef4444', weight: 3, fillOpacity: 0, dashArray: '' } });
+                map.pm.enableDraw('Line');
+            } else if(mode === 'front_zokludowany') {
+                map.pm.setGlobalOptions({ pathOptions: { color: '#d946ef', weight: 3, fillOpacity: 0, dashArray: '' } });
                 map.pm.enableDraw('Line');
             } else if(mode === 'strzalka') {
                 map.pm.setGlobalOptions({ pathOptions: { color: '#a8a29e', weight: 4, fillOpacity: 0, dashArray: '' } });
