@@ -1,139 +1,199 @@
 <div style="height: 85vh; width: 100%; display: flex; flex-direction: column; position: relative;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0 1rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0 1rem; flex-wrap: wrap; gap: 10px;">
         <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
-            <i data-lucide="map" style="color: var(--accent-primary);"></i> Interaktywny Radar Premium
+            <i data-lucide="map" style="color: var(--accent-primary);"></i> Wielki Pulpit (Radar + IMGW)
         </h2>
-        <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-secondary); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border-subtle);">
-            <button id="rv-play-btn" class="btn btn-ghost" style="padding: 5px; border-radius: 50%; color: var(--accent-primary);">
-                <i data-lucide="play"></i>
-            </button>
-            <span id="rv-time" style="font-family: monospace; font-size: 0.9rem; font-weight: bold; width: 60px; text-align: center;">--:--</span>
-            <input type="range" id="rv-slider" min="0" max="10" value="10" style="width: 150px; accent-color: var(--accent-primary);">
+        
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <!-- Odtwarzacz Radaru RainViewer -->
+            <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-secondary); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border-subtle);">
+                <span style="font-size: 0.8rem; color: var(--text-secondary);"><i data-lucide="cloud-rain"></i> Radar:</span>
+                <button id="rv-play-btn" class="btn btn-ghost" style="padding: 5px; border-radius: 50%; color: var(--accent-primary);">
+                    <i data-lucide="play"></i>
+                </button>
+                <span id="rv-time" style="font-family: monospace; font-size: 0.9rem; font-weight: bold; width: 60px; text-align: center;">--:--</span>
+                <input type="range" id="rv-slider" min="0" max="10" value="10" style="width: 120px; accent-color: var(--accent-primary);">
+            </div>
+
+            <!-- Kontroler Czasu IMGW -->
+            <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-secondary); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border-subtle);">
+                <span style="font-size: 0.8rem; color: var(--text-secondary);"><i data-lucide="thermometer"></i> Dane IMGW:</span>
+                <select id="imgw-okres" class="form-select" style="padding: 4px 8px; font-size: 0.85rem; border-radius: 12px; border: none; background: var(--bg-tertiary); color: var(--text-primary);">
+                    <option value="now">Aktualne (Teraz)</option>
+                    <option value="max3">Maksimum 3h</option>
+                    <option value="min3">Minimum 3h</option>
+                    <option value="max6">Maksimum 6h</option>
+                    <option value="min6">Minimum 6h</option>
+                    <option value="max12">Maksimum 12h</option>
+                    <option value="min12">Minimum 12h</option>
+                    <option value="max24">Maksimum 24h</option>
+                    <option value="min24">Minimum 24h</option>
+                </select>
+                <select id="imgw-zmienna" class="form-select" style="padding: 4px 8px; font-size: 0.85rem; border-radius: 12px; border: none; background: var(--bg-tertiary); color: var(--text-primary);">
+                    <option value="temp">Temperatura</option>
+                    <option value="wiatr">Wiatr Porywy</option>
+                    <option value="rosy">Punkt Rosy</option>
+                    <option value="wilg">Wilgotność</option>
+                </select>
+            </div>
         </div>
     </div>
-    <div id="premium-map" style="flex: 1; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: #111;"></div>
+    
+    <div id="premium-map" style="flex: 1; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: #111;">
+        <div id="imgw-loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; color: white; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+            <i data-lucide="loader" class="spin"></i> Pobieranie danych stacji...
+        </div>
+    </div>
 </div>
 
 <style>
     .leaflet-control-layers-expanded { background: var(--bg-primary) !important; color: var(--text-primary) !important; border: 1px solid var(--border-subtle) !important; border-radius: 8px !important; }
+    .imgw-station-marker {
+        background: transparent;
+        border: none;
+        color: white;
+        text-shadow: 1px 1px 2px black, -1px -1px 2px black, 1px -1px 2px black, -1px 1px 2px black;
+        font-weight: bold;
+        font-size: 11px;
+        text-align: center;
+        line-height: 1;
+    }
 </style>
 
 <script>
-    // Inicjalizacja odbywa się gdy Alpine (lub dynamic-tab) ładuje ten partial
     setTimeout(() => {
-        // Zabezpieczenie przed podwójną inicjalizacją
-        if (window.premiumMap) {
-            window.premiumMap.remove();
-        }
+        if (window.premiumMap) window.premiumMap.remove();
 
-        const map = L.map('premium-map', {
-            center: [51.9194, 19.1451], // Polska
-            zoom: 6,
-            zoomControl: false // dodamy w innym miejscu
-        });
+        const map = L.map('premium-map', { center: [51.9194, 19.1451], zoom: 6, zoomControl: false });
         window.premiumMap = map;
-
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Mapy bazowe
-        const darkMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd',
-            maxZoom: 20
-        });
-
-        const osmMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        });
-
+        const darkMap = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 20 });
+        const osmMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
         darkMap.addTo(map);
 
-        // RainViewer Logic
-        let radarLayers = [];
-        let timestamps = [];
-        let currentFrame = 0;
-        let animationTimer = null;
-
+        // ----------------------------------------------------
+        // RAINVIEWER RADAR
+        // ----------------------------------------------------
+        let radarLayers = [], timestamps = [], currentFrame = 0, animationTimer = null;
+        
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
             .then(data => {
                 timestamps = data.radar.past.map(t => t.time).concat(data.radar.nowcast.map(t => t.time));
-                
                 document.getElementById('rv-slider').max = timestamps.length - 1;
                 document.getElementById('rv-slider').value = timestamps.length - 1;
 
                 timestamps.forEach((time, index) => {
                     const layer = L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${time}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        opacity: index === timestamps.length - 1 ? 0.7 : 0,
-                        zIndex: 10
+                        opacity: index === timestamps.length - 1 ? 0.7 : 0, zIndex: 10
                     }).addTo(map);
                     radarLayers.push(layer);
                 });
-
-                updateTimeDisplay(timestamps.length - 1);
+                if(timestamps.length) updateTimeDisplay(timestamps.length - 1);
             });
 
         function updateTimeDisplay(index) {
             if(!timestamps[index]) return;
-            const date = new Date(timestamps[index] * 1000);
-            document.getElementById('rv-time').textContent = date.toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('rv-time').textContent = new Date(timestamps[index] * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
         }
 
         function showFrame(index) {
-            radarLayers.forEach((layer, i) => {
-                layer.setOpacity(i === parseInt(index) ? 0.7 : 0);
-            });
+            radarLayers.forEach((layer, i) => layer.setOpacity(i === parseInt(index) ? 0.7 : 0));
             updateTimeDisplay(index);
         }
 
-        document.getElementById('rv-slider').addEventListener('input', (e) => {
-            currentFrame = parseInt(e.target.value);
-            showFrame(currentFrame);
-        });
-
-        document.getElementById('rv-play-btn').addEventListener('click', (e) => {
+        document.getElementById('rv-slider').addEventListener('input', e => showFrame(currentFrame = parseInt(e.target.value)));
+        document.getElementById('rv-play-btn').addEventListener('click', e => {
             const btn = e.currentTarget;
             if (animationTimer) {
-                clearInterval(animationTimer);
-                animationTimer = null;
+                clearInterval(animationTimer); animationTimer = null;
                 btn.innerHTML = '<i data-lucide="play"></i>';
-                lucide.createIcons();
             } else {
                 btn.innerHTML = '<i data-lucide="pause"></i>';
-                lucide.createIcons();
                 if(currentFrame >= radarLayers.length - 1) currentFrame = 0;
-                
                 animationTimer = setInterval(() => {
-                    currentFrame++;
-                    if (currentFrame >= radarLayers.length) {
-                        currentFrame = 0;
-                    }
+                    currentFrame = currentFrame >= radarLayers.length - 1 ? 0 : currentFrame + 1;
                     document.getElementById('rv-slider').value = currentFrame;
                     showFrame(currentFrame);
-                }, 500); // 500ms na klatkę
+                }, 500);
             }
+            lucide.createIcons();
         });
 
+        // ----------------------------------------------------
+        // IMGW DATA (Firebase)
+        // ----------------------------------------------------
+        let imgwData = null;
+        const imgwLayerGroup = L.layerGroup().addTo(map);
+        
+        function getColor(val, scale) {
+            if(!scale || val === null) return "#888";
+            for(let i = 0; i < scale.length - 1; i++) {
+                if(val >= scale[i][0] * 100 && val <= scale[i+1][0] * 100) return scale[i][1];
+            }
+            return scale[scale.length-1][1];
+        }
+
+        function renderIMGW() {
+            if(!imgwData || !imgwData.MAP_DATA) return;
+            imgwLayerGroup.clearLayers();
+            
+            const okres = document.getElementById('imgw-okres').value;
+            const zmienna = document.getElementById('imgw-zmienna').value;
+            
+            const ds = imgwData.MAP_DATA[zmienna];
+            if(!ds || !ds[okres]) return;
+            
+            const data = ds[okres];
+            const scale = imgwData.COLORS.TEMP_COLORSCALE; // Uproszczenie dla prototypu
+            
+            // Rysowanie stacji (pt_lats, pt_lons, pt_vals, pt_txts)
+            if(data.pt_lats) {
+                for(let i=0; i<data.pt_lats.length; i++) {
+                    const lat = data.pt_lats[i];
+                    const lon = data.pt_lons[i];
+                    const txt = data.pt_txts[i];
+                    const hov = data.pt_hov[i];
+                    
+                    const icon = L.divIcon({
+                        className: 'imgw-station-marker',
+                        html: `<div>${txt}</div>`,
+                        iconSize: [30, 15],
+                        iconAnchor: [15, 7]
+                    });
+                    
+                    L.marker([lat, lon], {icon: icon})
+                     .bindTooltip(hov)
+                     .addTo(imgwLayerGroup);
+                }
+            }
+        }
+
+        document.getElementById('imgw-okres').addEventListener('change', renderIMGW);
+        document.getElementById('imgw-zmienna').addEventListener('change', renderIMGW);
+
+        // Fetch IMGW Data
+        fetch('https://meteo-bbe28-default-rtdb.europe-west1.firebasedatabase.app/imgw_map_data.json')
+            .then(res => res.json())
+            .then(data => {
+                imgwData = data;
+                document.getElementById('imgw-loading').style.display = 'none';
+                renderIMGW();
+            })
+            .catch(err => {
+                console.error("Błąd IMGW Firebase:", err);
+                document.getElementById('imgw-loading').innerHTML = "Błąd pobierania danych IMGW.";
+            });
+
         // Kontrolki warstw
-        const baseMaps = {
-            "Ciemna (CartoDB)": darkMap,
-            "Jasna (OSM)": osmMap
-        };
+        L.control.layers(
+            {"Ciemna (CartoDB)": darkMap, "Jasna (OSM)": osmMap},
+            {"Stacje IMGW": imgwLayerGroup},
+            {position: 'topright'}
+        ).addTo(map);
 
-        // Zastępcze warstwy sat/wyładowań (Można rozszerzyć wg potrzeb usera)
-        const dummyLightning = L.layerGroup(); 
-        
-        const overlayMaps = {
-            "Radar opadów (Animowany)": L.layerGroup(), // To jest sterowane manualnie z slidera, dodane tu jako placeholder by było widoczne
-            "Wyładowania (Wkrótce)": dummyLightning
-        };
-
-        L.control.layers(baseMaps, overlayMaps, { position: 'topright' }).addTo(map);
-
-        // Przeładuj ikony lucide w nowym widoku
         lucide.createIcons();
-        
-        // Zmusić mapę do przerysowania (fix błędu szarych kafli Leaflet w zakładkach)
         setTimeout(() => map.invalidateSize(), 500);
     }, 200);
 </script>

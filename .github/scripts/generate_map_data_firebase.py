@@ -121,8 +121,8 @@ def create_grid(lats, lons, vals, u_vals=None, v_vals=None):
     if len(vals) < 3:
         return [], [], [], [], [], []
     
-    # 1. Tworzenie regularnej siatki
-    grid_lon, grid_lat = np.mgrid[13.5:24.5:0.04, 48.5:55.5:0.04]
+    # 1. Tworzenie regularnej siatki (zmniejszona rozdzielczość 0.08 dla mniejszego JSONa)
+    grid_lon, grid_lat = np.mgrid[13.5:24.5:0.08, 48.5:55.5:0.08]
     
     points = np.array([lons, lats]).T
     
@@ -155,9 +155,9 @@ def create_grid(lats, lons, vals, u_vals=None, v_vals=None):
             lon, lat = grid_lon[i, j], grid_lat[i, j]
             val = grid_z[i, j]
             if not np.isnan(val) and poland_polygon.contains(Point(lon, lat)):
-                glats.append(round(lat,3))
-                glons.append(round(lon,3))
-                gvals.append(round(val,2))
+                glats.append(round(lat,2))
+                glons.append(round(lon,2))
+                gvals.append(round(val,1))
                 grid_masked[i, j] = val
                 if grid_u is not None and grid_v is not None:
                     gu.append(grid_u[i, j])
@@ -379,8 +379,7 @@ def generate_dashboard():
     js_colors = {"TEMP_COLORSCALE": TEMP_COLORSCALE, "WIND_COLORSCALE": WIND_COLORSCALE, "HUMIDITY_COLORSCALE": HUMIDITY_COLORSCALE, "DEWPOINT_COLORSCALE": DEWPOINT_COLORSCALE}
 
     # Zapis i wysyłka do Firebase
-    final_payload = {
-        "MAP_DATA": js_data,
+    final_payload_base = {
         "ZMIENNE": ZMIENNE,
         "COLORS": js_colors,
         "LATEST_TIME": latest_time_str,
@@ -397,15 +396,20 @@ def generate_dashboard():
             return [clean_nans(i) for i in obj]
         return obj
 
-    final_payload = clean_nans(final_payload)
+    final_payload_base = clean_nans(final_payload_base)
+    js_data = clean_nans(js_data)
 
-    print(f"  Wysyłanie map_data do bazy {FIREBASE_URL}/imgw_map_data.json")
     try:
-        resp_put = requests.put(f"{FIREBASE_URL}/imgw_map_data.json{auth_param}", json=final_payload)
-        if not resp_put.ok:
-            print(f"  [!] Firebase zwrócił błąd {resp_put.status_code}: {resp_put.text}")
-        resp_put.raise_for_status()
-        print("  [OK] Dane przestrzenne zaktualizowane w Firebase!")
+        print(f"  Wysyłanie metadanych do bazy {FIREBASE_URL}/imgw_map_data.json")
+        # Aktualizujemy bazowy obiekt (patch aby nie nadpisać dzieci jeśli nie wysyłamy od nowa)
+        requests.patch(f"{FIREBASE_URL}/imgw_map_data.json{auth_param}", json=final_payload_base).raise_for_status()
+
+        # Wysyłamy każdą zmienną w oddzielnym zapytaniu (Chunking = Ominięcie limitu Firebase)
+        for z_key, z_data in js_data.items():
+            print(f"  Wysyłanie warstwy {z_key} ({len(str(z_data))} bajtów)...")
+            requests.put(f"{FIREBASE_URL}/imgw_map_data/MAP_DATA/{z_key}.json{auth_param}", json=z_data).raise_for_status()
+
+        print("  [OK] Dane przestrzenne zaktualizowane w Firebase (Porcjami)!")
     except Exception as e:
         print(f"  [!] Błąd wysyłania do Firebase: {e}")
         sys.exit(1)
