@@ -85,8 +85,21 @@ window.initMapa = function() {
             maxZoom: 20, pane: 'labelsPane' 
         });
 
-        darkBase.addTo(map);
-        darkLabels.addTo(map);
+        const lightBase = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', { 
+            maxZoom: 20, pane: 'basePane' 
+        });
+        const lightLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', { 
+            maxZoom: 20, pane: 'labelsPane' 
+        });
+
+        // Tło dla etykiet żeby były czytelne niezależnie od interpolacji
+        map.getPane('labelsPane').style.filter = 'drop-shadow(0px 0px 3px rgba(255,255,255,0.8)) drop-shadow(0px 0px 1px rgba(0,0,0,1))';
+
+        const basemaps = {
+            "Ciemny (Dark)": L.layerGroup([darkBase, darkLabels]),
+            "Jasny (Voyager)": L.layerGroup([lightBase, lightLabels])
+        };
+        basemaps["Ciemny (Dark)"].addTo(map);
 
         // ----------------------------------------------------
         // RAINVIEWER RADAR
@@ -166,12 +179,13 @@ window.initMapa = function() {
             return [rgb[0], rgb[1], rgb[2], 160];
         }
 
-        function generateIDWImage(lats, lons, vals, scale, cmin, cmax) {
+        function generateIDWImage(lats, lons, vals, scale, cmin, cmax, drawIso) {
             const canvas = document.createElement('canvas');
             canvas.width = 240; 
             canvas.height = 160;
             const ctx = canvas.getContext('2d');
             const imgData = ctx.createImageData(canvas.width, canvas.height);
+            const valGrid = new Float32Array(canvas.width * canvas.height);
             
             const minLat = 48.5, maxLat = 55.5;
             const minLon = 13.5, maxLon = 24.5;
@@ -199,15 +213,39 @@ window.initMapa = function() {
                         den += w;
                     }
                     const val = num / den;
+                    const idx = (y * canvas.width + x);
+                    valGrid[idx] = val;
+                    
                     const rgba = getColorRGBA(val, scale, cmin, cmax);
                     
-                    const idx = (y * canvas.width + x) * 4;
-                    imgData.data[idx] = rgba[0];
-                    imgData.data[idx+1] = rgba[1];
-                    imgData.data[idx+2] = rgba[2];
-                    imgData.data[idx+3] = rgba[3]; 
+                    const pIdx = idx * 4;
+                    imgData.data[pIdx] = rgba[0];
+                    imgData.data[pIdx+1] = rgba[1];
+                    imgData.data[pIdx+2] = rgba[2];
+                    imgData.data[pIdx+3] = rgba[3]; 
                 }
             }
+            
+            if (drawIso) {
+                const step = (cmax - cmin) / 15; // np. co ~2 stopnie dla temp
+                for (let y = 0; y < canvas.height - 1; y++) {
+                    for (let x = 0; x < canvas.width - 1; x++) {
+                        const idx = y * canvas.width + x;
+                        const v1 = valGrid[idx];
+                        const v2 = valGrid[idx + 1];
+                        const v3 = valGrid[idx + canvas.width];
+                        
+                        if (Math.floor(v1 / step) !== Math.floor(v2 / step) || Math.floor(v1 / step) !== Math.floor(v3 / step)) {
+                            const pIdx = idx * 4;
+                            imgData.data[pIdx] = 0;
+                            imgData.data[pIdx+1] = 0;
+                            imgData.data[pIdx+2] = 0;
+                            imgData.data[pIdx+3] = 120; // lekko przezroczyste czarne linie
+                        }
+                    }
+                }
+            }
+            
             ctx.putImageData(imgData, 0, 0);
             return canvas.toDataURL();
         }
@@ -360,12 +398,13 @@ window.initMapa = function() {
             const showTxt = document.getElementById('chk-txt').checked;
             const showPt = document.getElementById('chk-pt').checked;
             const showInter = document.getElementById('chk-inter').checked;
+            const showIso = document.getElementById('chk-iso') ? document.getElementById('chk-iso').checked : false;
             const opacityBg = parseInt(document.getElementById('opa-bg').value) / 100;
             
             if(data.pt_lats && (showTxt || showPt)) {
                 for(let i=0; i<data.pt_lats.length; i++) {
                     let htmlContent = '';
-                    if(showTxt) htmlContent += `<div>${data.pt_txts[i]}</div>`;
+                    if(showTxt) htmlContent += `<div style="text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}</div>`;
                     if(showPt) htmlContent += `<div style="width:6px;height:6px;background:white;border-radius:50%;margin:2px auto;box-shadow:0 0 2px black;"></div>`;
                     
                     const icon = L.divIcon({
@@ -382,7 +421,7 @@ window.initMapa = function() {
             }
             
             if(data.pt_lats && data.pt_lats.length > 5 && showInter) {
-                const dataUrl = generateIDWImage(data.pt_lats, data.pt_lons, data.pt_vals, scale, cmin, cmax);
+                const dataUrl = generateIDWImage(data.pt_lats, data.pt_lons, data.pt_vals, scale, cmin, cmax, showIso);
                 const bounds = [[48.5, 13.5], [55.5, 24.5]];
                 idwOverlay = L.imageOverlay(dataUrl, bounds, { opacity: opacityBg, pane: 'weatherPane' }).addTo(map);
             }
@@ -399,6 +438,8 @@ window.initMapa = function() {
                 if(document.getElementById('imgw-okres').value !== 'now') {
                     document.getElementById('imgw-loading').style.display = 'none';
                     window.renderIMGW();
+                } else {
+                    window.renderIMGW();
                 }
             })
             .catch(err => console.error("Błąd IMGW Firebase:", err));
@@ -407,7 +448,7 @@ window.initMapa = function() {
         window.renderIMGW();
 
         L.control.layers(
-            {},
+            basemaps,
             {"Stacje IMGW": imgwLayerGroup},
             {position: 'topright'}
         ).addTo(map);
