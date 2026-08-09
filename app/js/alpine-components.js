@@ -49,27 +49,75 @@ document.addEventListener('alpine:init', () => {
             let sub = this.subCode;
             let dod = parseInt(this.dodVal) || 1;
             
-            if (sub.startsWith('BS')) {
-                if (sub === 'BSA') rating = (dod === 1) ? 'IF0.5' : (dod === 2) ? 'IF1.5' : 'IF0';
-                else if (sub === 'BSD') rating = (dod === 1) ? 'IF2.5' : (dod === 2) ? 'IF4' : 'IF1.5';
-                else rating = (dod === 1) ? 'IF1.5' : (dod === 2) ? 'IF2.5' : 'IF1';
-            } else if (sub.startsWith('TR')) {
-                if (sub === 'TRW') rating = (dod === 1) ? 'IF0.5' : (dod === 2) ? 'IF1.5' : 'IF0';
-                else if (sub === 'TRS') rating = (dod === 1) ? 'IF1.5' : (dod === 2) ? 'IF2.5' : 'IF1';
-                else rating = (dod === 1) ? 'IF1' : (dod === 2) ? 'IF2' : 'IF0.5';
+            const map = {
+                'BSA': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
+                'BSB': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
+                'BSC': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
+                'BSD': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF3'},
+                'BSE': {1: 'IF2',   2: 'IF3',   3: 'IF4'},
+                'BSF': {1: 'IF2.5', 2: 'IF3.5', 3: 'IF4'},
+                
+                'BRA': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
+                'BRD': {1: 'IF1',   2: 'IF1.5', 3: 'IF2.5'},
+                'BRE': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF3'},
+                
+                'TRW': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
+                'TRA': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
+                'TRS': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
+                
+                'TSW': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
+                'TSA': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
+                'TSS': {1: 'IF2',   2: 'IF2.5', 3: 'IF3'},
+                
+                'VHT': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
+                'VHE': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
+                'VHC': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
+                'VHL': {1: 'IF2',   2: 'IF2.5', 3: 'IF3'},
+                
+                'PTW': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
+                'PTS': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
+                'PTT': {1: 'IF2',   2: 'IF3',   3: 'IF4'},
+                
+                'SCA': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
+                'SCD': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
+                'SCF': {1: 'IF2',   2: 'IF2.5', 3: 'IF3'},
+            };
+            
+            if (map[sub] && map[sub][dod]) {
+                rating = map[sub][dod];
             } else {
-                rating = (dod === 1) ? 'IF1.5' : 'IF2.5';
+                rating = (dod === 1) ? 'IF1' : (dod === 2) ? 'IF2' : 'IF3';
             }
             
             return this.meteo.ifScaleClasses.find(c => c.code === rating) || this.meteo.ifScaleClasses[2];
         },
         getBadgeColor(code) {
             const colors = {
-                'IF0': '#10B981', 'IF0.5': '#34D399', 'IF1': '#F59E0B',
-                'IF1.5': '#D97706', 'IF2': '#EF4444', 'IF2.5': '#DC2626',
-                'IF3': '#B91C1C', 'IF4': '#7C3AED', 'IF5': '#6D28D9'
+                'IF0': 'linear-gradient(135deg, #10B981, #059669)', 
+                'IF0.5': 'linear-gradient(135deg, #34D399, #10B981)', 
+                'IF1': 'linear-gradient(135deg, #FCD34D, #F59E0B)',
+                'IF1.5': 'linear-gradient(135deg, #F59E0B, #D97706)', 
+                'IF2': 'linear-gradient(135deg, #F87171, #EF4444)', 
+                'IF2.5': 'linear-gradient(135deg, #EF4444, #DC2626)',
+                'IF3': 'linear-gradient(135deg, #DC2626, #991B1B)', 
+                'IF4': 'linear-gradient(135deg, #8B5CF6, #6D28D9)', 
+                'IF5': 'linear-gradient(135deg, #4C1D95, #312E81)'
             };
-            return colors[code] || '#3B82F6';
+            return colors[code] || 'linear-gradient(135deg, #3B82F6, #2563EB)';
+        },
+        getExampleImage(code) {
+            const examples = {
+                'IF0': 'assets/img/wiedza/if_scale_0.png',
+                'IF0.5': 'assets/img/wiedza/if_scale_1.png',
+                'IF1': 'assets/img/wiedza/if_scale_2.png',
+                'IF1.5': 'assets/img/wiedza/if_scale_6.png',
+                'IF2': 'assets/img/wiedza/if_scale_9.png',
+                'IF2.5': 'assets/img/wiedza/if_scale_10.png',
+                'IF3': 'assets/img/wiedza/if_scale_12.png',
+                'IF4': 'assets/img/wiedza/if_scale_13.png',
+                'IF5': 'assets/img/wiedza/if_scale_14.png'
+            };
+            return examples[code] || 'assets/img/wiedza/if_scale_0.png';
         }
     }));
 

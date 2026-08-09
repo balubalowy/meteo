@@ -8,7 +8,7 @@ echo =======================================
 echo 1. Zbieranie statystyk burzowych (Excel)...
 
 python .private/parse_storm_stats.py
-python .private/fetch_dashboard_links.py
+python .github/scripts/fetch_dashboard_links.py
 python .private/update_burze.py
 
 echo.

@@ -241,17 +241,23 @@
             </div>
           </div>
 
-          <div class="result-box mt-1" x-show="resultObj">
-            <div style="font-size:0.85rem; color:var(--text-muted)">Wyznaczony stopień uszkodzenia ESSL:</div>
-            <div style="display:flex; align-items:center; gap:0.75rem; margin:0.4rem 0">
-              <span class="if-badge" :style="'background:' + getBadgeColor(resultObj.code) + '; font-size:1.4rem; padding:0.4rem 0.8rem'" x-text="resultObj.code"></span>
-              <div>
-                <div style="font-size:1.3rem; font-weight:700; color:var(--text-primary)">~ <span x-text="resultObj.centralSpeedKmh"></span> km/h (<span x-text="resultObj.centralSpeedMs"></span> m/s)</div>
-                <div style="font-size:0.8rem; color:var(--text-subtle)">Zakres: <span x-text="resultObj.rangeKmh"></span> km/h (<span x-text="resultObj.centralSpeedKt"></span> kt)</div>
+          <div class="result-box mt-1" x-show="resultObj" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start;">
+            <div style="flex: 1; min-width: 250px;">
+              <div style="font-size:0.85rem; color:var(--text-muted)">Wyznaczony stopień uszkodzenia ESSL:</div>
+              <div style="display:flex; align-items:center; gap:0.75rem; margin:0.4rem 0">
+                <span class="if-badge" :style="'background:' + getBadgeColor(resultObj.code) + '; font-size:1.4rem; padding:0.4rem 0.8rem; border-radius: 8px; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.15);'" x-text="resultObj.code"></span>
+                <div>
+                  <div style="font-size:1.3rem; font-weight:700; color:var(--text-primary)">~ <span x-text="resultObj.centralSpeedKmh"></span> km/h (<span x-text="resultObj.centralSpeedMs"></span> m/s)</div>
+                  <div style="font-size:0.8rem; color:var(--text-subtle)">Zakres: <span x-text="resultObj.rangeKmh"></span> km/h (<span x-text="resultObj.centralSpeedKt"></span> kt)</div>
+                </div>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted); border-top:1px solid var(--border-color); padding-top:0.4rem; margin-top:0.4rem">
+                <strong>Interpretacja ESSL:</strong> <span x-text="resultObj.desc"></span>
               </div>
             </div>
-            <div style="font-size:0.8rem; color:var(--text-muted); border-top:1px solid var(--border-color); padding-top:0.4rem; margin-top:0.4rem">
-              <strong>Interpretacja ESSL:</strong> <span x-text="resultObj.desc"></span>
+            <div style="width: 180px; flex-shrink: 0;" class="if-example-photo">
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px;">Przykładowe zniszczenia:</div>
+                <img :src="getExampleImage(resultObj.code)" alt="Przykład zniszczeń" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); object-fit: cover; height: 110px; cursor: pointer;" onclick="window.open(this.src, '_blank')">
             </div>
           </div>
         </div>
@@ -273,7 +279,7 @@
             <tbody id="if-classes-table-body">
               <template x-for="item in meteo.ifScaleClasses" :key="item.code">
                 <tr>
-                  <td><span class="if-badge" :style="'background: ' + (item.code.includes('5') ? '#8b5cf6' : item.code.includes('4') ? '#d946ef' : item.code.includes('3') ? '#ef4444' : item.code.includes('2') ? '#f97316' : item.code.includes('1') ? '#eab308' : '#3b82f6')" x-text="item.code"></span></td>
+                  <td style="width: 15%;"><span class="if-badge" :style="'background: ' + getBadgeColor(item.code) + '; color: white; border-radius: 6px; padding: 4px 8px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);'" x-text="item.code"></span></td>
                   <td><strong x-text="item.centralSpeedKmh + ' km/h'"></strong><br><span style="font-size:0.75rem; color:var(--text-secondary)" x-text="'(' + item.rangeKmh + ')'"></span></td>
                   <td><strong x-text="item.centralSpeedMs + ' m/s'"></strong><br><span style="font-size:0.75rem; color:var(--text-secondary)" x-text="'(' + item.rangeMs + ')'"></span></td>
                   <td x-text="item.centralSpeedKt + ' kt'"></td>
