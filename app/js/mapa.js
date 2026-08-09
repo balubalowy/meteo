@@ -455,10 +455,11 @@ window.initMapa = function() {
                     
                     const isDataValid = (dateStr) => {
                         if(!dateStr) return false;
-                        // Format API: YYYY-MM-DD HH:mm:ss
-                        const dataDate = new Date(dateStr.replace(' ', 'T'));
+                        const parts = dateStr.split(/[- :]/);
+                        if (parts.length < 6) return false;
+                        const dataDate = new Date(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]);
                         const diffHours = (new Date() - dataDate) / (1000 * 60 * 60);
-                        return diffHours <= 2.5 && diffHours >= -1; // max 2.5h stare, -1 na ewentualne różnice stref czasowych
+                        return diffHours <= 3.5 && diffHours >= -3; // tolerancja dla spóźnionych stacji
                     };
 
                     const temp = parseFloat(st.temperatura_powietrza);
@@ -490,7 +491,7 @@ window.initMapa = function() {
                     const wiatr_poryw_kmh = porywy.length ? Math.max(...porywy) : NaN;
                     const wiatr_sr_kmh = !isNaN(wiatr_sr) ? wiatr_sr * 3.6 : NaN;
 
-                    const addData = (zmienna, val, txt, hov, dir, t_str) => {
+                    const addData = (zmienna, val, txt, hov, dir, t_str, extra) => {
                         if(isNaN(val) || !isDataValid(t_str)) return;
                         dataObj[zmienna].pt_lats.push(lat);
                         dataObj[zmienna].pt_lons.push(lon);
@@ -498,6 +499,10 @@ window.initMapa = function() {
                         dataObj[zmienna].pt_dirs.push(dir !== undefined ? dir : null);
                         dataObj[zmienna].pt_txts.push(txt);
                         dataObj[zmienna].pt_hov.push(`<b>${nazwa}</b><br>${hov}`);
+                        if(extra) {
+                            if(!dataObj[zmienna].pt_extras) dataObj[zmienna].pt_extras = [];
+                            dataObj[zmienna].pt_extras.push(extra);
+                        }
                     };
 
                     addData('temp', temp, temp?.toFixed(1) + '°', `Temperatura: ${temp?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
@@ -508,8 +513,9 @@ window.initMapa = function() {
                     addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`, wiatr_kier, wiatr_sr_t);
                     
                     // synop: display temp as value, but text contains more info
-                    if(!isNaN(temp) && !isNaN(wiatr_sr_kmh) && !isNaN(wilg) && isDataValid(temp_t)) {
-                        addData('synop', temp, temp?.toFixed(1) + '°', `Temp: ${temp?.toFixed(1)}°C${formatTime(temp_t)}<br>Wiatr: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}<br>Wilg: ${wilg}%${formatTime(wilg_t)}`);
+                    if(!isNaN(temp) && isDataValid(temp_t)) {
+                        const extra = { temp, dewPoint, wiatr_sr_kmh, wiatr_poryw_kmh, wiatr_kier, wilg };
+                        addData('synop', temp, '', `Temp: ${temp?.toFixed(1)}°C${formatTime(temp_t)}<br>Wiatr: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}<br>Wilg: ${wilg}%${formatTime(wilg_t)}`, wiatr_kier, temp_t, extra);
                     }
                 }
                 
@@ -588,18 +594,61 @@ window.initMapa = function() {
                     if (ptColorMode === 'scale') ptColor = "rgb(" + getColorRGBA(val, scale, cmin, cmax).slice(0,3).join(',') + ")";
                     else if (ptColorMode === 'black') ptColor = "black";
                     
-                    if(showTxt) htmlContent += `<div style="color: white; text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}</div>`;
-                    if(showPt) {
-                        if ((zmienna === 'wiatr' || zmienna === 'wiatr_sr') && data.pt_dirs && !isNaN(data.pt_dirs[i]) && data.pt_dirs[i] !== null) {
-                            const dir = data.pt_dirs[i] + 180; // Wiatr wieje Z podanego kierunku (np. 0° = z Północy), więc strzałka leci na Południe
-                            htmlContent += `<div style="width:18px; height:18px; margin:2px auto; transform: rotate(${dir}deg); color: ${ptColor}; text-shadow: 0 0 2px black;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 1px black);">
-                                    <line x1="12" y1="21" x2="12" y2="3"></line>
-                                    <polyline points="5 10 12 3 19 10"></polyline>
+                    if(zmienna === 'synop' && data.pt_extras && data.pt_extras[i]) {
+                        // Render full synoptic station model
+                        const ex = data.pt_extras[i];
+                        htmlContent = `<div style="position: relative; width: 40px; height: 40px; margin: -10px -10px;">`;
+                        
+                        // Center dot
+                        htmlContent += `<div style="position: absolute; top: 15px; left: 15px; width: 10px; height: 10px; background: ${ptColor}; border-radius: 50%; box-shadow: 0 0 2px black; border: 1px solid rgba(255,255,255,0.7); z-index: 10;"></div>`;
+                        
+                        // Top-left: Temperature (Red)
+                        htmlContent += `<div style="position: absolute; top: -2px; left: -10px; width: 25px; text-align: right; color: #f87171; font-weight: bold; font-size: 0.8rem; text-shadow: 0 0 2px black, 0 0 3px black;">${ex.temp?.toFixed(1)}</div>`;
+                        
+                        // Bottom-left: Dew Point (Green/Blue)
+                        if(ex.dewPoint) {
+                            htmlContent += `<div style="position: absolute; top: 22px; left: -10px; width: 25px; text-align: right; color: #60a5fa; font-weight: bold; font-size: 0.8rem; text-shadow: 0 0 2px black, 0 0 3px black;">${ex.dewPoint?.toFixed(1)}</div>`;
+                        }
+                        
+                        // Top-right: Gust / Wind
+                        if(ex.wiatr_poryw_kmh && ex.wiatr_poryw_kmh > 0) {
+                            htmlContent += `<div style="position: absolute; top: -2px; left: 25px; width: 25px; text-align: left; color: #fbbf24; font-weight: bold; font-size: 0.75rem; text-shadow: 0 0 2px black, 0 0 3px black;">${ex.wiatr_poryw_kmh?.toFixed(0)}</div>`;
+                        }
+                        
+                        // Bottom-right: Humidity
+                        if(!isNaN(ex.wilg)) {
+                            htmlContent += `<div style="position: absolute; top: 22px; left: 25px; width: 25px; text-align: left; color: #9ca3af; font-size: 0.7rem; text-shadow: 0 0 2px black, 0 0 3px black;">${ex.wilg}%</div>`;
+                        }
+                        
+                        // Wind Barb (Feathers)
+                        if(!isNaN(ex.wiatr_kier) && ex.wiatr_sr_kmh > 0) {
+                            const dir = ex.wiatr_kier + 180;
+                            // Simplify barb: just a line with a small feather indicating speed (very basic)
+                            htmlContent += `<div style="position: absolute; top: 11px; left: 11px; width: 18px; height: 18px; transform: rotate(${dir}deg); transform-origin: center;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 2px black);">
+                                    <line x1="12" y1="24" x2="12" y2="4"></line>
+                                    <line x1="12" y1="4" x2="18" y2="8"></line>
                                 </svg>
                             </div>`;
-                        } else {
-                            htmlContent += `<div style="width:10px;height:10px;background:${ptColor};border-radius:50%;margin:2px auto;box-shadow:0 0 2px black; border:1px solid rgba(255,255,255,0.7);"></div>`;
+                        }
+                        
+                        htmlContent += `</div>`;
+                        
+                    } else {
+                        // Standard marker
+                        if(showTxt) htmlContent += `<div style="color: white; text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}</div>`;
+                        if(showPt) {
+                            if ((zmienna === 'wiatr' || zmienna === 'wiatr_sr') && data.pt_dirs && !isNaN(data.pt_dirs[i]) && data.pt_dirs[i] !== null) {
+                                const dir = data.pt_dirs[i] + 180; // Wiatr wieje Z podanego kierunku (np. 0° = z Północy), więc strzałka leci na Południe
+                                htmlContent += `<div style="width:18px; height:18px; margin:2px auto; transform: rotate(${dir}deg); color: ${ptColor}; text-shadow: 0 0 2px black;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 1px black);">
+                                        <line x1="12" y1="21" x2="12" y2="3"></line>
+                                        <polyline points="5 10 12 3 19 10"></polyline>
+                                    </svg>
+                                </div>`;
+                            } else {
+                                htmlContent += `<div style="width:10px;height:10px;background:${ptColor};border-radius:50%;margin:2px auto;box-shadow:0 0 2px black; border:1px solid rgba(255,255,255,0.7);"></div>`;
+                            }
                         }
                     }
                     
