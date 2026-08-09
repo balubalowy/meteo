@@ -1118,5 +1118,103 @@ window.KNOWLEDGE_BASE = [
         "image": "assets/img/knowledge/pdf_ekstremalne/Zrzut ekranu 2026-08-09 192442.png"
       }
     ]
+  },
+  {
+    "id": "pdf_burze",
+    "name": "Struktury Burzowe i Wiatry (Z PDF)",
+    "icon": "wind",
+    "items": [
+      {
+        "name": "Downburst (Microburst / Macroburst)",
+        "danger": "Wysokie",
+        "desc": "Silny prąd zstępujący powodujący niszczące porywy wiatru prostoliniowego. Microburst ma zasięg do 4 km (może być suchy, mokry lub hybrydowy), Macroburst obejmuje obszar powyżej 4 km.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "Landspout / Waterspout (Nietornadyczne trąby)",
+        "danger": "Umiarkowane",
+        "desc": "Trąby powietrzne lądowe (Landspout) lub wodne (Waterspout) niezwiązane z rotującym prądem wstępującym (mezocyklonem). Zwykle słabsze od klasycznych tornad superkomórkowych.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "MCS / MCC",
+        "danger": "Wysokie",
+        "desc": "Mezoskalowy Układ Konwekcyjny (MCS) i jego największa, okrągła forma (MCC - Mesoscale Convective Complex). Rozległe układy wielokomórkowe przynoszące intensywne opady, silny wiatr i częste wyładowania.",
+        "url": "",
+        "image": ""
+      }
+    ]
+  },
+  {
+    "id": "pdf_radar",
+    "name": "Sygnatury Radarowe (Z PDF)",
+    "icon": "radio",
+    "items": [
+      {
+        "name": "Hook Echo (Sygnatura Haczykowata)",
+        "danger": "Ekstremalne",
+        "desc": "Sygnatura w kształcie haka na radarze (najlepiej widoczna na skanach PPI najniższych elewacji) na południowo-zachodniej lub południowej flance superkomórki. Często wskazuje na obecność mezocyklonu i ryzyko tornada.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "Bow Echo (Sygnatura Łukowa)",
+        "danger": "Wysokie",
+        "desc": "Sygnatura w kształcie łuku (wygiętego łuku strzelca), charakterystyczna dla linii szkwału ewoluującej pod wpływem prądu zstępującego (RIJ - Rear Inflow Jet). Zwiastuje niszczące porywy wiatru.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "TBSS (Three-Body Scatter Spike)",
+        "danger": "Wysokie",
+        "desc": "Szpica / kolec echa odbiciowego wybiegający wzdłuż promienia od rdzenia burzy. Artefakt wynikający z trzykrotnego odbicia fali od ogromnych kul gradowych (>5 cm). Potwierdza ekstremalny grad.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "TDS (Tornadic Debris Signature)",
+        "danger": "Ekstremalne",
+        "desc": "Sygnatura odłamków tornadycznych widoczna dzięki podwójnej polaryzacji fali. Pozwala potwierdzić fizyczne uderzenie tornada w ziemię i niszczenie obiektów (niski współczynnik korelacji).",
+        "url": "",
+        "image": ""
+      }
+    ]
+  },
+  {
+    "id": "pdf_wskazniki",
+    "name": "Wskaźniki Konwekcyjne (Z PDF)",
+    "icon": "bar-chart-2",
+    "items": [
+      {
+        "name": "SRH (Storm Relative Helicity)",
+        "danger": "Wysokie",
+        "desc": "Względna skrętność burzowa. Mierzy potencjał do tworzenia rotujących prądów wstępujących (mezocyklonów) na podstawie pionowych uskoków wiatru. Wysokie wartości SRH (0-1 km oraz 0-3 km) drastycznie zwiększają ryzyko wystąpienia trąb powietrznych.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "LCL (Lifting Condensation Level)",
+        "danger": "Umiarkowane",
+        "desc": "Poziom kondensacji z uniesienia (podstawa chmury). Zależy ściśle od wilgotności powietrza przy ziemi. Nisko położony LCL w połączeniu z odpowiednimi uskokami wiatru bardzo sprzyja formowaniu się tornad.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "LFC (Level of Free Convection)",
+        "danger": "Umiarkowane",
+        "desc": "Poziom swobodnej konwekcji. Punkt, powyżej którego cząstka powietrza staje się cieplejsza od otoczenia i dalej wznosi się samoczynnie, tworząc rozbudowane chmury Cb.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "Środowisko CAPE + Wind Shear",
+        "danger": "Ekstremalne",
+        "desc": "Najgroźniejsze sytuacje (np. Derecho z 2009 r. czy tornada z sierpnia 2008 r.) występują przy nałożeniu się bardzo dużej chwiejności (CAPE) oraz dynamicznego przepływu z silnymi uskokami wiatru. Sprzyja to doskonale zorganizowanym, długotrwałym i niszczącym burzom wielokomórkowym i superkomórkom.",
+        "url": "",
+        "image": ""
+      }
+    ]
   }
 ];
