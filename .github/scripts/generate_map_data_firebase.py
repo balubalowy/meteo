@@ -65,15 +65,76 @@ OKRESY_NAZWY = {
     "min12": "Min 12h", "max24": "Max 24h", "min24": "Min 24h"
 }
 
-def kier_na_strzalke(kier):
-    if kier is None: return ""
-    try:
-        val = float(kier)
-    except:
-        return ""
-    dirs = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"]
-    idx = round(val / 45.0) % 8
-    return dirs[idx]
+def create_grid(lats, lons, vals, u_vals=None, v_vals=None):
+    """Tworzy interpolowaną siatkę dla heatmapy oraz wektorów."""
+    if len(vals) < 3:
+        return [], [], [], [], [], []
+    
+    # 1. Tworzenie regularnej siatki
+    grid_lon, grid_lat = np.mgrid[13.5:24.5:0.04, 48.5:55.5:0.04]
+    
+    points = np.array([lons, lats]).T
+    
+    # Próba interpolacji linear, z fallbackiem do nearest (łatanie dziur na granicach)
+    grid_z_linear = griddata(points, vals, (grid_lon, grid_lat), method='linear')
+    grid_z_nearest = griddata(points, vals, (grid_lon, grid_lat), method='nearest')
+    grid_z = np.where(np.isnan(grid_z_linear), grid_z_nearest, grid_z_linear)
+    
+    # Interpolacja U i V
+    grid_u, grid_v = None, None
+    if u_vals and v_vals and len(u_vals) == len(vals):
+        grid_u_lin = griddata(points, u_vals, (grid_lon, grid_lat), method='linear')
+        grid_u_near = griddata(points, u_vals, (grid_lon, grid_lat), method='nearest')
+        grid_u = np.where(np.isnan(grid_u_lin), grid_u_near, grid_u_lin)
+        
+        grid_v_lin = griddata(points, v_vals, (grid_lon, grid_lat), method='linear')
+        grid_v_near = griddata(points, v_vals, (grid_lon, grid_lat), method='nearest')
+        grid_v = np.where(np.isnan(grid_v_lin), grid_v_near, grid_v_lin)
+    
+    poland_polygon = pobierz_polske()
+    
+    glats, glons, gvals = [], [], []
+    gu, gv = [], []
+    
+    grid_masked = np.full(grid_lon.shape, np.nan)
+    
+    # Maskowanie
+    for i in range(grid_lon.shape[0]):
+        for j in range(grid_lon.shape[1]):
+            lon, lat = grid_lon[i, j], grid_lat[i, j]
+            val = grid_z[i, j]
+            if not np.isnan(val) and poland_polygon.contains(Point(lon, lat)):
+                glats.append(round(lat,3))
+                glons.append(round(lon,3))
+                gvals.append(round(val,2))
+                grid_masked[i, j] = val
+                if grid_u is not None and grid_v is not None:
+                    gu.append(grid_u[i, j])
+                    gv.append(grid_v[i, j])
+    
+    # Generowanie siatki wektorów strzałek wiatru
+    w_lats, w_lons, w_txts = [], [], []
+    if len(gu) > 0 and len(gv) > 0:
+        # Pamiętajmy, że chcemy próbkować "co n-ty" punkt dla czytelności mapy:
+        for i in range(0, len(glats), 40): # Rzadsza siatka wektorów (mniej więcej co 40 punkt w 1D)
+            u = gu[i]
+            v = gv[i]
+            spd = math.sqrt(u*u + v*v)
+            if spd > 2.0: # Pokazujemy strzałki tylko gdy wiatr > 2 km/h
+                # Obliczanie kierunku (odwrócony atan2 bo u/v są wektorami ruchu powietrza)
+                angle = math.degrees(math.atan2(u, v))
+                if angle < 0: angle += 360
+                
+                # Zmiana kąta na strzałkę Unicode
+                # 0=N, 90=E, 180=S, 270=W
+                idx = int(round(angle / 45.0)) % 8
+                arrows = ['⬆', '↗', '➡', '↘', '⬇', '↙', '⬅', '↖']
+                w_txts.append(arrows[idx])
+                w_lats.append(glats[i])
+                w_lons.append(glons[i])
+
+    return glats, glons, gvals, w_lats, w_lons, w_txts, grid_masked, grid_lon, grid_lat
+
 
 
 def generate_dashboard():
