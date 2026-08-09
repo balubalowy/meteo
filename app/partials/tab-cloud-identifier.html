@@ -1,0 +1,79 @@
+<div x-data="cloudIdentifier()">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+            <i data-lucide="cloud"></i> Kreator Identyfikacji Chmur (WMO)
+        </h2>
+    </div>
+    
+    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+        Wybieraj po kolei cechy chmury, zaczynając od jej rodzaju (Genus). System automatycznie podpowie Ci dozwolone gatunki (Species), odmiany (Varieties) oraz cechy szczególne (Features) zgodne z systematyką Światowej Organizacji Meteorologicznej (WMO).
+    </p>
+
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        
+        <!-- Rodzaj -->
+        <div class="card" style="padding: 1rem;">
+            <label class="label">1. Rodzaj (Genus)</label>
+            <select class="form-select" x-model="selectedGenus" @change="resetSelections('genus')" style="width: 100%; margin-top: 5px;">
+                <option value="">-- Wybierz Rodzaj --</option>
+                <template x-for="(data, genus) in wmoData" :key="genus">
+                    <option :value="genus" x-text="genus"></option>
+                </template>
+            </select>
+            <p class="text-xs" style="color: var(--text-secondary); margin-top: 5px;">Podstawowy poziom klasyfikacji, określający piętro i strukturę chmury.</p>
+        </div>
+
+        <!-- Gatunek -->
+        <div class="card" style="padding: 1rem;" :style="!selectedGenus && 'opacity: 0.5; pointer-events: none;'">
+            <label class="label">2. Gatunek (Species) <span class="text-xs" style="color: var(--text-secondary);">(Opcjonalnie)</span></label>
+            <select class="form-select" x-model="selectedSpecies" style="width: 100%; margin-top: 5px;">
+                <option value="">-- Brak --</option>
+                <template x-for="species in availableSpecies" :key="species">
+                    <option :value="species" x-text="species"></option>
+                </template>
+            </select>
+            <p class="text-xs" style="color: var(--text-secondary); margin-top: 5px;" x-show="availableSpecies.length === 0 && selectedGenus">Ten rodzaj nie posiada specyficznych gatunków.</p>
+        </div>
+
+        <!-- Odmiana -->
+        <div class="card" style="padding: 1rem;" :style="!selectedGenus && 'opacity: 0.5; pointer-events: none;'">
+            <label class="label">3. Odmiana (Variety) <span class="text-xs" style="color: var(--text-secondary);">(Opcjonalnie)</span></label>
+            <select class="form-select" x-model="selectedVariety" style="width: 100%; margin-top: 5px;">
+                <option value="">-- Brak --</option>
+                <template x-for="variety in availableVarieties" :key="variety">
+                    <option :value="variety" x-text="variety"></option>
+                </template>
+            </select>
+            <p class="text-xs" style="color: var(--text-secondary); margin-top: 5px;" x-show="availableVarieties.length === 0 && selectedGenus">Ten rodzaj nie posiada odmian.</p>
+        </div>
+
+        <!-- Cecha dodatkowa -->
+        <div class="card" style="padding: 1rem;" :style="!selectedGenus && 'opacity: 0.5; pointer-events: none;'">
+            <label class="label">4. Cechy dodatkowe (Features) <span class="text-xs" style="color: var(--text-secondary);">(Opcjonalnie)</span></label>
+            <select class="form-select" x-model="selectedFeature" style="width: 100%; margin-top: 5px;">
+                <option value="">-- Brak --</option>
+                <template x-for="feature in availableFeatures" :key="feature">
+                    <option :value="feature" x-text="feature"></option>
+                </template>
+            </select>
+        </div>
+    </div>
+
+    <!-- Wynik i Linki -->
+    <div class="card" style="padding: 1.5rem; background: var(--bg-secondary); border: 1px solid var(--border-subtle); display: flex; flex-direction: column; align-items: center; text-align: center;" x-show="selectedGenus" x-transition>
+        <h3 style="color: var(--text-secondary); margin-bottom: 0.5rem;">Zidentyfikowana chmura:</h3>
+        <h2 style="font-size: 2rem; color: var(--accent-primary); margin-bottom: 1.5rem; font-weight: bold;" x-text="finalCloudName"></h2>
+        
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Sprawdź w zewnętrznych i miarodajnych źródłach, czy masz rację:</p>
+        
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+            <a :href="wmoAtlasLink" target="_blank" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
+                <i data-lucide="book-open"></i> WMO Cloud Atlas
+            </a>
+            
+            <a :href="googleSearchLink" target="_blank" class="btn btn-ghost" style="display: flex; align-items: center; gap: 8px; padding: 10px 20px; border: 1px solid var(--border-subtle);">
+                <i data-lucide="image"></i> Szukaj w Google Grafika
+            </a>
+        </div>
+    </div>
+</div>

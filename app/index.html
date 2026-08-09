@@ -12,6 +12,7 @@
   
   <!-- Skrypty Danych i Alpine.js -->
   <script src="assets/js/data.js?v=20"></script>
+  <script src="js/cloud-identifier.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   
   <!-- Leaflet CSS -->
@@ -78,7 +79,8 @@
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-stats"><i data-lucide="bar-chart-2"></i> Statystyki</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-ensembles"><i data-lucide="cloud-rain"></i> Ensembles</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-stacje"><i data-lucide="thermometer"></i> Stacje Live</a>
-          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-kreator"><i data-lucide="edit-3"></i> Kreator</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-kreator"><i data-lucide="edit-3"></i> Kreator Map</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-cloud-identifier"><i data-lucide="cloud"></i> Kreator Chmur</a>
           <a href="https://balubalowy.github.io/system/" target="_blank" class="nav-link btn btn-ghost" style="opacity: 0.75; font-size: 0.85rem;" title="Otwórz System B-Core"><i data-lucide="command" style="width: 14px; height: 14px; color: var(--accent-primary);"></i> B-Core</a>
         </nav>
       </div>
@@ -120,12 +122,6 @@
             <img id="dash-sigwx-cz" class="zoomable" src="https://aviation-api.imgw.pl/image/significant/cz" alt="SIGWX Czechy" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
           
-          <!-- Meteo.pl Wrocław -->
-          <div class="card tile-item" data-id="tile-meteo-wroclaw" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Meteogram Wrocław</h3>
-            <div id="img-meteo-wroclaw-loading" class="skeleton-loader" style="height: 150px;"></div>
-            <img id="img-meteo-wroclaw" class="zoomable" src="" alt="Meteogram Wrocław" style="display: none; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-          </div>
 
           <!-- CMM IMGW Mapa Synoptyczna -->
           <div class="card tile-item" data-id="tile-cmm-synop" style="padding: 1rem; cursor: grab;">
@@ -321,6 +317,13 @@
       <div id="tab-kreator" class="tab-view dynamic-tab" data-src="partials/tab-kreator.html">
   <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
     <i data-lucide="loader" class="spin"></i> Ładowanie widoku...
+  </div>
+</div>
+
+      <!-- TAB CLOUD IDENTIFIER -->
+      <div id="tab-cloud-identifier" class="tab-view dynamic-tab" data-src="partials/tab-cloud-identifier.html">
+  <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+    <i data-lucide="loader" class="spin"></i> Ładowanie kreatora chmur...
   </div>
 </div>
 
