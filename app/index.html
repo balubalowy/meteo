@@ -6,6 +6,8 @@
   <title>B-Meteo — Baza Wiedzy i Narzędzia Prognostyczne</title>
   <meta name="description" content="Centrum analiz meteorologicznych: stacje IMGW, prognozy ensemble, narzędzia radarowe, baza wiedzy burzowej, kalkulatory IF/DCP/Wmax/LCL.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#121212">
 
   <!-- B-Core Design System -->
   <link rel="stylesheet" href="assets/css/bcore.css?v=11">
@@ -72,6 +74,7 @@
       <div class="top-stats">
           <nav class="nav-links">
           <a href="#" class="nav-link btn btn-ghost tab-btn active" data-tab="tab-overview"><i data-lucide="layout-dashboard"></i> Pulpit</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-mapa" style="color: var(--accent-primary);"><i data-lucide="map"></i> Radar Live</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-if-evaluator"><i data-lucide="tornado"></i> Skala IF</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-calculators"><i data-lucide="calculator"></i> Kalkulatory</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-knowledge"><i data-lucide="book-open"></i> Baza Wiedzy</a>
@@ -89,7 +92,12 @@
   <!-- Main Content -->
   <div class="container main-content">
       <div id="tab-overview" class="tab-view active">
-         <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Widoki Synoptyczne, Radary i Zjawiska (Live)</h2>
+         <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Widoki Synoptyczne, Radary i Zjawiska (Live)</h2>
+            <button id="toggle-edit-layout" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-subtle); border-radius: 4px; display: flex; align-items: center; gap: 6px;">
+                <i data-lucide="move"></i> <span id="edit-layout-text">Edytuj układ</span>
+            </button>
+         </div>
         
         <div id="dashboard-tiles" class="dashboard-grid">
           <!-- SOB Prognoza -->
@@ -311,7 +319,11 @@
 </div>
 
       <!-- TAB 6: MAPY -->
-      
+      <div id="tab-mapa" class="tab-view dynamic-tab" data-src="partials/tab-mapa.html">
+        <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
+          <i data-lucide="loader" class="spin"></i> Ładowanie Mapy Premium...
+        </div>
+      </div>
       
       <!-- TAB KREATOR -->
       <div id="tab-kreator" class="tab-view dynamic-tab" data-src="partials/tab-kreator.html">
@@ -401,6 +413,91 @@
     <script src="js/kreator.js"></script>
     <script src="js/cmm-map.js"></script>
     <script src="js/burze.js"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+    </script>
+    
+    <!-- SortableJS Dashboard Logic -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const dashboard = document.getElementById('dashboard-tiles');
+        let sortableInstance = null;
+        let isEditing = false;
+        
+        // Funkcja wczytująca układ z localStorage
+        function loadDashboardOrder() {
+          const savedOrder = localStorage.getItem('dashboardOrder');
+          if (savedOrder) {
+            const orderArray = JSON.parse(savedOrder);
+            const items = Array.from(dashboard.children);
+            
+            // Posortuj elementy według zapisanej kolejności
+            items.sort((a, b) => {
+              const idA = a.getAttribute('data-id');
+              const idB = b.getAttribute('data-id');
+              let indexA = orderArray.indexOf(idA);
+              let indexB = orderArray.indexOf(idB);
+              
+              if (indexA === -1) indexA = 999;
+              if (indexB === -1) indexB = 999;
+              
+              return indexA - indexB;
+            });
+            
+            // Dodaj posortowane elementy z powrotem do kontenera
+            items.forEach(item => dashboard.appendChild(item));
+          }
+        }
+        
+        loadDashboardOrder();
+        
+        document.getElementById('toggle-edit-layout').addEventListener('click', (e) => {
+          isEditing = !isEditing;
+          const textSpan = document.getElementById('edit-layout-text');
+          const btn = document.getElementById('toggle-edit-layout');
+          
+          if (isEditing) {
+            textSpan.textContent = "Zapisz układ";
+            btn.style.borderColor = "var(--accent-primary)";
+            btn.style.color = "var(--accent-primary)";
+            dashboard.classList.add('editing-layout');
+            
+            sortableInstance = new Sortable(dashboard, {
+              animation: 150,
+              handle: '.tile-item',
+              ghostClass: 'sortable-ghost',
+              store: {
+                set: function (sortable) {
+                  const order = sortable.toArray();
+                  localStorage.setItem('dashboardOrder', JSON.stringify(order));
+                }
+              }
+            });
+          } else {
+            textSpan.textContent = "Edytuj układ";
+            btn.style.borderColor = "var(--border-subtle)";
+            btn.style.color = "";
+            dashboard.classList.remove('editing-layout');
+            
+            if (sortableInstance) {
+              sortableInstance.destroy();
+              sortableInstance = null;
+            }
+          }
+        });
+      });
+    </script>
 </body>
 
 </html>

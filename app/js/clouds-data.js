@@ -1321,5 +1321,432 @@ window.KNOWLEDGE_BASE = [
         "image": ""
       }
     ]
+  },
+  {
+    "id": "galeria_user",
+    "name": "Galeria Użytkownika (Nowe)",
+    "icon": "image",
+    "items": [
+      {
+        "name": "Zrzut ekranu #1",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 192109.png"
+      },
+      {
+        "name": "Zrzut ekranu #2",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 192150.png"
+      },
+      {
+        "name": "Zrzut ekranu #3",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 192442.png"
+      },
+      {
+        "name": "Zrzut ekranu #4",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 192500.png"
+      },
+      {
+        "name": "Zrzut ekranu #5",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 192508.png"
+      },
+      {
+        "name": "Zrzut ekranu #6",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 192523.png"
+      },
+      {
+        "name": "Zrzut ekranu #7",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 192654.png"
+      },
+      {
+        "name": "Zrzut ekranu #8",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204138.png"
+      },
+      {
+        "name": "Zrzut ekranu #9",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204208.png"
+      },
+      {
+        "name": "Zrzut ekranu #10",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204222.png"
+      },
+      {
+        "name": "Zrzut ekranu #11",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204239.png"
+      },
+      {
+        "name": "Zrzut ekranu #12",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204247.png"
+      },
+      {
+        "name": "Zrzut ekranu #13",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204307.png"
+      },
+      {
+        "name": "Zrzut ekranu #14",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204418.png"
+      },
+      {
+        "name": "Zrzut ekranu #15",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204458.png"
+      },
+      {
+        "name": "Zrzut ekranu #16",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204504.png"
+      },
+      {
+        "name": "Zrzut ekranu #17",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204509.png"
+      },
+      {
+        "name": "Zrzut ekranu #18",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204632.png"
+      },
+      {
+        "name": "Zrzut ekranu #19",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204704.png"
+      },
+      {
+        "name": "Zrzut ekranu #20",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204731.png"
+      },
+      {
+        "name": "Zrzut ekranu #21",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204805.png"
+      },
+      {
+        "name": "Zrzut ekranu #22",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204818.png"
+      },
+      {
+        "name": "Zrzut ekranu #23",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204902.png"
+      },
+      {
+        "name": "Zrzut ekranu #24",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 204922.png"
+      },
+      {
+        "name": "Zrzut ekranu #25",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205104.png"
+      },
+      {
+        "name": "Zrzut ekranu #26",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205112.png"
+      },
+      {
+        "name": "Zrzut ekranu #27",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205119.png"
+      },
+      {
+        "name": "Zrzut ekranu #28",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205127.png"
+      },
+      {
+        "name": "Zrzut ekranu #29",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205153.png"
+      },
+      {
+        "name": "Zrzut ekranu #30",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205232.png"
+      },
+      {
+        "name": "Zrzut ekranu #31",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205237.png"
+      },
+      {
+        "name": "Zrzut ekranu #32",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205445.png"
+      },
+      {
+        "name": "Zrzut ekranu #33",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205525.png"
+      },
+      {
+        "name": "Zrzut ekranu #34",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205551.png"
+      },
+      {
+        "name": "Zrzut ekranu #35",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205633.png"
+      },
+      {
+        "name": "Zrzut ekranu #36",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205642.png"
+      },
+      {
+        "name": "Zrzut ekranu #37",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205701.png"
+      },
+      {
+        "name": "Zrzut ekranu #38",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205714.png"
+      },
+      {
+        "name": "Zrzut ekranu #39",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205808.png"
+      },
+      {
+        "name": "Zrzut ekranu #40",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205859.png"
+      },
+      {
+        "name": "Zrzut ekranu #41",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 205916.png"
+      },
+      {
+        "name": "Zrzut ekranu #42",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 210115.png"
+      },
+      {
+        "name": "Zrzut ekranu #43",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 210229.png"
+      },
+      {
+        "name": "Zrzut ekranu #44",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 210255.png"
+      },
+      {
+        "name": "Zrzut ekranu #45",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 210307.png"
+      },
+      {
+        "name": "Zrzut ekranu #46",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 210340.png"
+      },
+      {
+        "name": "Zrzut ekranu #47",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 210401.png"
+      },
+      {
+        "name": "Zrzut ekranu #48",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 210414.png"
+      },
+      {
+        "name": "Zrzut ekranu #49",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 210700.png"
+      },
+      {
+        "name": "Zrzut ekranu #50",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 210705.png"
+      },
+      {
+        "name": "Zrzut ekranu #51",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 210955.png"
+      },
+      {
+        "name": "Zrzut ekranu #52",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 211134.png"
+      },
+      {
+        "name": "Zrzut ekranu #53",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 211229.png"
+      },
+      {
+        "name": "Zrzut ekranu #54",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 211244.png"
+      },
+      {
+        "name": "Zrzut ekranu #55",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 211446.png"
+      },
+      {
+        "name": "Zrzut ekranu #56",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 211453.png"
+      },
+      {
+        "name": "Zrzut ekranu #57",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 211510.png"
+      },
+      {
+        "name": "Zrzut ekranu #58",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 211523.png"
+      },
+      {
+        "name": "Zrzut ekranu #59",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 211529.png"
+      },
+      {
+        "name": "Zrzut ekranu #60",
+        "danger": "Nieokreślone",
+        "desc": "Obraz wgrany przez użytkownika. Zjawisko lub sygnatura do ręcznego sklasyfikowania.",
+        "url": "",
+        "image": "assets/img/knowledge/galeria/Zrzut ekranu 2026-08-09 211632.png"
+      }
+    ]
   }
 ];
