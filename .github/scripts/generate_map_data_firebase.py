@@ -65,6 +65,57 @@ OKRESY_NAZWY = {
     "min12": "Min 12h", "max24": "Max 24h", "min24": "Min 24h"
 }
 
+def kier_na_strzalke(kier):
+    if kier is None: return ""
+    try:
+        val = float(kier)
+    except:
+        return ""
+    dirs = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"]
+    idx = round(val / 45.0) % 8
+    return dirs[idx]
+
+# ================================================================
+# FUNKCJE POMOCNICZE MAPY
+# ================================================================
+def pobierz_polske():
+    try:
+        url = 'https://raw.githubusercontent.com/ppatrzyk/polska-geojson/master/wojewodztwa/wojewodztwa-min.geojson'
+        geo_data = requests.get(url, timeout=10).json()
+        polygons = [shape(f['geometry']).buffer(0) for f in geo_data['features']]
+        return unary_union(polygons)
+    except:
+        url = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries/POL.geo.json'
+        geo_data = requests.get(url).json()
+        return shape(geo_data['features'][0]['geometry']).buffer(0)
+
+def extract_contours(grid_z, grid_lon, grid_lat, interval):
+    if len(grid_z) == 0: return [], [], []
+    min_val = np.nanmin(grid_z)
+    max_val = np.nanmax(grid_z)
+    if np.isnan(min_val): return [], [], []
+    
+    levels = np.arange(np.floor(min_val/interval)*interval, np.ceil(max_val/interval)*interval + interval, interval)
+    fig_c = plt.figure()
+    ax = fig_c.add_subplot(111)
+    cs = ax.contour(grid_lon, grid_lat, grid_z, levels=levels)
+    
+    lons, lats, txts = [], [], []
+    for level, path in zip(levels, cs.get_paths()):
+        codes = path.codes if path.codes is not None else np.zeros(len(path.vertices))
+        for i, (coord, code) in enumerate(zip(path.vertices, codes)):
+            if code == 1 and i > 0: # MOVETO = break line
+                lons.append(None); lats.append(None); txts.append(None)
+            lons.append(coord[0])
+            lats.append(coord[1])
+            txts.append(f"{level}")
+        lons.append(None); lats.append(None); txts.append(None)
+    plt.close(fig_c)
+    return lats, lons, txts
+
+# ================================================================
+# GŁÓWNA FUNKCJA
+# ================================================================
 def create_grid(lats, lons, vals, u_vals=None, v_vals=None):
     """Tworzy interpolowaną siatkę dla heatmapy oraz wektorów."""
     if len(vals) < 3:
