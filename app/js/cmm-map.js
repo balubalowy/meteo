@@ -6,7 +6,7 @@ let cmmMeteoDataCache = null;
 let cmmSynopDataCache = null;
 
 window.fallbackCmmMap = function() {
-    console.log("Obraz CMM niedostępny. Fallback do API IMGW...");
+    // console.log("Obraz CMM niedostępny. Fallback do API IMGW...");
     const imgEl = document.getElementById('dash-cmm-synop');
     if(imgEl) imgEl.style.display = 'none';
     

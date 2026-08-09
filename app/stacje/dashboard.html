@@ -175,29 +175,29 @@
 
             const traces = [
                 // 0: Grid (Interpolacja)
-                { type: 'scattermapbox', mode: 'markers', lat: [], lon: [], hoverinfo: "skip", marker: {size: 15, showscale: true} },
+                { type: 'scattermap', mode: 'markers', lat: [], lon: [], hoverinfo: "skip", marker: {size: 15, showscale: true} },
                 // 1: Izolinie (Kontury)
-                { type: 'scattermapbox', mode: 'lines', lat: [], lon: [], hoverinfo: "skip", line: {width: 1, color: 'rgba(0,0,0,0.4)'} },
+                { type: 'scattermap', mode: 'lines', lat: [], lon: [], hoverinfo: "skip", line: {width: 1, color: 'rgba(0,0,0,0.4)'} },
                 // 2: Punkty OK (Główna warstwa stacji)
-                { type: 'scattermapbox', mode: 'markers', lat: [], lon: [], text: [], hoverinfo: "text", textfont: {size: 11, color: "black"}, textposition: "middle center", marker: {size: 16, showscale: false} },
+                { type: 'scattermap', mode: 'markers', lat: [], lon: [], text: [], hoverinfo: "text", textfont: {size: 11, color: "black"}, textposition: "middle center", marker: {size: 16, showscale: false} },
                 // 3: Punkty Brak Danych
-                { type: 'scattermapbox', mode: 'markers', lat: [], lon: [], text: [], hoverinfo: "skip", marker: {size: 4, color: 'rgba(255,255,255,0.0)'} },
+                { type: 'scattermap', mode: 'markers', lat: [], lon: [], text: [], hoverinfo: "skip", marker: {size: 4, color: 'rgba(255,255,255,0.0)'} },
                 // 4: Strzałki Wiatru (Globalna Siatka wektorowa)
-                { type: 'scattermapbox', mode: 'text', lat: [], lon: [], text: [], hoverinfo: "skip", textfont: {size: 14, color: "rgba(0,0,0,0.7)"}, textposition: "middle center" },
+                { type: 'scattermap', mode: 'text', lat: [], lon: [], text: [], hoverinfo: "skip", textfont: {size: 14, color: "rgba(0,0,0,0.7)"}, textposition: "middle center" },
                 // 5: Etykiety (Top Left) Synop - Temp
-                { type: 'scattermapbox', mode: 'text', lat: [], lon: [], text: [], hoverinfo: "text", textfont: {size: 12, color: "#990000"}, textposition: "top left" },
+                { type: 'scattermap', mode: 'text', lat: [], lon: [], text: [], hoverinfo: "text", textfont: {size: 12, color: "#990000"}, textposition: "top left" },
                 // 6: Etykiety (Bottom Left) Synop - Rosy
-                { type: 'scattermapbox', mode: 'text', lat: [], lon: [], text: [], hoverinfo: "text", textfont: {size: 12, color: "#006600"}, textposition: "bottom left" },
+                { type: 'scattermap', mode: 'text', lat: [], lon: [], text: [], hoverinfo: "text", textfont: {size: 12, color: "#006600"}, textposition: "bottom left" },
                 // 7: Etykiety (Top Right) Synop - Wiatr Śr
-                { type: 'scattermapbox', mode: 'text', lat: [], lon: [], text: [], hoverinfo: "text", textfont: {size: 12, color: "#000099"}, textposition: "top right" },
+                { type: 'scattermap', mode: 'text', lat: [], lon: [], text: [], hoverinfo: "text", textfont: {size: 12, color: "#000099"}, textposition: "top right" },
                 // 8: Etykiety (Bottom Right) Synop - Wiatr Poryw
-                { type: 'scattermapbox', mode: 'text', lat: [], lon: [], text: [], hoverinfo: "text", textfont: {size: 12, color: "#660066"}, textposition: "bottom right" }
+                { type: 'scattermap', mode: 'text', lat: [], lon: [], text: [], hoverinfo: "text", textfont: {size: 12, color: "#660066"}, textposition: "bottom right" }
             ];
 
             const layout = {
                 margin: {l: 0, r: 0, t: 0, b: 0},
                 showlegend: false,
-                mapbox: { style: "carto-darkmatter", center: {lat: 52.0, lon: 19.2}, zoom: 5.5 }
+                map: { style: "carto-darkmatter", center: {lat: 52.0, lon: 19.2}, zoom: 5.5 }
             };
             
             Plotly.newPlot('plot', traces, layout, {responsive: true}).then(() => {
@@ -280,7 +280,7 @@
         
         window.updateStyle = function() {
             const style = document.getElementById("sel-style").value;
-            Plotly.relayout('plot', {'mapbox.style': style});
+            Plotly.relayout('plot', {'map.style': style});
         }
         
         window.updateSliders = function() {

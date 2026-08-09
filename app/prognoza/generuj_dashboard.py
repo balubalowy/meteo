@@ -135,7 +135,7 @@ def generate_dashboard():
             [0.0, "#0000ff"], [0.25, "#00ffff"], [0.5, "#ffff00"], [0.75, "#ff0000"], [1.0, "#ffffff"]
         ]
 
-        trace_temp = go.Scattermapbox(
+        trace_temp = go.Scattermap(
             lat=df_fine['Lat'], lon=df_fine['Lon'],
             mode='markers+text',
             text=df_fine['Temperatura'].astype(str) + '°C',
@@ -153,7 +153,7 @@ def generate_dashboard():
             customdata=df_fine[['Szansa']]
         )
 
-        trace_prob = go.Scattermapbox(
+        trace_prob = go.Scattermap(
             lat=df_fine['Lat'], lon=df_fine['Lon'],
             mode='markers+text',
             text=df_fine['Szansa'].astype(str) + '%',
@@ -175,12 +175,12 @@ def generate_dashboard():
         fig = go.Figure(data=[trace_temp, trace_prob])
         fig.update_traces(opacity=0.9)
         
-        trace_contour_temp = go.Scattermapbox(
+        trace_contour_temp = go.Scattermap(
             lat=c_lat_t, lon=c_lon_t, mode='lines',
             line=dict(width=1, color='rgba(0,0,0,0.5)'),
             text=c_txt_t, hovertemplate="Izolinia: %{text}°C<extra></extra>", hoverinfo="text"
         )
-        trace_contour_prob = go.Scattermapbox(
+        trace_contour_prob = go.Scattermap(
             lat=c_lat_p, lon=c_lon_p, mode='lines',
             line=dict(width=1, color='rgba(0,0,0,0.5)'),
             text=c_txt_p, hovertemplate="Izolinia: %{text}%<extra></extra>", hoverinfo="text",
@@ -190,14 +190,14 @@ def generate_dashboard():
         max_temp_idx = df_fine['Temperatura'].idxmax()
         max_temp_row = df_fine.loc[max_temp_idx]
         
-        trace_max_temp_text = go.Scattermapbox(
+        trace_max_temp_text = go.Scattermap(
             lat=[max_temp_row['Lat']], lon=[max_temp_row['Lon']], mode='markers+text',
             marker=dict(size=22, color='rgba(0,0,0,0)', opacity=1.0),
             text=[f"🔥 MAX TEMP: {max_temp_row['Temperatura']}°C"],
             textposition="top right", textfont=dict(color="black", size=14),
             hoverinfo="skip"
         )
-        trace_max_temp_border = go.Scattermapbox(
+        trace_max_temp_border = go.Scattermap(
             lat=[max_temp_row['Lat']], lon=[max_temp_row['Lon']], mode='markers',
             marker=dict(size=24, color='white', opacity=0.7), hoverinfo="skip"
         )
@@ -205,14 +205,14 @@ def generate_dashboard():
         max_prob_idx = df_fine['Szansa'].idxmax()
         max_prob_row = df_fine.loc[max_prob_idx]
         
-        trace_max_prob_text = go.Scattermapbox(
+        trace_max_prob_text = go.Scattermap(
             lat=[max_prob_row['Lat']], lon=[max_prob_row['Lon']], mode='markers+text',
             marker=dict(size=22, color='rgba(0,0,0,0)', opacity=1.0),
             text=[f"⚠️ MAX SZANSA: {max_prob_row['Szansa']}%"],
             textposition="bottom right", textfont=dict(color="black", size=14),
             hoverinfo="skip", visible=False
         )
-        trace_max_prob_border = go.Scattermapbox(
+        trace_max_prob_border = go.Scattermap(
             lat=[max_prob_row['Lat']], lon=[max_prob_row['Lon']], mode='markers',
             marker=dict(size=24, color='black', opacity=0.7), hoverinfo="skip", visible=False
         )
@@ -226,7 +226,7 @@ def generate_dashboard():
 
         fig.update_layout(
             showlegend=False,
-            mapbox=dict(style="carto-positron", center=dict(lat=52.0, lon=19.2), zoom=5.2),
+            map=dict(style="carto-positron", center=dict(lat=52.0, lon=19.2), zoom=5.2),
             margin=dict(l=0, r=0, t=0, b=0)
         )
 
@@ -237,7 +237,7 @@ def generate_dashboard():
         dropdown_data = dict(buttons=data_buttons, direction="down", pad={"r": 10, "t": 10}, showactive=True, x=0.01, xanchor="left", y=0.99, yanchor="top", bgcolor="white", bordercolor="gray")
         
         map_styles = ["carto-darkmatter", "carto-positron", "open-street-map"]
-        style_buttons = [dict(args=["mapbox.style", s], label=s, method="relayout") for s in map_styles]
+        style_buttons = [dict(args=["map.style", s], label=s, method="relayout") for s in map_styles]
         dropdown_style = dict(buttons=style_buttons, direction="down", pad={"r": 10, "t": 10}, showactive=True, x=0.20, xanchor="left", y=0.99, yanchor="top", bgcolor="white", bordercolor="gray")
 
         opacity_slider = dict(
