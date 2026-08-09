@@ -1020,5 +1020,75 @@ window.KNOWLEDGE_BASE = [
         "image": "https://cmm.imgw.pl/favicon.ico"
       }
     ]
+  },
+  {
+    "id": "advanced_scales",
+    "name": "Archiwum Badań: Zaawansowane Skale i Indeksy",
+    "icon": "book",
+    "items": [
+      {
+        "name": "Skala IF (International Fujita Scale) - Wstęp",
+        "danger": "Pomiary Zniszczeń",
+        "desc": "Międzynarodowa Skala Fujity wprowadzona przez ESSL (2023). Ocenia siłę tornad i wiatrów szkwałowych na podstawie bardzo szczegółowych zniszczeń budynków, drzew i infrastruktury. Mierzy prędkości chwilowe wiatru (instantaneous 3D wind speed).",
+        "url": "https://www.essl.org/cms/international-fujita-scale/",
+        "image": "assets/img/wiedza/if_scale_0.png"
+      },
+      {
+        "name": "Skala IF0 - IF1 (25 m/s - 40 m/s)",
+        "danger": "Słabe / Umiarkowane",
+        "desc": "Wiatr rzędu 90 km/h do 150 km/h. Charakteryzuje się urywaniem gałęzi (debranching), lekkimi zniszczeniami poszyć dachowych, a od IF1 przewracaniem słabo zakotwiczonych obiektów (np. namioty, lekkie przyczepy).",
+        "url": "",
+        "image": "assets/img/wiedza/if_scale_10.png"
+      },
+      {
+        "name": "Skala IF1.5 - IF2 (50 m/s - 60 m/s)",
+        "danger": "Silne (Silne uszkodzenia)",
+        "desc": "Wiatr 180 km/h - 220 km/h. Skutkuje podnoszeniem pojazdów typu VAN i małych przyczep kempingowych na odległość kilkunastu metrów (lofting). Słabe murowane budynki mogą tracić ściany.",
+        "url": "",
+        "image": "assets/img/wiedza/if_scale_11.png"
+      },
+      {
+        "name": "Skala IF2.5 - IF3 (70 m/s - 80 m/s)",
+        "danger": "Dewastujące (Ciężkie tornada)",
+        "desc": "Wiatr 250 km/h - 290 km/h. Pełne ułamywanie pni nawet zdrowych drzew bez liści. Konstrukcje dachowe wyrywane w całości (Roof destroyed). Poważne uszkodzenia nośne mocnych, murowanych domów (np. wyrwane piętra).",
+        "url": "",
+        "image": "assets/img/wiedza/if_scale_12.png"
+      },
+      {
+        "name": "Skala IF4 - IF5 (105 m/s - 130+ m/s)",
+        "danger": "Katastrofalne (Tornada niszczycielskie)",
+        "desc": "Wiatr 380 km/h - 470+ km/h. Totalna anihilacja solidnych domów murowanych z fundamentami. Pojazdy ciężarowe miotane niczym zabawki na duże odległości. Kora dosłownie zrywana (sandblasting) z pni drzew przez pędzący gruz i zanieczyszczenia.",
+        "url": "",
+        "image": "assets/img/wiedza/if_scale_14.png"
+      },
+      {
+        "name": "Storm Relative Helicity (SRH)",
+        "danger": "Ryzyko Superkomórek i Tornad",
+        "desc": "Skrętność wiatru względem poruszającej się burzy. Określa skłonność prądów wstępujących do ruchu wirowego. Obliczana poprzez całkowanie od gruntu do konkretnej wysokości. Duże SRH w warstwie 0-3km (>250 m2/s2) i 0-1km (>100 m2/s2) drastycznie zwiększa zagrożenie potężnymi tornadami.",
+        "url": "",
+        "image": "assets/img/wiedza/if_scale_2.png"
+      },
+      {
+        "name": "SBCAPE, MLCAPE i MUCAPE",
+        "danger": "Paliwo do burz (Metody Liczenia)",
+        "desc": "CAPE można policzyć dla różnych cząstek startowych. SB (Surface Based) to cząstka z samej ziemi. ML (Mixed Layer) bierze uśrednioną cząstkę z dolnych 100 hPa - bardzo realistyczna dla letnich burz. MU (Most Unstable) bierze cząstkę z poziomu o największej chwiejności (ważne zimą i w burzach wzniesionych ponad frontem).",
+        "url": "",
+        "image": "assets/img/wiedza/if_scale_1.png"
+      },
+      {
+        "name": "Lifted Index (LI)",
+        "danger": "Ryzyko uniesienia",
+        "desc": "Różnica między temperaturą otoczenia a temperaturą hipotetycznie uniesionej cząstki na wys. 500 hPa. Wartości ujemne (np. LI = -6) oznaczają potężną konwekcję. Ostrzega, że cząstka na górze będzie znacznie gorętsza niż otoczenie, a więc wystrzeli jak z procy.",
+        "url": "",
+        "image": "assets/img/wiedza/if_scale_7.png"
+      },
+      {
+        "name": "Poziom Swobodnej Konwekcji (LFC) i Równowagi (EL)",
+        "danger": "Dynamika Prądu",
+        "desc": "LFC (Level of Free Convection): Wysokość, od której cząstka staje się cieplejsza od otoczenia i unosi się SAMA dzięki sile wyporu. EL (Equilibrium Level): Poziom blisko stratosfery, gdzie cząstka traci wyporność - tu buduje się gigantyczne płaskie kowadło (incus) superkomórki.",
+        "url": "",
+        "image": "assets/img/wiedza/if_scale_8.png"
+      }
+    ]
   }
 ];

@@ -6,6 +6,15 @@
           <!-- Sidebar -->
           <div style="flex: 0 0 250px; display: flex; flex-direction: column; gap: 10px;">
             <input type="text" class="form-input" placeholder="Szukaj zjawiska..." x-model="searchQuery" style="margin-bottom: 10px;">
+            
+            <button class="btn" 
+                    :class="activeCategory?.id === 'classifier' ? 'btn-primary' : 'btn-ghost'" 
+                    style="text-align: left; padding: 10px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-subtle); margin-bottom: 15px; border-color: var(--accent-primary);"
+                    @click="selectCategory({id: 'classifier', name: 'Klasyfikator Chmur (Interaktywny)'})">
+              <i data-lucide="camera" style="width: 16px; height: 16px;"></i>
+              <span style="font-weight: bold; color: var(--accent-primary);">Klasyfikator Chmur</span>
+            </button>
+            
             <template x-for="cat in categories" :key="cat.id">
               <button class="btn" 
                       :class="activeCategory?.id === cat.id ? 'btn-primary' : 'btn-ghost'" 
@@ -50,6 +59,65 @@
                       </div>
                     </div>
                   </template>
+                </div>
+              </div>
+            </template>
+            
+            <template x-if="activeCategory && activeCategory.id === 'classifier'">
+              <div x-data="cloudClassifier">
+                <h3 style="color: var(--accent-primary); border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">Klasyfikator Chmur (Identyfikacja)</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">Wybierz to, co widzisz na niebie. Klasyfikator bazuje na oficjalnej tabeli WMO, filtrując niemożliwe kombinacje gatunków, odmian i form specjalnych.</p>
+                
+                <div class="card" style="padding: 2rem; display: flex; flex-direction: column; gap: 20px; background: var(--bg-tertiary);">
+                  
+                  <div>
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">1. Rodzaj (Genus):</label>
+                    <select class="form-input" x-model="rodzaj" @change="zmianaRodzaju()">
+                      <option value="Brak">-- Wybierz Rodzaj --</option>
+                      <option value="Cirrus">Cirrus</option>
+                      <option value="Cirrocumulus">Cirrocumulus</option>
+                      <option value="Cirrostratus">Cirrostratus</option>
+                      <option value="Altocumulus">Altocumulus</option>
+                      <option value="Altostratus">Altostratus</option>
+                      <option value="Stratocumulus">Stratocumulus</option>
+                      <option value="Stratus">Stratus</option>
+                      <option value="Cumulus">Cumulus</option>
+                      <option value="Nimbostratus">Nimbostratus</option>
+                      <option value="Cumulonimbus">Cumulonimbus</option>
+                    </select>
+                  </div>
+                  
+                  <div x-show="rodzaj !== 'Brak'">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">2. Gatunek (Species):</label>
+                    <select class="form-input" x-model="gatunek">
+                      <template x-for="g in dostepneGatunki" :key="g">
+                        <option :value="g" x-text="g"></option>
+                      </template>
+                    </select>
+                  </div>
+                  
+                  <div x-show="rodzaj !== 'Brak'">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">3. Odmiana (Variety):</label>
+                    <select class="form-input" x-model="odmiana">
+                      <template x-for="o in dostepneOdmiany" :key="o">
+                        <option :value="o" x-text="o"></option>
+                      </template>
+                    </select>
+                  </div>
+                  
+                  <div x-show="rodzaj !== 'Brak'">
+                    <label style="display: block; margin-bottom: 5px; color: var(--text-secondary);">4. Forma specjalna (Feature):</label>
+                    <select class="form-input" x-model="forma">
+                      <template x-for="f in dostepneFormy" :key="f">
+                        <option :value="f" x-text="f"></option>
+                      </template>
+                    </select>
+                  </div>
+                  
+                  <button class="btn btn-primary" style="margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; font-size: 1.1rem;" @click="szukajWGoogle()">
+                    <i data-lucide="search"></i> Sprawdź i porównaj w Google
+                  </button>
+                  
                 </div>
               </div>
             </template>

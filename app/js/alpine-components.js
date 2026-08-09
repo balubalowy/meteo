@@ -187,4 +187,95 @@ document.addEventListener('alpine:init', () => {
             return items;
         }
     }));
+
+    // 6. Klasyfikator Chmur
+    Alpine.data('cloudClassifier', () => ({
+        matrix: {
+            "Cirrus": {
+                gatunki: ["Brak", "fibratus", "uncinus", "spissatus", "castellanus", "floccus"],
+                odmiany: ["Brak", "intortus", "radiatus", "vertebratus", "duplicatus"],
+                formy: ["Brak", "mamma", "fluctus"]
+            },
+            "Cirrocumulus": {
+                gatunki: ["Brak", "stratiformis", "lenticularis", "castellanus", "floccus"],
+                odmiany: ["Brak", "undulatus", "lacunosus"],
+                formy: ["Brak", "virga", "mamma", "cavum"]
+            },
+            "Cirrostratus": {
+                gatunki: ["Brak", "fibratus", "nebulosus"],
+                odmiany: ["Brak", "duplicatus", "undulatus"],
+                formy: ["Brak"]
+            },
+            "Altocumulus": {
+                gatunki: ["Brak", "stratiformis", "lenticularis", "castellanus", "floccus", "volutus"],
+                odmiany: ["Brak", "translucidus", "perlucidus", "opacus", "duplicatus", "undulatus", "radiatus", "lacunosus"],
+                formy: ["Brak", "virga", "mamma", "cavum", "fluctus", "asperitas"]
+            },
+            "Altostratus": {
+                gatunki: ["Brak"],
+                odmiany: ["Brak", "translucidus", "opacus", "duplicatus", "undulatus", "radiatus"],
+                formy: ["Brak", "virga", "praecipitatio", "pannus", "mamma"]
+            },
+            "Stratocumulus": {
+                gatunki: ["Brak", "stratiformis", "lenticularis", "castellanus", "floccus", "volutus"],
+                odmiany: ["Brak", "translucidus", "perlucidus", "opacus", "duplicatus", "undulatus", "radiatus", "lacunosus"],
+                formy: ["Brak", "virga", "mamma", "praecipitatio", "fluctus", "asperitas", "cavum"]
+            },
+            "Stratus": {
+                gatunki: ["Brak", "nebulosus", "fractus"],
+                odmiany: ["Brak", "opacus", "translucidus", "undulatus"],
+                formy: ["Brak", "praecipitatio", "fluctus"]
+            },
+            "Cumulus": {
+                gatunki: ["Brak", "humilis", "mediocris", "congestus", "fractus"],
+                odmiany: ["Brak", "radiatus"],
+                formy: ["Brak", "virga", "praecipitatio", "pileus", "velum", "arcus", "pannus", "fluctus", "tuba"]
+            },
+            "Nimbostratus": {
+                gatunki: ["Brak"],
+                odmiany: ["Brak"],
+                formy: ["Brak", "praecipitatio", "virga", "pannus"]
+            },
+            "Cumulonimbus": {
+                gatunki: ["Brak", "calvus", "capillatus"],
+                odmiany: ["Brak"],
+                formy: ["Brak", "praecipitatio", "virga", "pannus", "incus", "mamma", "pileus", "velum", "arcus", "murus", "cauda", "flumen", "tuba"]
+            }
+        },
+        rodzaj: "Brak",
+        gatunek: "Brak",
+        odmiana: "Brak",
+        forma: "Brak",
+
+        get dostepneGatunki() {
+            return this.rodzaj !== "Brak" ? this.matrix[this.rodzaj].gatunki : ["Brak"];
+        },
+        get dostepneOdmiany() {
+            return this.rodzaj !== "Brak" ? this.matrix[this.rodzaj].odmiany : ["Brak"];
+        },
+        get dostepneFormy() {
+            return this.rodzaj !== "Brak" ? this.matrix[this.rodzaj].formy : ["Brak"];
+        },
+
+        zmianaRodzaju() {
+            this.gatunek = "Brak";
+            this.odmiana = "Brak";
+            this.forma = "Brak";
+        },
+
+        szukajWGoogle() {
+            if (this.rodzaj === "Brak") {
+                alert("Wybierz przynajmniej Rodzaj chmury!");
+                return;
+            }
+            let query = this.rodzaj;
+            if (this.gatunek !== "Brak") query += " " + this.gatunek;
+            if (this.odmiana !== "Brak") query += " " + this.odmiana;
+            if (this.forma !== "Brak") query += " " + this.forma;
+            
+            query += " cloud"; // dodajemy "cloud" dla lepszych wynikow
+            const url = "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(query);
+            window.open(url, "_blank");
+        }
+    }));
 });
