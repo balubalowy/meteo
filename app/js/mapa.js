@@ -35,27 +35,91 @@ window.initMapa = function() {
                 pathOptions: { color: '#ef4444', weight: 3, fillOpacity: 0.4 }
             });
 
+            window.currentDrawingMode = 'polygon';
+
             map.on('pm:create', e => {
                 const layer = e.layer;
+                
+                if (window.currentDrawingMode === 'front_chlodny') {
+                    const decorator = L.polylineDecorator(layer, {
+                        patterns: [
+                            { offset: 25, repeat: 60, symbol: L.Symbol.arrowHead({pixelSize: 15, polygon: true, pathOptions: {stroke: true, color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 1, weight: 2}}) }
+                        ]
+                    }).addTo(map);
+                    layer._myDecorator = decorator;
+                } else if (window.currentDrawingMode === 'front_cieply') {
+                    const decorator = L.polylineDecorator(layer, {
+                        patterns: [
+                            { offset: 25, repeat: 60, symbol: L.Symbol.marker({
+                                markerOptions: {
+                                    icon: L.divIcon({
+                                        className: 'warm-front-icon',
+                                        html: '<div style="width: 12px; height: 12px; background: #ef4444; border-radius: 50%; border: 2px solid white; transform: translate(-20%, -20%);"></div>',
+                                        iconSize: [0, 0]
+                                    })
+                                }
+                            })}
+                        ]
+                    }).addTo(map);
+                    layer._myDecorator = decorator;
+                } else if (window.currentDrawingMode === 'strzalka') {
+                    const decorator = L.polylineDecorator(layer, {
+                        patterns: [
+                            { offset: '100%', repeat: 0, symbol: L.Symbol.arrowHead({pixelSize: 18, polygon: true, pathOptions: {stroke: true, color: '#a8a29e', fillColor: '#a8a29e', fillOpacity: 1}}) }
+                        ]
+                    }).addTo(map);
+                    layer._myDecorator = decorator;
+                }
+                
                 layer.on('click', () => {
                     if (map.pm.globalRemovalModeEnabled()) {
                         map.removeLayer(layer);
+                        if(layer._myDecorator) map.removeLayer(layer._myDecorator);
                     }
+                });
+                
+                layer.on('pm:remove', () => {
+                    if(layer._myDecorator) map.removeLayer(layer._myDecorator);
                 });
             });
         }
         
         window.setDrawingColor = function(color) {
             if(map.pm) {
-                map.pm.setGlobalOptions({ pathOptions: { color: color, weight: 3, fillOpacity: 0.4 } });
+                window.currentDrawingMode = 'polygon';
+                map.pm.setGlobalOptions({ pathOptions: { color: color, weight: 3, fillOpacity: 0.4, dashArray: '' } });
                 map.pm.enableDraw('Polygon');
+            }
+        };
+
+        window.setDrawingMode = function(mode) {
+            if(!map.pm) return;
+            window.currentDrawingMode = mode;
+            if(mode === 'zbieznosc') {
+                map.pm.setGlobalOptions({ pathOptions: { color: '#f97316', weight: 4, fillOpacity: 0, dashArray: '10, 10' } });
+                map.pm.enableDraw('Line');
+            } else if(mode === 'front_chlodny') {
+                map.pm.setGlobalOptions({ pathOptions: { color: '#3b82f6', weight: 3, fillOpacity: 0, dashArray: '' } });
+                map.pm.enableDraw('Line');
+            } else if(mode === 'front_cieply') {
+                map.pm.setGlobalOptions({ pathOptions: { color: '#ef4444', weight: 3, fillOpacity: 0, dashArray: '' } });
+                map.pm.enableDraw('Line');
+            } else if(mode === 'strzalka') {
+                map.pm.setGlobalOptions({ pathOptions: { color: '#a8a29e', weight: 4, fillOpacity: 0, dashArray: '' } });
+                map.pm.enableDraw('Line');
+            } else if(mode === 'kolko') {
+                map.pm.setGlobalOptions({ pathOptions: { color: '#22c55e', weight: 3, fillOpacity: 0.3, dashArray: '' } });
+                map.pm.enableDraw('Circle');
             }
         };
         
         window.clearMap = function() {
             if(!map) return;
             map.eachLayer(layer => {
-                if (layer instanceof L.Polygon && !layer._url) map.removeLayer(layer);
+                if ((layer instanceof L.Polygon || layer instanceof L.Polyline || layer instanceof L.Circle) && !layer._url) {
+                    map.removeLayer(layer);
+                    if(layer._myDecorator) map.removeLayer(layer._myDecorator);
+                }
             });
         };
         
