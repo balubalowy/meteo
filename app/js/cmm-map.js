@@ -91,12 +91,28 @@ window.renderCmmMapData = function() {
         }
         
         if (val !== null && !isNaN(val)) {
-            const iconHtml = `<div style="background: rgba(255,255,255,0.9); border: 2px solid ${color}; color: #1e293b; font-weight: bold; padding: 2px 4px; border-radius: 6px; font-size: 11px; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.3); text-align: center; line-height:1.1;">${val}${suffix}<br><span style="font-size: 8px; color: #64748b;">${st.nazwa}</span></div>`;
+            const iconHtml = `<div style="
+                background: ${color}ee; 
+                color: #ffffff; 
+                font-weight: 600; 
+                padding: 4px 6px; 
+                border-radius: 6px; 
+                font-size: 11px; 
+                white-space: nowrap; 
+                box-shadow: 0 2px 5px rgba(0,0,0,0.4); 
+                text-align: center; 
+                line-height: 1.1;
+                backdrop-filter: blur(2px);
+                border: 1px solid rgba(255,255,255,0.25);
+            ">
+                <span style="font-size: 13px;">${val}</span><span style="font-size: 9px; margin-left: 1px;">${suffix}</span><br>
+                <span style="font-size: 8px; font-weight: 500; opacity: 0.9;">${st.nazwa}</span>
+            </div>`;
             const divIcon = L.divIcon({
                 className: 'custom-cmm-icon',
                 html: iconHtml,
-                iconSize: [60, 26],
-                iconAnchor: [30, 13]
+                iconSize: null, // Pozwala HTML automatycznie dopasować szerokość
+                iconAnchor: [20, 16] // Delikatne wyśrodkowanie
             });
             L.marker([st.lat, st.lon], { icon: divIcon }).addTo(cmmMapInstance);
         }
@@ -122,4 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }, 1500);
+
+    // Sprawdzamy czy obrazek załadował się z błędem zanim JS zdążył się uruchomić
+    if (window._cmmFallbackTriggered) {
+        window.fallbackCmmMap();
+    }
 });
