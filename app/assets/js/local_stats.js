@@ -88,7 +88,7 @@ window.meteoStats = {
     }
   ],
   "pythonFiles": 46,
-  "htmlFiles": 16,
+  "htmlFiles": 17,
   "excelFiles": 2,
-  "lastSync": "2026-08-09 14:45:33"
+  "lastSync": "2026-08-09 14:53:27"
 };
