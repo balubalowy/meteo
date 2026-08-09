@@ -36,17 +36,17 @@ jobs:
         run: |
           echo "${{ github.event.inputs.threshold }}" > inputs.txt
           echo "${{ github.event.inputs.days_ahead }}" >> inputs.txt
-          cd prognoza
-          python pobierz_ensemble.py < ../inputs.txt
+          cd .private/archiwum/prognoza
+          python pobierz_ensemble.py < ../../../inputs.txt
 
       - name: Run generuj_dashboard
         run: |
-          cd prognoza
+          cd .private/archiwum/prognoza
           python generuj_dashboard.py
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "📈 auto: wygenerowano nowy dashboard ensemble"
-          file_pattern: "prognoza/Dashboard_Pogody.html prognoza/dashboard.html prognoza/config.json prognoza/Dane_Mapy_Polska.xlsx"
+          file_pattern: ".private/archiwum/prognoza/Dashboard_Pogody.html .private/archiwum/prognoza/dashboard.html .private/archiwum/prognoza/config.json .private/archiwum/prognoza/Dane_Mapy_Polska.xlsx"
           branch: main

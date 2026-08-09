@@ -25,7 +25,7 @@ jobs:
       - name: Fetch IMGW data and push to Firebase
         env:
           FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
-        run: python scripts/fetch_imgw_firebase.py
+        run: python .private/fetch_imgw_firebase.py
 
       - name: Install map dependencies
         run: pip install numpy scipy shapely matplotlib
@@ -33,10 +33,10 @@ jobs:
       - name: Generate and upload Map Data
         env:
           FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
-        run: python scripts/generate_map_data_firebase.py
+        run: python .private/generate_map_data_firebase.py
 
       - name: Fetch Dashboard Links
-        run: python scripts/fetch_dashboard_links.py
+        run: python .private/fetch_dashboard_links.py
 
       - name: Commit Dashboard Links
         run: |

@@ -1,0 +1,39 @@
+/* styles.css */
+
+/* Poprawione kafelki - usunięto wymuszanie 1:1 dla wszystkich, bo psuło to bardziej złożone widgety */
+#dashboard-tiles .tile-item {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 350px; /* Zapewnia odpowiednią wysokość dla map i iframe'ów */
+}
+
+/* Dostosowanie map i obrazów w kafelkach by wypełniały przestrzeń, ale nie psuły proporcji */
+#dashboard-tiles .tile-item > iframe {
+    flex-grow: 1;
+    height: 100% !important;
+    min-height: 250px;
+    border: none;
+}
+
+#dashboard-tiles .tile-item > img.zoomable {
+    flex-grow: 1;
+    object-fit: contain;
+    max-height: 400px;
+}
+
+#cmm-map-container {
+    height: 100% !important;
+    min-height: 300px;
+    flex-grow: 1;
+}
+
+#dash-cmm-synop {
+    height: 100% !important;
+    object-fit: contain;
+}
+
+/* Wymuszenie proporcji dla konkretnych map (jeśli to potrzebne) */
+.map-tile {
+    aspect-ratio: 1 / 1;
+}

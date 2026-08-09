@@ -1,0 +1,52 @@
+<div id="tab-knowledge" class="tab-view" x-data="knowledgeBase" x-init="init()">
+        <h2 class="section-title"><i data-lucide="book-open" style="margin-right: 10px;"></i> Baza Wiedzy (Katalog Zjawisk)</h2>
+        
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+          
+          <!-- Sidebar -->
+          <div style="flex: 0 0 250px; display: flex; flex-direction: column; gap: 10px;">
+            <input type="text" class="form-input" placeholder="Szukaj zjawiska..." x-model="searchQuery" style="margin-bottom: 10px;">
+            <template x-for="cat in categories" :key="cat.id">
+              <button class="btn" 
+                      :class="activeCategory?.id === cat.id ? 'btn-primary' : 'btn-ghost'" 
+                      style="text-align: left; padding: 10px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-subtle);"
+                      @click="selectCategory(cat)">
+                <i :data-lucide="cat.icon" style="width: 16px; height: 16px;"></i>
+                <span x-text="cat.name"></span>
+              </button>
+            </template>
+          </div>
+
+          <!-- Main Content -->
+          <div style="flex: 1; min-width: 300px;">
+            <template x-if="activeCategory">
+              <div>
+                <h3 style="color: var(--accent-primary); border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem; margin-bottom: 1.5rem;" x-text="activeCategory.name"></h3>
+                
+                <template x-if="filteredItems.length === 0">
+                  <p style="color: var(--text-secondary);">Nie znaleziono wyników dla wyszukiwania.</p>
+                </template>
+
+                <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
+                  <template x-for="item in filteredItems" :key="item.name">
+                    <div class="card" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 15px;">
+                      <h4 style="font-size: 1.2rem; margin: 0; color: var(--text-primary);" x-text="item.name"></h4>
+                      
+                      <div style="background: var(--bg-tertiary); padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 10px; color: var(--accent-warning);">
+                        <i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i>
+                        <span style="font-size: 0.9rem;"><strong>Zagrożenie:</strong> <span x-text="item.danger"></span></span>
+                      </div>
+                      
+                      <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <img :src="item.image" alt="Ilustracja" class="zoomable" style="width: 100%; max-width: 300px; height: auto; border-radius: 8px; object-fit: cover; border: 1px solid var(--border-subtle);" onerror="this.src='data:image/svg+xml,<svg xmlns=\\\'http://www.w3.org/2000/svg\\\' width=\\\'300\\\' height=\\\'200\\\'><rect width=\\\'100%\\\' height=\\\'100%\\\' fill=\\\'#1e293b\\\'/><text x=\\\'50%\\\' y=\\\'50%\\\' fill=\\\'#64748b\\\' text-anchor=\\\'middle\\\' alignment-baseline=\\\'middle\\\'>Brak Obrazu</text></svg>'">
+                        <p style="flex: 1; min-width: 250px; line-height: 1.6; color: var(--text-secondary);" x-text="item.desc"></p>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+
+        </div>
+      </div>

@@ -1,0 +1,190 @@
+// alpine-components.js
+// Komponenty i logika dla Alpine.js
+
+document.addEventListener('alpine:init', () => {
+
+    // 1. SOB Tile (Prognoza)
+    Alpine.data('sobTile', () => ({
+        sobImg: '',
+        loading: true,
+        async fetchSOB() {
+            try {
+                const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://obserwatorzy.info/prognoza-burz/'));
+                const data = await res.json();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(data.contents, 'text/html');
+                const imgs = Array.from(doc.querySelectorAll('img'));
+                const targetImg = imgs.find(img => img.src && (img.src.includes('forecast') || img.src.includes('sob') || img.src.includes('prognoza')));
+                if (targetImg) this.sobImg = targetImg.src;
+                else this.sobImg = 'https://obserwatorzy.info/wp-content/uploads/2026/08/forecast-20260807.png';
+            } catch(e) {
+                this.sobImg = 'https://obserwatorzy.info/wp-content/uploads/2026/08/forecast-20260807.png';
+            }
+            this.loading = false;
+        }
+    }));
+
+    // 2. Skala IF
+    Alpine.data('ifEvaluator', () => ({
+        diId: '',
+        subCode: '',
+        dodVal: 1,
+        get currentDi() {
+            return this.meteo.damageIndicators.find(d => d.id === this.diId) || this.meteo.damageIndicators[0];
+        },
+        init() {
+            if (this.meteo.damageIndicators && this.meteo.damageIndicators.length > 0) {
+                this.diId = this.meteo.damageIndicators[0].id;
+                this.subCode = this.meteo.damageIndicators[0].subclasses[0].code;
+            }
+            this.$watch('diId', () => {
+                if (this.currentDi && this.currentDi.subclasses.length > 0) {
+                    this.subCode = this.currentDi.subclasses[0].code;
+                }
+            });
+        },
+        get resultObj() {
+            if (!this.subCode || !this.meteo.ifScaleClasses) return null;
+            let rating = 'IF1';
+            let sub = this.subCode;
+            let dod = parseInt(this.dodVal) || 1;
+            
+            if (sub.startsWith('BS')) {
+                if (sub === 'BSA') rating = (dod === 1) ? 'IF0.5' : (dod === 2) ? 'IF1.5' : 'IF0';
+                else if (sub === 'BSD') rating = (dod === 1) ? 'IF2.5' : (dod === 2) ? 'IF4' : 'IF1.5';
+                else rating = (dod === 1) ? 'IF1.5' : (dod === 2) ? 'IF2.5' : 'IF1';
+            } else if (sub.startsWith('TR')) {
+                if (sub === 'TRW') rating = (dod === 1) ? 'IF0.5' : (dod === 2) ? 'IF1.5' : 'IF0';
+                else if (sub === 'TRS') rating = (dod === 1) ? 'IF1.5' : (dod === 2) ? 'IF2.5' : 'IF1';
+                else rating = (dod === 1) ? 'IF1' : (dod === 2) ? 'IF2' : 'IF0.5';
+            } else {
+                rating = (dod === 1) ? 'IF1.5' : 'IF2.5';
+            }
+            
+            return this.meteo.ifScaleClasses.find(c => c.code === rating) || this.meteo.ifScaleClasses[2];
+        },
+        getBadgeColor(code) {
+            const colors = {
+                'IF0': '#10B981', 'IF0.5': '#34D399', 'IF1': '#F59E0B',
+                'IF1.5': '#D97706', 'IF2': '#EF4444', 'IF2.5': '#DC2626',
+                'IF3': '#B91C1C', 'IF4': '#7C3AED', 'IF5': '#6D28D9'
+            };
+            return colors[code] || '#3B82F6';
+        }
+    }));
+
+    // 3. Kalkulatory
+    Alpine.data('calcWind', () => ({
+        val: 100, 
+        unit: 'kmh', 
+        get kmh() { 
+            return this.unit === 'kmh' ? this.val : this.unit === 'ms' ? this.val * 3.6 : this.val * 1.852; 
+        }
+    }));
+
+    Alpine.data('calcDcp', () => ({
+        dcape: 1000, 
+        mucape: 2500, 
+        dls: 22, 
+        mw: 18, 
+        get dcp() { 
+            return ((this.dcape/980)*(this.mucape/2000)*(this.dls/(20*0.5144))*(this.mw/(16*0.5144))).toFixed(2); 
+        }
+    }));
+
+    Alpine.data('calcWmax', () => ({
+        cape: 2000, 
+        get wmax() { return Math.sqrt(2 * this.cape); }
+    }));
+
+    Alpine.data('calcLcl', () => ({
+        t: 25.0, 
+        td: 18.0, 
+        get lcl() { return Math.max(0, 125 * (this.t - this.td)).toFixed(0); }
+    }));
+
+    Alpine.data('calcMagnus', () => ({
+        t: 20.0,
+        rh: 50,
+        td: 9.3,
+        lastCalc: 'Wpisz dane aby przeliczyć...',
+        calcTd() {
+            let a = 17.27, b = 237.7;
+            let alpha = ((a * this.t) / (b + this.t)) + Math.log(this.rh / 100);
+            this.td = parseFloat(((b * alpha) / (a - alpha)).toFixed(1));
+            this.lastCalc = 'Punkt rosy (Td): ' + this.td + ' °C';
+        },
+        calcRh() {
+            let a = 17.27, b = 237.7;
+            let e = 6.112 * Math.exp((a * this.td) / (b + this.td));
+            let es = 6.112 * Math.exp((a * this.t) / (b + this.t));
+            this.rh = Math.min(100, Math.max(0, (e / es) * 100)).toFixed(1);
+            this.lastCalc = 'Wilgotność (RH): ' + this.rh + ' %';
+        }
+    }));
+
+    Alpine.data('calcWindChill', () => ({
+        t: -5.0,
+        v: 20.0,
+        get windChill() {
+            if (this.t > 10.0 || this.v < 4.8) return this.t.toFixed(1);
+            const vPow = Math.pow(this.v, 0.16);
+            const twc = 13.12 + 0.6215 * this.t - 11.37 * vPow + 0.3965 * this.t * vPow;
+            return twc.toFixed(1);
+        }
+    }));
+
+    // 4. Alert Rules (Ostrzeżenia SOB)
+    Alpine.data('alertRules', () => ({
+        state: { wind: 0, torn: 0, hail: 0, rain: 0 },
+        levelDetails: {
+            1: { code: 'MRG', color: '#22c55e', name: 'MRG (Marginalne - 1/5)', desc: 'Niskie ryzyko zjawisk burzowych.' },
+            2: { code: 'NWL', color: '#eab308', name: 'NWL (Niewielkie - 2/5)', desc: 'Umiarkowanie groźne burze.' },
+            3: { code: 'SRD', color: '#f97316', name: 'SRD (Średnie - 3/5)', desc: 'Niebezpieczne, silne burze.' },
+            4: { code: 'DZ',  color: '#ef4444', name: 'DZ (Duże - 4/5)', desc: 'Bardzo groźne burze / Nawałnice.' },
+            5: { code: 'EXT', color: '#b91c1c', name: 'EXT (Ekstremalne - 5/5)', desc: 'Katastrofalne zjawiska, np. Derecho.' }
+        },
+        selectCell(cat, val) {
+            this.state[cat] = val;
+        },
+        get maxVal() {
+            return Math.max(this.state.wind, this.state.torn, this.state.hail, this.state.rain);
+        },
+        get result() {
+            if (this.maxVal === 0) return null;
+            return this.levelDetails[this.maxVal];
+        }
+    }));
+
+    // 5. Baza Wiedzy (Wielki System)
+    Alpine.data('knowledgeBase', () => ({
+        categories: [],
+        activeCategory: null,
+        searchQuery: '',
+        
+        init() {
+            if (window.KNOWLEDGE_BASE) {
+                this.categories = window.KNOWLEDGE_BASE;
+                if (this.categories.length > 0) {
+                    this.activeCategory = this.categories[0];
+                }
+            }
+        },
+        
+        selectCategory(cat) {
+            this.activeCategory = cat;
+            this.searchQuery = '';
+        },
+        
+        get filteredItems() {
+            if (!this.activeCategory) return [];
+            
+            let items = this.activeCategory.items;
+            if (this.searchQuery.trim() !== '') {
+                const q = this.searchQuery.toLowerCase();
+                items = items.filter(i => i.name.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q));
+            }
+            return items;
+        }
+    }));
+});

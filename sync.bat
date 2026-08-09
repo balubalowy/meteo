@@ -7,9 +7,9 @@ echo    Centrum Meteo: Local Sync to Cloud
 echo =======================================
 echo 1. Zbieranie statystyk burzowych (Excel)...
 
-python scripts/parse_storm_stats.py
-python scripts/fetch_dashboard_links.py
-python scripts/update_burze.py
+python .private/parse_storm_stats.py
+python .private/fetch_dashboard_links.py
+python .private/update_burze.py
 
 echo.
 echo 2. Wypychanie na GitHub...

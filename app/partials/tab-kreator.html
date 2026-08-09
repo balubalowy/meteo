@@ -1,0 +1,58 @@
+<div id="tab-kreator" class="tab-view">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="edit-3"></i> Kreator Map Ostrzeżeń (Dla Łowców)
+            </h2>
+            <button onclick="exportMap()" class="btn btn-primary"><i data-lucide="download"></i> Eksportuj Mapę</button>
+        </div>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Wybierz obszar, a następnie rysuj strefy zagrożeń używając narzędzi na mapie.</p>
+
+        <div style="display: flex; gap: 15px; align-items: flex-start;">
+            <!-- Panel boczny z obszarami i narzędziami -->
+            <div style="width: 200px; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0;">
+                
+                <div class="card" style="padding: 10px;">
+                    <h4 style="margin-bottom: 10px; font-size: 0.9rem; color: var(--text-secondary);">Wybierz Obszar</h4>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([52.069, 19.480], 6);">Polska (Całość)</button>
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([53.5, 18.5], 7);">Polska Północna</button>
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([50.5, 19.5], 7);">Polska Południowa</button>
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([52.0, 16.5], 7);">Polska Zachodnia</button>
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([52.0, 22.5], 7);">Polska Wschodnia</button>
+                        <button class="btn btn-ghost" style="text-align: left; padding: 6px;" onclick="if(kMap) kMap.setView([49.5, 17.5], 5);">Europa Środkowa</button>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 10px;">
+                    <h4 style="margin-bottom: 10px; font-size: 0.9rem; color: var(--text-secondary);">Zagrożenia</h4>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <button class="btn btn-ghost threat-btn" style="border: 1px solid #22c55e; color: #22c55e; text-align: left; padding: 6px;" onclick="setDrawingColor('#22c55e')">MRG (1)</button>
+                        <button class="btn btn-ghost threat-btn" style="border: 2px solid #eab308; color: #eab308; text-align: left; padding: 6px; box-shadow: 0 0 8px #eab308;" onclick="setDrawingColor('#eab308')">NWL (2)</button>
+                        <button class="btn btn-ghost threat-btn" style="border: 1px solid #f97316; color: #f97316; text-align: left; padding: 6px;" onclick="setDrawingColor('#f97316')">SRD (3)</button>
+                        <button class="btn btn-ghost threat-btn" style="border: 1px solid #ef4444; color: #ef4444; text-align: left; padding: 6px;" onclick="setDrawingColor('#ef4444')">DZ (4)</button>
+                        <button class="btn btn-ghost threat-btn" style="border: 1px solid #d946ef; color: #d946ef; text-align: left; padding: 6px;" onclick="setDrawingColor('#d946ef')">EXT (5)</button>
+                        <hr style="border-color: var(--border-subtle); margin: 5px 0;" />
+                        <button class="btn btn-ghost" style="color: var(--accent-danger); text-align: left; padding: 6px;" onclick="clearMap()"><i data-lucide="trash-2" style="width:16px; height:16px;"></i> Wyczyść</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Kontener mapy -->
+            <div style="flex-grow: 1; display: flex; justify-content: center; align-items: flex-start; min-width: 0;">
+                <div id="export-container" style="position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-subtle); width: 100%; max-width: 600px; aspect-ratio: 1 / 1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <div id="kreator-map" style="height: 100%; width: 100%;"></div>
+                    <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(15, 23, 42, 0.85); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); z-index: 999; pointer-events: none;">
+                        <div style="font-weight: bold; color: var(--text-primary); margin-bottom: 5px; font-size: 0.9rem;">B-Meteo Prognoza</div>
+                        <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem;">
+                            <span style="color: #22c55e;">■ MRG (Marginalne)</span>
+                            <span style="color: #eab308;">■ NWL (Niewielkie)</span>
+                            <span style="color: #f97316;">■ SRD (Średnie)</span>
+                            <span style="color: #ef4444;">■ DZ (Duże)</span>
+                            <span style="color: #d946ef;">■ EXT (Ekstremalne)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
