@@ -457,9 +457,9 @@ window.initMapa = function() {
                         if(!dateStr) return false;
                         const parts = dateStr.split(/[- :]/);
                         if (parts.length < 6) return false;
-                        const dataDate = new Date(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]);
-                        const diffHours = (new Date() - dataDate) / (1000 * 60 * 60);
-                        return diffHours <= 3.5 && diffHours >= -3; // tolerancja dla spóźnionych stacji
+                        const dataDate = new Date(Date.UTC(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]));
+                        const diffHours = (Date.now() - dataDate.getTime()) / (1000 * 60 * 60);
+                        return diffHours <= 3.5 && diffHours >= -1; // tolerancja dla spóźnionych stacji
                     };
 
                     const temp = parseFloat(st.temperatura_powietrza);
@@ -480,8 +480,12 @@ window.initMapa = function() {
                     
                     const formatTime = (dateStr) => {
                         if(!dateStr) return '';
-                        const parts = dateStr.split(' ');
-                        if(parts.length > 1) return ` <span style="font-size:0.75rem; color:#a1a1aa;">(${parts[1].substring(0, 5)})</span>`;
+                        const parts = dateStr.split(/[- :]/);
+                        if(parts.length >= 6) {
+                            const utcDate = new Date(Date.UTC(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]));
+                            const localTime = utcDate.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+                            return ` <span style="font-size:0.75rem; color:#a1a1aa;">(${localTime})</span>`;
+                        }
                         return '';
                     };
                     
