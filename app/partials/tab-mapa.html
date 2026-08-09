@@ -8,10 +8,13 @@
             <h2 style="margin: 0; font-size: 1.1rem;">Wielki Pulpit</h2>
         </div>
 
-        <!-- SEKCJA: Radar -->
+        <!-- SEKCJA: Radar i Wyładowania -->
         <div style="padding: 15px; border-bottom: 1px solid var(--border-subtle);">
-            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 6px;">
-                <i data-lucide="cloud-rain" style="width: 16px; height: 16px;"></i> Radar Opadów (Live)
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
+                <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="cloud-rain" style="width: 16px; height: 16px;"></i> Radar Opadów</span>
+                <button class="btn btn-ghost" style="padding: 4px 8px; font-size: 0.75rem; border: 1px solid var(--accent-primary); color: var(--accent-primary);" onclick="document.getElementById('lightning-modal').style.display='block'">
+                    <i data-lucide="zap" style="width: 12px; height: 12px;"></i> Pioruny (Live)
+                </button>
             </div>
             <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-secondary); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                 <button id="rv-play-btn" class="btn btn-ghost" style="padding: 5px; border-radius: 50%; color: var(--accent-primary);">
@@ -168,6 +171,19 @@
         </div>
         <div id="ensemble-iframe-container" style="flex: 1; width: 100%; position: relative;">
             <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-secondary);"><i data-lucide="loader" class="spin"></i> Wczytywanie danych z chmury...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Wyładowania (LightningMaps) -->
+<div id="lightning-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; padding: 20px; box-sizing: border-box;">
+    <div style="width: 100%; height: 100%; background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--border-subtle); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.7);">
+        <div style="padding: 10px 20px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+             <h3 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; color: #eab308;"><i data-lucide="zap"></i> Detektor Wyładowań (Live)</h3>
+             <button class="btn btn-ghost" style="padding: 5px; color: var(--text-secondary);" onclick="document.getElementById('lightning-modal').style.display='none'"><i data-lucide="x"></i></button>
+        </div>
+        <div style="flex: 1; width: 100%; position: relative;">
+            <iframe src="https://www.lightningmaps.org/#m=sat;t=3;s=0;o=0;b=;ts=0;" style="width: 100%; height: 100%; border: none;"></iframe>
         </div>
     </div>
 </div>
@@ -400,33 +416,136 @@
             return canvas.toDataURL();
         }
 
-        function renderIMGW() {
-            if(!imgwData || !imgwData.MAP_DATA) return;
+        function calculateDewPoint(temp_c, rh_pct) {
+            if(temp_c == null || rh_pct == null || rh_pct <= 0) return null;
+            const a = 17.27, b = 237.7;
+            const alpha = (a * temp_c) / (b + temp_c) + Math.log(rh_pct / 100.0);
+            return (b * alpha) / (a - alpha);
+        }
+
+        let imgwLiveCache = null;
+        let imgwLiveCacheTime = 0;
+
+        async function getIMGWLiveData() {
+            const now = Date.now();
+            if(imgwLiveCache && (now - imgwLiveCacheTime < 60000)) return imgwLiveCache; // 1 min cache
+            
+            document.getElementById('imgw-loading').style.display = 'flex';
+            document.getElementById('imgw-loading').innerHTML = '<i data-lucide="loader" class="spin"></i> Pobieranie danych z IMGW (Live)...';
+            
+            try {
+                const res = await fetch('https://danepubliczne.imgw.pl/api/data/meteo/');
+                const rawData = await res.json();
+                
+                const dataObj = {
+                    'temp': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
+                    'wiatr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
+                    'wiatr_sr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
+                    'rosy': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
+                    'wilg': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
+                    'grunt': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] },
+                    'synop': { pt_lats: [], pt_lons: [], pt_vals: [], pt_txts: [], pt_hov: [] }
+                };
+
+                for(let st of rawData) {
+                    const lat = parseFloat(st.lat);
+                    const lon = parseFloat(st.lon);
+                    if(isNaN(lat) || isNaN(lon)) continue;
+                    const nazwa = st.nazwa_stacji;
+
+                    const temp = parseFloat(st.temperatura_powietrza);
+                    const temp_grunt = parseFloat(st.temperatura_gruntu);
+                    const wilg = parseFloat(st.wilgotnosc_wzgledna);
+                    const wiatr_sr = parseFloat(st.wiatr_srednia_predkosc);
+                    const wiatr_poryw = parseFloat(st.wiatr_poryw_10min);
+                    const wiatr_max = parseFloat(st.wiatr_predkosc_maksymalna);
+                    
+                    const dewPoint = calculateDewPoint(temp, wilg);
+                    
+                    const porywy = [wiatr_poryw, wiatr_max].filter(v => !isNaN(v)).map(v => v * 3.6);
+                    const wiatr_poryw_kmh = porywy.length ? Math.max(...porywy) : NaN;
+                    const wiatr_sr_kmh = !isNaN(wiatr_sr) ? wiatr_sr * 3.6 : NaN;
+
+                    const addData = (zmienna, val, txt, hov) => {
+                        if(isNaN(val)) return;
+                        dataObj[zmienna].pt_lats.push(lat);
+                        dataObj[zmienna].pt_lons.push(lon);
+                        dataObj[zmienna].pt_vals.push(val);
+                        dataObj[zmienna].pt_txts.push(txt);
+                        dataObj[zmienna].pt_hov.push(`<b>${nazwa}</b><br>${hov}`);
+                    };
+
+                    addData('temp', temp, temp?.toFixed(1) + '°', `Temperatura: ${temp?.toFixed(1)}°C`);
+                    addData('grunt', temp_grunt, temp_grunt?.toFixed(1) + '°', `Temp. Gruntu: ${temp_grunt?.toFixed(1)}°C`);
+                    addData('wilg', wilg, wilg?.toFixed(0) + '%', `Wilgotność: ${wilg?.toFixed(0)}%`);
+                    addData('rosy', dewPoint, dewPoint?.toFixed(1) + '°', `Punkt Rosy: ${dewPoint?.toFixed(1)}°C`);
+                    addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h`);
+                    addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h`);
+                    
+                    // synop: display temp as value, but text contains more info
+                    if(!isNaN(temp) && !isNaN(wiatr_sr_kmh) && !isNaN(wilg)) {
+                        addData('synop', temp, temp?.toFixed(1) + '°', `Temp: ${temp?.toFixed(1)}°C<br>Wiatr: ${wiatr_poryw_kmh?.toFixed(0)} km/h<br>Wilg: ${wilg}%`);
+                    }
+                }
+                
+                imgwLiveCache = dataObj;
+                imgwLiveCacheTime = now;
+                document.getElementById('imgw-loading').style.display = 'none';
+                return imgwLiveCache;
+            } catch (err) {
+                console.error("Błąd IMGW Live API:", err);
+                document.getElementById('imgw-loading').innerHTML = "Błąd pobierania danych IMGW API.";
+                return null;
+            }
+        }
+
+        async function renderIMGW() {
+            const okres = document.getElementById('imgw-okres').value;
+            const zmienna = document.getElementById('imgw-zmienna').value;
+            
+            let data = null;
+            
+            if (okres === 'now') {
+                const liveDataObj = await getIMGWLiveData();
+                if(liveDataObj) {
+                    data = liveDataObj[zmienna];
+                }
+            } else {
+                // Historia Firebase
+                if(!imgwData || !imgwData.MAP_DATA) return;
+                const ds = imgwData.MAP_DATA[zmienna];
+                if(ds && ds[okres]) data = ds[okres];
+            }
+
+            if(!data) return;
+
             imgwLayerGroup.clearLayers();
             if(idwOverlay) {
                 map.removeLayer(idwOverlay);
                 idwOverlay = null;
             }
             
-            const okres = document.getElementById('imgw-okres').value;
-            const zmienna = document.getElementById('imgw-zmienna').value;
+            // ZInfo setup
+            const zInfo = imgwData && imgwData.ZMIENNE ? imgwData.ZMIENNE[zmienna] : null;
             
-            const ds = imgwData.MAP_DATA[zmienna];
-            if(!ds || !ds[okres]) return;
-            
-            const data = ds[okres];
-            const zInfo = imgwData.ZMIENNE[zmienna];
-            
-            // Fallbacks w przypadku braku cscale
             let scale;
             if (zInfo && zInfo.cscale && imgwData.COLORS[zInfo.cscale]) {
                 scale = imgwData.COLORS[zInfo.cscale];
             } else {
-                scale = imgwData.COLORS['temp'] || [[0, '#000000'], [1, '#ffffff']]; // Domyślna skala
+                // Hardcoded scales based on variable if ZMIENNE not loaded yet
+                if (zmienna.includes('temp') || zmienna === 'rosy' || zmienna === 'grunt' || zmienna === 'synop') {
+                    scale = [[0,"#0000ff"],[0.25,"#00ffff"],[0.5,"#00ff00"],[0.75,"#ffff00"],[1,"#ff0000"]];
+                } else if (zmienna.includes('wiatr')) {
+                    scale = [[0,"#ffffff"],[0.2,"#a1dab4"],[0.4,"#41b6c4"],[0.6,"#2c7fb8"],[1,"#253494"]];
+                } else if (zmienna === 'wilg') {
+                    scale = [[0,"#ffffcc"],[0.5,"#41b6c4"],[1,"#0c2c84"]];
+                } else {
+                    scale = [[0, '#000000'], [1, '#ffffff']];
+                }
             }
             
-            const cmin = zInfo && zInfo.cmin !== undefined ? zInfo.cmin : 0;
-            const cmax = zInfo && zInfo.cmax !== undefined ? zInfo.cmax : 100;
+            const cmin = zInfo && zInfo.cmin !== undefined ? zInfo.cmin : (zmienna === 'wilg' ? 0 : -20);
+            const cmax = zInfo && zInfo.cmax !== undefined ? zInfo.cmax : (zmienna === 'wilg' ? 100 : 40);
             
             const showTxt = document.getElementById('chk-txt').checked;
             const showPt = document.getElementById('chk-pt').checked;
@@ -459,20 +578,25 @@
             }
         }
 
+        // Trigger fetches
         document.getElementById('imgw-okres').addEventListener('change', renderIMGW);
         document.getElementById('imgw-zmienna').addEventListener('change', renderIMGW);
 
+        // Fetch history data in the background just in case they select max/min
         fetch('https://meteo-bbe28-default-rtdb.europe-west1.firebasedatabase.app/imgw_map_data.json')
             .then(res => res.json())
             .then(data => {
                 imgwData = data;
-                document.getElementById('imgw-loading').style.display = 'none';
-                renderIMGW();
+                // Don't hide loading yet if 'now' is selected, getIMGWLiveData will handle it
+                if(document.getElementById('imgw-okres').value !== 'now') {
+                    document.getElementById('imgw-loading').style.display = 'none';
+                    renderIMGW();
+                }
             })
-            .catch(err => {
-                console.error("Błąd IMGW Firebase:", err);
-                document.getElementById('imgw-loading').innerHTML = "Błąd pobierania danych IMGW.";
-            });
+            .catch(err => console.error("Błąd IMGW Firebase:", err));
+
+        // Initial render for 'now'
+        renderIMGW();
 
         L.control.layers(
             {},
