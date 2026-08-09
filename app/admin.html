@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - B-Meteo</title>
+  <link rel="stylesheet" href="assets/css/bcore.css?v=11">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="p-6">
+  <header class="topbar">
+    <div class="logo">
+      <i data-lucide="settings" class="symbol"></i>
+      <h1>Panel <span>Admina</span></h1>
+    </div>
+    <div class="top-stats">
+      <a href="index.html" class="btn btn-ghost"><i data-lucide="arrow-left"></i> Powrót do Głównego Centrum</a>
+    </div>
+  </header>
+
+  <main class="container main-content" x-data="adminPanel()">
+    <!-- Sekcja 1: Token -->
+    <div class="card mb-3">
+      <div class="card-header-bar">
+        <div class="card-title">Ustawienia Dostępu (GitHub API)</div>
+      </div>
+      <div class="p-4" style="padding: 16px;">
+        <p style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">Aby uruchamiać skrypty Pythona ze strony, musisz podać swój prywatny token GitHub (Personal Access Token) z uprawnieniami "repo". Zostanie on zapisany tylko w Twojej przeglądarce, więc jest bezpieczny.</p>
+        <div class="input-group" style="max-width: 500px;">
+          <label class="label" style="font-size: 12px;">GitHub Personal Access Token (PAT)</label>
+          <input type="password" class="input" x-model="githubToken" placeholder="ghp_..." @change="saveToken()" style="width: 100%; padding: 8px; margin-top: 4px; background: var(--bg-tertiary); color: white; border: 1px solid var(--border-subtle); border-radius: 4px;">
+        </div>
+        <p style="font-size: 12px; color: #4ade80; margin-top: 8px;" x-show="tokenSaved">Token zapisany w pamięci przeglądarki!</p>
+      </div>
+    </div>
+
+    <!-- Sekcja 2: Generowanie Ensemble -->
+    <div class="grid" style="grid-template-columns: 1fr; gap: 16px;">
+      <div class="card">
+        <div class="card-header-bar">
+          <div class="card-title">Wyzwól skrypt: Generuj Dashboard Ensemble (Prognoza)</div>
+        </div>
+        <div class="p-4" style="padding: 16px;">
+          <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="input-group">
+              <label class="label">Próg temperatury (°C)</label>
+              <input type="number" class="input" x-model="ensembleThreshold" style="width: 100%; padding: 8px; margin-top: 4px; background: var(--bg-tertiary); color: white; border: 1px solid var(--border-subtle); border-radius: 4px;">
+            </div>
+            <div class="input-group">
+              <label class="label">Na ile dni do przodu?</label>
+              <input type="number" class="input" x-model="ensembleDays" style="width: 100%; padding: 8px; margin-top: 4px; background: var(--bg-tertiary); color: white; border: 1px solid var(--border-subtle); border-radius: 4px;">
+            </div>
+          </div>
+          
+          <button class="btn btn-primary" @click="runEnsemble()" :disabled="isGenerating" style="padding: 10px 16px; background: #3b82f6; border: none; border-radius: 4px; color: white; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: bold;">
+            <i data-lucide="play" x-show="!isGenerating"></i>
+            <i data-lucide="loader" x-show="isGenerating"></i>
+            <span x-text="isGenerating ? 'Wysyłanie zlecenia...' : 'Uruchom Skrypt na Serwerze'"></span>
+          </button>
+          
+          <div style="margin-top: 16px; padding: 12px; border-radius: 4px; font-size: 14px; background: var(--bg-secondary); border: 1px solid var(--border-subtle);" :style="statusColor" x-show="statusMsg" x-text="statusMsg"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function adminPanel() {
+      return {
+        githubToken: localStorage.getItem('bmeteo_gh_token') || '',
+        tokenSaved: false,
+        ensembleThreshold: '30',
+        ensembleDays: '1',
+        isGenerating: false,
+        statusMsg: '',
+        statusColor: '',
+        
+        saveToken() {
+          localStorage.setItem('bmeteo_gh_token', this.githubToken);
+          this.tokenSaved = true;
+          setTimeout(() => this.tokenSaved = false, 2000);
+        },
+        
+        async runEnsemble() {
+          if (!this.githubToken) {
+            this.statusMsg = 'Błąd: Brak tokena GitHub! Uzupełnij go na górze strony.';
+            this.statusColor = 'color: #f87171;'; // red
+            return;
+          }
+          
+          this.isGenerating = true;
+          this.statusMsg = 'Łączenie z API GitHuba i wysyłanie polecenia workflow_dispatch...';
+          this.statusColor = 'color: #facc15;'; // yellow
+          
+          try {
+            const response = await fetch('https://api.github.com/repos/balubalowy/meteo/actions/workflows/generate-ensemble.yml/dispatches', {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/vnd.github+json',
+                'Authorization': 'Bearer ' + this.githubToken,
+                'X-GitHub-Api-Version': '2022-11-28',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                ref: 'main',
+                inputs: {
+                  threshold: this.ensembleThreshold.toString(),
+                  days_ahead: this.ensembleDays.toString()
+                }
+              })
+            });
+            
+            if (response.ok) {
+              this.statusMsg = 'Sukces! Skrypt został wyzwolony pomyślnie. Nowe dane i mapa wygenerują się na serwerze i pojawią się na stronie w ciągu 1-2 minut.';
+              this.statusColor = 'color: #4ade80;'; // green
+            } else {
+              const data = await response.json().catch(()=>({}));
+              this.statusMsg = 'Odmowa dostępu (' + response.status + '): ' + (data.message || 'Twój token jest nieprawidłowy, stracił ważność lub brakuje uprawnień "repo".');
+              this.statusColor = 'color: #f87171;';
+            }
+          } catch (error) {
+            this.statusMsg = 'Błąd sieci: ' + error.message;
+            this.statusColor = 'color: #f87171;';
+          } finally {
+            this.isGenerating = false;
+          }
+        }
+      }
+    }
+    lucide.createIcons();
+  </script>
+</body>
+</html>
