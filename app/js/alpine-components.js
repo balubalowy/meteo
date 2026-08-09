@@ -50,15 +50,15 @@ document.addEventListener('alpine:init', () => {
             let dod = parseInt(this.dodVal) || 1;
             
             const map = {
-                'BSA': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
-                'BSB': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
-                'BSC': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
-                'BSD': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF3'},
-                'BSE': {1: 'IF2',   2: 'IF3',   3: 'IF4'},
-                'BSF': {1: 'IF2.5', 2: 'IF3.5', 3: 'IF4'},
+                'BSA': {1: 'IF0.5', 2: 'IF1',   3: 'IF2'},
+                'BSB': {1: 'IF1',   2: 'IF1.5', 3: 'IF2.5'},
+                'BSC': {1: 'IF1.5', 2: 'IF2',   3: 'IF3'},
+                'BSD': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF4'},
+                'BSE': {1: 'IF2',   2: 'IF3',   3: 'IF5'}, // Zawalenie solidnych domów
+                'BSF': {1: 'IF2.5', 2: 'IF4',   3: 'IF5'}, // Zawalenie budynków żelbetowych
                 
                 'BRA': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
-                'BRD': {1: 'IF1',   2: 'IF1.5', 3: 'IF2.5'},
+                'BRD': {1: 'IF1',   2: 'IF2',   3: 'IF2.5'},
                 'BRE': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF3'},
                 
                 'TRW': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
@@ -70,17 +70,17 @@ document.addEventListener('alpine:init', () => {
                 'TSS': {1: 'IF2',   2: 'IF2.5', 3: 'IF3'},
                 
                 'VHT': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
-                'VHE': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
-                'VHC': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
-                'VHL': {1: 'IF2',   2: 'IF2.5', 3: 'IF3'},
+                'VHE': {1: 'IF1',   2: 'IF2',   3: 'IF2.5'},
+                'VHC': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF3'},
+                'VHL': {1: 'IF2',   2: 'IF3',   3: 'IF4'},
                 
                 'PTW': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
-                'PTS': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
+                'PTS': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF3'},
                 'PTT': {1: 'IF2',   2: 'IF3',   3: 'IF4'},
                 
                 'SCA': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
                 'SCD': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
-                'SCF': {1: 'IF2',   2: 'IF2.5', 3: 'IF3'},
+                'SCF': {1: 'IF2',   2: 'IF3',   3: 'IF4'},
             };
             
             if (map[sub] && map[sub][dod]) {

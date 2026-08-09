@@ -1,0 +1,3447 @@
+European Severe Storms Laboratory 
+ 
+ 
+ 
+The International Fujita (IF) Scale 
+for tornado and wind damage assessments 
+ 
+  
+  
+ 
+ 
+ 
+ 
+        
+ 
+
+ 
+2 
+ 
+Contributors: 
+Pieter Groenemeijer – ESSL (coordinator; main author) 
+Lothar Bock – DWD, Germany 
+Juan de Dios Soriano – AEMet , Spain 
+Maciej Dutkiewicz – Bydgoszcz University of Science and Technology, Poland 
+Delia Gutiérrez-Rubio – AEMet, Spain 
+Alois M. Holzer – ESSL 
+Martin Hubrig – Germany 
+Rainer Kaltenberger – Austria 
+Thilo Kühne – ESSL 
+Mortimer Müller – Universität für Bodenkultur (BOKU), Austria 
+Bas van der Ploeg – Netherlands 
+Tomáš Púčik – ESSL 
+Thomas Schreiner – ESSL 
+Miroslav Šinger – SHMI, Slovakia 
+Gabriel Strommer – ESSL 
+Andi Xhelaj – Univ. of Genova, Italy 
+We are grateful for the critical comments provided by the following people. Even though they 
+do not support some aspects of the scale, their comments have been valuable for improving it: 
+Yukio Tamura, Hiroshi Niino, Gregory Kopp, David Sills, and Mekdes Tadesse Mengistu.  
+ 
+ 
+ 
+Version 1.0e as of 7 September 2025 - Corrections were made to treefall ratings 
+ 
+Published by: 
+European Severe Storms Laboratory e.V. 
+Münchener Strasse 20 
+82234 Wessling 
+Germany 
+Contact: inflow@essl.org 
+ 
+ 
+
+ 
+3 
+ 
+Contents 
+1 
+Introduction ............................................................................................................................. 5 
+1.1 
+This document version ..................................................................................................... 5 
+1.2 
+The content of this document.......................................................................................... 5 
+2 
+Motivation ............................................................................................................................... 6 
+2.1 
+History of wind speed scales for tornadoes..................................................................... 6 
+2.2 
+The Enhanced Fujita (EF-) scale and its adaptations........................................................ 7 
+2.3 
+Desired properties of the IF-scale .................................................................................... 8 
+2.4 
+The wind speed definition.............................................................................................. 10 
+2.5 
+The IF-scale speeds......................................................................................................... 12 
+3 
+Damage Indicator Inventory .................................................................................................. 13 
+3.1 
+Interpretation of the IF-scale in the Damage Indicator sections ................................... 14 
+3.2 
+DI: Buildings – B (BS, BR, BN, BM) .................................................................................. 15 
+3.3 
+DI: Road Vehicles – VH ................................................................................................... 28 
+3.4 
+DI: Trees - TR .................................................................................................................. 31 
+3.5 
+DI: Tree stand – TS.......................................................................................................... 39 
+3.6 
+DI: Wind turbines – WT .................................................................................................. 42 
+3.7 
+DI: Greenhouses - GH ..................................................................................................... 43 
+3.8 
+DI: Train cars – TC ........................................................................................................... 45 
+3.9 
+DI: Mobile Homes / Static Caravans – MH ..................................................................... 46 
+3.10 DI: Poles and Towers – PT .............................................................................................. 47 
+3.11 DI: Solar Panels – SP ....................................................................................................... 49 
+3.12 DI: Fences - FC ................................................................................................................ 50 
+3.13 DI: Free-standing walls – FW .......................................................................................... 51 
+3.14 DI: Signs and billboards – SN .......................................................................................... 53 
+3.15 DI: Connected scaffolding – CS....................................................................................... 55 
+3.16 DI: Carports / Garages – CP ............................................................................................ 56 
+3.17 DI: Service station canopies – SS .................................................................................... 57 
+3.18 DI: Shipping containers – SC........................................................................................... 59 
+3.19 DI: Cranes – CR ............................................................................................................... 61 
+
+ 
+4 
+ 
+3.20 DI: Outdoor furniture – OF ............................................................................................. 62 
+3.21 DI: Wind Speed Measurement – WM ............................................................................ 63 
+4 
+Conducting a damage survey................................................................................................. 64 
+4.1 
+Surveying ........................................................................................................................ 64 
+4.2 
+Rating a tornado or wind event ..................................................................................... 65 
+4.3 
+Determining the nature of an event .............................................................................. 66 
+4.4 
+Definition of track length, width, and number of events .............................................. 68 
+References..................................................................................................................................... 69 
+Appendix Photos and descriptions of undamaged buildings ....................................................... 72 
+ 
+ 
+ 
+
+ 
+5 
+ 
+1 Introduction 
+1.1 
+This document version 
+The current version of this document is the first complete version of the IF-scale, published 1 
+August 2023.  
+1.2 
+The content of this document 
+This document consists of two parts. First, a description of the International Fujita scale, or IF-
+scale, is given. Second, in Chapter 5, recommendations are provided on conducting a damage 
+survey and interpreting the collected data. 
+The purpose of the IF-scale is to enable expressing the intensity of tornadoes and local wind 
+phenomena in a generic way that allows international comparisons. The international focus 
+contrasts it with other scales, hence the adjective “International” in its name. However, 
+additional guidance will be needed to apply the scale in other regions than Europe, since most 
+given examples originate from Europe. The development of the IF-scale was needed because a 
+sufficiently detailed scale that was consistent with past tornado rating practice at ESSL, was not 
+available. ESSL developed this scale in collaboration in collaboration with individuals from various 
+other institutions.  
+After extensive preparatory work had been conducted in a series of workshops of tornado and 
+wind damage by the European Severe Storms Laboratory since 2011, the first draft of this 
+document resulted from a workshop on 4 – 7 September 2018 organized in Wiener Neustadt, 
+and it has since evolved into the present version.  
+The latest in person workshop on tornado and wind damage assessment took place 29 August – 
+1 Sept 2022. At the 2022 ESSL workshop, a number of issues with the preliminary version 0.10 
+were raised, which were taken into account. After a commenting phase for the resulting 
+document, final minor changes were made to result in the current version 1.0. 
+ 
+ 
+ 
+
+ 
+6 
+ 
+2 Motivation 
+2.1 
+History of wind speed scales for tornadoes 
+Several scales have been developed to help compare events by comparing the inflicted damage 
+(Figure 2-1). Most prominently, Dr Tetsuya Theodore Fujita developed what has become known 
+as the Fujita scale (Fujita, 1980). Other wind speed scales include the TORRO- or T-scale (Meaden, 
+1976) and the newer Enhanced Fujita or EF-scale (McDonald and Mehta, 2006), and a national 
+and regional adaptations to it, discussed below.  
+ 
+Figure 2-1. Pre-existing wind speed scales used for tornado damage assessment and the IF-scale. 
+These scales are numbered series of descriptions of increasingly serious wind effects on various 
+objects, along with ranges of wind speeds thought to be responsible for causing the respective 
+damage. For the earliest scales by Fujita and TORRO, a scientific motivation for the posited wind 
+speed estimations was absent. The Fujita-scale has been used in the United States until 2007 and 
+is still used by some organisations, including the European Severe Storms Laboratory. 
+Near the end of Fujita’s scientific career, he wrote that his scale requires refinement by taking 
+the sturdiness of damaged structures into account when assessing damage to buildings (Fujita, 
+1992; Figure 2-2). In Europe, the European Severe Storms Laboratory developed an adapted 
+version of the scale to aid rating tornadoes in Europe with the Fujita scale (Feuerstein et al 2012; 
+see Figure 2-2 right).  
+
+ 
+7 
+ 
+       
+ 
+Figure 2-2. Left: The Fujita (F-) scale allowing for various building types with varying  sturdiness. The extent of 
+damage expressed various with both windspeed and sturdiness of structures. From: Fujita (1992). Right: F-scale 
+ratings as a function of building sturdiness (A-F), and of loss ratio and Fujita damage class (f0-f5), as used by 
+ESSL. Adapted from: Feuerstein et al (2012). 
+2.2 
+The Enhanced Fujita (EF-) scale and its adaptations 
+In 2007, Texas Tech University introduced a series of refinements and revisions to wind speed 
+estimates for specific damages, distinguishing between many more types of wind damage, 
+resulting in the Enhanced Fujita (EF) scale (McDonald and Mehta 2006). A tornado damage 
+assessment framework was introduced by systematically categorizing the effects of severe winds 
+using the concepts of damage levels and damage indicators. A damage indicator (DI) is a specific 
+object that may be affected by the wind, and a damage degree (DoD) is the extent to which that 
+object was damaged.  
+New wind speed estimates for a particular DoD of a particular DI were obtained through expert 
+elicitation: A small number of people, experts in engineering and meteorology, provided 
+estimates for the responsible wind speed for each DoD/DI combination. As a result, the EF scale 
+provides a range of the possible responsible wind speed for a large inventory of potential damage 
+to properties typically found in the United States.  
+Since then, a number of adaptations of the EF scale have been developed, for example in Canada 
+(Environment Canada, 2015; Sills et al., 2014) and Japan (JMA, 2015). These adaptations and 
+modifications were necessary because the EF scale assumes that damage indicators such as 
+schools, shopping malls and residential buildings have the robustness typical of the United States, 
+which results from building codes and construction practices there and does not necessarily 
+correspond to those in other countries. In addition, some common damage indicators were 
+missing such as damage to vehicles. Since then, proposals for new damage indicators have been 
+made, for example by Mahieu and Wesolek (2016) and by Hubrig (2015), who proposed 
+extensions that reflect damage to trees. Some of these efforts were limited to extending the EF 
+scale, while others significantly changed the wind speed estimates of a given damage type 
+DoD/DI combination, which of course complicates international comparison. 
+
+ 
+8 
+ 
+Acknowledging some of the complications of using the EF-scale, a process was started in the USA 
+to develop an updated and formalized EF scale standard to be officially adopted by the American 
+Society of Civil Engineers (ASCE, 2022). The issues being addressed concerned a number of the 
+concerns that spurred the development of the IF scale (e.g., missing DIs, emphasis on building 
+function rather than building construction). This process has still not concluded. 
+2.3 Desired properties of the IF-scale 
+In developing the IF-scale, the following properties formulated by Doswell et al. (2009) were our 
+guidance. First, the scale must be consistent in the sense that it can be applied consistently over 
+time and across many regions, preferably globally. Second, it must be accurate, i.e., as accurate 
+as possible given the available data. Last, it must be broadly applicable, covering the wide range 
+of observed wind effects and wind speeds. We next describe how the IF scale attempts to meet 
+those requirements. 
+1. Consistency 
+To ensure that the scale can be applied consistently in areas where the Fujita- or T-scale have 
+been used in the past, the IF-scale uses wind speeds that are compatible with those scales. For 
+example, the IF3 wind speed value corresponds to the wind speed of F3.  
+2. Broad applicability and wind speed definition 
+The aim of IF-scale is to present an approach that is fundamentally applicable. It specifies the 
+common denominator, to which further regional refinements can be made. The fact that the 
+building damage indicator is categorised according to its sturdiness, rather than its function (cf. 
+EF scale: small retail building, single-family house, primary school, et cetera), should facilitate 
+this.The scale includes the effects of the wind on a wide range of objects and structures and 
+integrates suggestions made by regional adaptors of the EF scale. 
+Broad applicability also means that the scale can be applied to the entire range of observed 
+wind speeds. Since Doppler radar measurements have shown that wind speeds of up to F5 can 
+occur in some tornadoes, the scale should be able to account for the potential impacts of such 
+wind speeds. 
+Broad applicability is also understood to mean that the scale should be applicable to all types of 
+wind events, not just tornadoes. Although the type of damage caused by tornadoes may differ 
+from that caused by downbursts, e.g., due to larger pressure differences or sudden changes in 
+wind speed and direction, there is currently no full scientific understanding of whether similar 
+wind speeds would lead to differing levels of damage in tornadoes and in downbursts. This is why 
+the working hypothesis of the IF scale approach is that they can be treated equally. 
+To apply wind speed estimates to tornadoes and other wind phenomena, the IF-scale must define 
+precisely what type of wind speed measurement it relates to.  
+
+ 
+9 
+ 
+Videos of tornado damage and Doppler radar measurements have shown that winds of extremely 
+short duration can be responsible for severe impacts, such as vehicles that are being lifted within 
+a fraction of a second. Therefore, it is reasonable to assume that a wind speed measured during 
+only a fraction of a second right at the location of the damage has a stronger correlation to the 
+observed damage than, for instance, a three second average wind speed. Furthermore, all three 
+wind components, including the vertical, contribute to the pressure differences that cause 
+damage.  
+Therefore, the IF-scale wind speeds listed are understood to be the instantaneous three-
+dimensional wind speed at the height of the observed damage (see Section 0).  
+3. Accuracy 
+To ensure high accuracy, wind speed estimates should be based on scientific research, including 
+actual wind speed measurements where available, and engineering calculations and wind tunnel 
+experiments where they are not. Only if measurements are not available and calculations are not 
+possible, or have not been made yet, subjective expert estimates are to be used. Such estimates 
+are to be updated as soon as calculations, or, preferably, measurements become available.  
+Aside from being as accurate as possible, the scale must also convey its (lack of) accuracy 
+correctly. Where the F-scale is expressed by adjacent ranges of wind speeds for each class of the 
+scale, the IF-scale instead provides a central value. For example, where the Fujita scale defines 
+F3 as wind speeds from 71 – 92 m/s, the IF-scale definition is 80 m/s. Rounded values, and the 
+remark that a range of wind speeds starting about 20% lower and higher than this value is meant 
+should help to avoid the impression of a very high accuracy.  
+Low wind speeds, which occur much more frequently, are rated with higher accuracy, as more 
+experience with rating such winds has been gained. To enable a higher precision, the IF-scale 
+uses half steps for the lower half of scale, i.e., IF0.5, IF1.5, and IF2.5. This renders the step size 
+similar to that of the EF-scale (cf. Figure 2-1). Old tornado records can be compared rather easily 
+to new IF ratings because the damages of a given F category and a given IF category should be 
+similar because they correspond to the same wind speed. 
+ 
+ 
+ 
+
+ 
+10 
+ 
+2.4 
+The wind speed definition 
+For the wind speeds of the scale, the instantaneous three-dimensional wind speed at the and 
+height of the observed damage was chosen. This contrasts with other speed scales that, 
+implicitly or explicitly, take these wind speeds to refer to a longer duration wind gust, e.g., 1 s 
+or 3 s duration gust, or an equivalent wind speed where equivalent means the speed of a 3 s 
+duration gust that causes the same impacts. 
+The choice for the instantaneous wind speed is motivated by the following arguments: 
+1. Damage in tornadoes often occurs within a fraction of a second. This is shown by many 
+video recordings of tornadoes in which cars are lifted in rapidly translating vortices that 
+affect it for a period much shorter than a second, or debris that are accelerated to 100 
+m/s within a fraction of a second. Such quick effects are to be expected, considering 
+that the wind produces damage by means of the differential pressures on an object. 
+These pressures interact with the wind field at the speed of sound. A simple scale 
+analysis shows that the characteristic timescale of a 102 m/s wind affecting a 101 m large 
+object is 10-1 s. This suggests that wind speed measurements averaged over 1 or 3 
+seconds will be more poorly correlated with the observed wind effects than shorter 
+duration measurements, at least when ignoring cases of failure due to repeated 
+wind/pressure peaks that have shown to be important at least in some cases (Morrison 
+and Kopp, 2011).  
+ 
+2. For intense events, rare available measurements almost never include 3 second 
+average wind speeds, but, instead, measurements from mobile Doppler radars (Kosiba 
+and Wurman 2013; Kosiba and Wurman 2023), or the speeds can be deduced from 
+photogrammetric analyses. While these are not absolutely instantaneous and local 
+measurements, their effective average time is much smaller than three seconds. 
+ 
+In a rare case where an anemometer measurement was available in a tornado, the 
+speed averaged over a 0.05 s period was at least 18% higher than a 1-second, and 60% 
+higher than a 3-second averaged speed (Blanchard 1992; Lombardo 2018). The duration 
+of averaging, thus, has a big effect on the wind speed value at least in some cases. The 
+net effect of considering the instantaneous rather than an averaged wind speed is that 
+the IF-scale wind speeds are higher for a given class than in the EF-scale and its regional 
+adaptations. The conversion between the instantaneous and 3-second averaged wind 
+speed is not straightforward in tornadoes, and certain assumptions need to be made. 
+New computational or real simulations of tornadoes and downbursts (Hangan, 2014) 
+will likely improve our knowledge in the coming years. Outside of tornadoes, there are 
+estimates for the conversion factor between instantaneous and 3-second averaged wind 
+speeds. In non-tornadic strong wind events, one can expect a 0.1 s duration wind gust to 
+
+ 
+11 
+ 
+be 17% higher than 3 s wind gusts according to a particular study (see footnote1), while 
+other estimates exist as well. 
+ 
+3. The range of maximum observed wind speeds by Doppler radar measurements in 
+tornadoes in the USA corresponds well with the proposed wind speeds of the Fujita 
+scale, that the IF-scale continues to use, ranging up to 144 m/s, and with 5% of their 
+best sampled tornadoes having measured wind speed ≥ 127 m/s (Wurman, 2021). For 
+comparison, the central values of the (I)F4 and (I)F5 classes are 105 and 130 m/s.  
+ 
+With respect to the height of measurement, the implications of the wind speeds are smaller, 
+since, although the wind speed at an altitude of 10 m AGL may not be representative of that 
+where damage is produced, but it may be a fair estimate on average. Speeds may be lower 
+closer to the ground than 10 m, because of the effects of turbulent friction in case a balanced 
+flow has developed where turbulent friction and pressure gradient forces are in balance. On the 
+other hand, it may be higher, since radar measurements show that the wind speed in a tornado 
+reaches a maximum very close to the ground, likely lower than 15 m above it (Kosiba and 
+Wurman, 2023).  
+The full 3D wind speed vector is always larger than or equal to the horizontal component. Near 
+the core of tornadic vortices, the vertical component may even be much larger than the 
+horizontal component as can be seen in videos where tornadic debris are lofted. The strongest 
+vertical speeds occur near the centre of a tornado and its potential sub-vortices, but the 
+horizontal wind component is smaller there. A vertical wind component is, however, just as well 
+capable of producing damage as the horizontal wind as it induces differential pressures as well. 
+The net effect of including the vertical component of the wind near the damage does not 
+render these speeds much different from horizontal winds far away from a tornado’s centre, 
+but certainly higher than the horizontal wind close to it. 
+ 
+ 
+ 
+1  The maximum wind speed found when measuring every 0.1s (i.e., 10 Hz) is typically about 3.5 times the standard 
+deviation of the turbulent wind σ0.1s, i.e., 3.5 σ0.1s, which compares to 2.45 σ0.1s when measuring the gusts over a 3s 
+averaging interval (Beljaars, 1987, Figure 10). Estimating umax,3s ≈ 1.6 uavg in a non-tornadic storm (Vickery and 
+Skerlj, 2005), it follows that σ0.1s ≈ 0.25 uavg. This means that where umax,3s ≈ 1.6 uavg, the maximum 0.1 s gust 
+umax,0.1s ≈ 1.875 uavg, i.e., ≈ 17% higher. 
+
+ 
+12 
+ 
+2.5 
+The IF-scale speeds 
+Table 1. IF-scale instantaneous wind speeds corresponding to the classes. They are rounded to the nearest 
+multiple of 10 or 5, except where this would introduce a large percentual error.  
+IF scale 
+class 
+Instantaneous wind speed 
+m/s 
+km/h 
+mph 
+knots 
+IF0 
+25  
+90 
+55 
+50 
+IF0.5 
+33 
+120 
+75 
+65 
+IF1 
+40 
+150 
+90 
+80 
+IF1.5 
+50 
+180 
+110 
+100 
+IF2 
+60 
+220 
+135 
+120 
+IF2.5 
+70 
+250 
+160 
+140 
+IF3 
+80 
+290 
+180 
+160 
+IF4 
+105 
+380 
+230 
+200 
+IF5 
+130 
+470 
+290 
+250 
+ 
+Table 1 shows the wind speeds of the IF-scale whereby each class is defined by one value. These 
+central values have been chosen so that the distances that there is a considerable overlap 
+between the classes when assuming errors of 20 in which case the lower bound of a given level 
+of the scale is close to the central value of the class below and that above it. 
+We required that the steps be consistent with the original Fujita scale and introduced half steps. 
+Above F2.5, such a subdivision was not made, and only full steps are used. 
+The formula for the wind speed as a function of step is identical to that of the Fujita-scale, i.e.: 
+IF(x) = 6.30 (x + 2.5)1.5 m/s 
+IF(x) = 22.7 (x + 2.5)1.5 km/h 
+IF(x) = 14.1 (x + 2.5)1.5 mph 
+IF(x) = 12.3 (x + 2.5)1.5 knots 
+Note that, in the original Fujita scale, the coefficient 2.5 in the above formulas is 2.0. We here 
+want, e.g., IF1 to correspond to the middle of the range between x = 1.0 and x = 2.0 in the original 
+scale, i.e., x = 1.5, and have increased to coefficient by 0.5 for that reason. 
+ 
+ 
+
+ 
+13 
+ 
+3 Damage Indicator Inventory 
+For the IF-scale, the following Damage Indicators have been defined. This list can be expanded 
+in the future.  
+Damage Indicator 
+Subclasses 
+Degrees of Damage 
+BS 
+Building - structure 
+A,AB,B,C,D,E,F 
+0,1A,1B,2 
+BR 
+Building - roof 
+A,AB,B,C,D,E,F 
+0,1,2 
+BN 
+Building - non-structural elements 
+SW,SS,TW,TS,HW,HS 0,1,2,3 
+BM 
+Building - anchoring 
+SM,SI,DB 
+1 
+VH 
+Road Vehicles 
+T,E,L,C 
+0,1,2,3,4 
+TR 
+Trees 
+W,A,S 
+0,1,2,3,4,5,6,7,8,9 
+TS 
+Tree stands 
+W,A,S 
+0,1,2,3,4 
+WT 
+Wind turbines 
+A,S 
+0,1,2,3 
+GH 
+Greenhouses 
+W,A,S 
+0,1,2,3 
+TC 
+Train cars 
+S,F 
+0,1 
+MH 
+Mobile homes / static caravans 
+- 
+0,1,2,3,4,5 
+PT 
+Poles and towers 
+W,S,T 
+0,1,2 
+SP 
+Solar Panels 
+- 
+0,1 
+FC 
+Fences 
+W,S 
+1 
+FW 
+Free-standing walls 
+Z,A,AB,B,C,D,E,F 
+1,2 
+SN 
+Signs and billboards 
+T,M 
+0,1,2 
+SW 
+Connected scaffolding 
+- 
+1 
+CP 
+Carports / garages 
+- 
+1 
+SS 
+Service Station Canopies 
+- 
+0,1,2,3 
+SC 
+Shipping Containers 
+A,B,C,D,E,F 
+1,2,3 
+CR 
+Cranes 
+G,T 
+1,2 
+OF 
+Outdoor Furniture 
+L,H 
+0,1,2 
+WM Wind Speed Measurement 
+3,2,1,0 
+0,0.5,1,1.5,2,2.5,3,4,5 
+
+Interpretation of the IF-scale in the Damage Indicator sections 
+14 
+ 
+3.1 
+Interpretation of the IF-scale in the Damage Indicator sections 
+The following sections include tables that list a given IF scale value for each combination of a 
+Degree of Damage and a Damage Indicator. Sometimes the symbols <, ≤, and ≥ are used. Their 
+meaning is as follows: 
+Symbol 
+Meaning 
+< 
+the damage occurred with the wind speed lower than the indicated IF 
+number 
+≤ 
+the damage occurred with the wind speed of the indicated IF number, 
+or with a lower wind speed 
+(no symbol) 
+the damage occurred with the wind speed of the indicated IF number 
+ 
+≥ 
+the damage occurred with a wind speed of the indicated IF number,  
+or with a higher wind speed 
+ 
+Wind speeds are understood to be estimates and errors are expected. These may easily be as 
+high as 20 %. 
+ 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+15 
+ 
+3.2 
+DI: Buildings – B (BS, BR, BN, BM) 
+Buildings include all structures with a roof and walls standing more or less permanently in one 
+place. They include all forms of residential, commercial, and industrial buildings as well as 
+outbuildings of any kind. 
+The damage to various components of buildings is to be assessed individually. Concretely, the 
+following forms of damage are distinguished: 
+1. Damage to the building’s structural elements, i.e., its frame and/or walls (sub DI: BS) 
+2. Damage to its roof structure (sub DI: BR) 
+3. Damage to non-structural elements of the roof and/or walls, such as cladding, tiles, 
+shingles, or sheathing (BN) 
+4. Damage to anchoring, i.e., movement of the building off its foundation (BM) 
+Ratings for multiple forms of damage can be made. The highest rating is the rating for the 
+object.  
+3.2.1 
+Damage to structural elements (walls or frame) – DI: BS 
+If any structural elements of a building fail, the sturdiness of the structure needs to be known 
+to estimate the wind speed responsible for the damage. We distinguish between buildings in 
+which a frame provides its sturdiness, and those where mass walls provide the sturdiness.  
+In frame structures, the frame gives the building its structural stability. The walls are made from 
+panels of wood, metal, glass, or other materials that contribute little to the strength of the 
+building. Frames are often made of wood, metal, but may also be constructed from reinforced 
+concrete.  
+In the case of mass walls, building material is stacked, and may be connected by mortar or a 
+similar material to form walls that carry the weight of the structure. Examples of mass wall 
+construction are brick masonry walls, walls of concrete blocks, or wood logs. A special form of 
+mass walls is cast concrete. Especially when cast concrete is reinforced by steel, the resulting 
+structure is very wind resistant. 
+As a first step, the sturdiness class is to be assigned to any structure to determine the Damage 
+Indicator. When assessing the sturdiness of both mass wall and frame structures, one should 
+consider that buildings intended as (permanent) homes - in affluent areas - are often stronger 
+than those which are not. 
+3.2.1.1 Frame structures 
+Following Fujita (1992), for frame structures, a number of classes of sturdiness are 
+distinguished.  
+
+DI: Buildings – B (BS, BR, BN, BM) 
+16 
+ 
+Table 2. Sturdiness classes for frame structures. 
+Class Description 
+Comparable description by Fujita (1992) 
+A 
+exceptionally weak or faulty frames 
+weak outbuilding 
+AB 
+extremely weak frames 
+average outbuilding 
+B 
+very weak frames 
+strong outbuilding 
+C 
+weak frames 
+weak frame house 
+D 
+strong frames 
+strong frame house 
+E 
+very strong frames 
+brick structure 
+F 
+exceptionally strong frames 
+concrete building 
+ 
+The sturdiness of a frame structure can be difficult to assess and depends both on the thickness 
+of the frame’s elements, the material it consists of the strength of the connections between 
+frame elements, and the geometry of the frame and its elements. A number of examples are 
+given in 3.2.1.4. More research is needed to provide guidance on the classification of frame 
+structures to be included in future editions of the IF-scale. 
+3.2.1.2 Mass wall structures 
+The sturdiness of mass wall buildings can be estimated by the thickness and quality of the wall. 
+Table 3. Sturdiness classes of mass wall structures. The bold letter class is the default, the class in brackets shall 
+be chosen in case of a vulnerable 3D geometry or connection weaknesses (see text). 
+ 
+Sturdiness class of a building 
+(in brackets: building with vulnerable 3D geometry) 
+ 
+<- Wall Quality 
+Wall Thickness -> 
+10 – 20 
+cm 
+20 – 40 
+cm 
+40 – 80 
+cm 
+> 80  
+cm 
+stacked hollow masonry units  
+without reinforcement and with little 
+to no connections 
+AB  (A) 
+B  (AB) 
+C  (B) 
+D  (C) 
+stacked heavy masonry units such as 
+solid brick or stones, with little to very 
+poor connections  
+B  (AB) 
+C  (B) 
+D  (C) 
+E  (D) 
+weak brick masonry, 
+unreinforced cast concrete 
+C  (B) 
+D  (C) 
+E  (D) 
+F  (E) 
+strong brick masonry, 
+filled concrete masonry units 
+D  (C) 
+E  (D) 
+F  (E) 
+F  (E) 
+steel reinforced filled concrete blocks,  
+or cast-in-place reinforced concrete 
+E  (D) 
+F  (E) 
+F  (F) 
+F  (F) 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+17 
+ 
+The sturdiness of the building can be estimated using Table 3 on the basis of the wall quality 
+and wall thickness. The lower class (in brackets) shall be chosen in case the geometry of the 3D 
+structure renders it comparatively sensitive to wind effects. An example is the presence of very 
+large openings in the building (e.g., windows) or obvious weaknesses in wall-to-wall or wall-to-
+ceiling connections. 
+3.2.1.3 Degrees of Damage 
+Every combination of a sturdiness class and an observed degree of damage gives a rating on the 
+IF scale and an associated wind speed. The fraction of walls that has been destroyed is the key 
+quantity to be considered.  
+Any damage to walls above the highest ceiling are to be ignored here, as such damage is 
+considered under the separate damage indicator for roof damage BR. 
+Table 4. IF ratings for building structural elements, i.e., the walls or frame as a function of sturdiness and DoD. 
+Degree of Damage  
+to walls or frame: 
+ 
+Rating for a given sturdiness class and DoD 
+ 
+A 
+AB 
+B 
+C  
+D 
+E 
+F 
+DoD 0 
+Negligible damage to 
+structure 
+except to gables 
+above highest ceiling 
+≤IF0.5 
+≤ 33 
+≤ 120 
+≤IF1 
+≤ 40 
+≤ 150 
+≤IF1.5 
+≤ 50 
+≤ 180 
+≤IF2 
+≤ 60 
+≤ 220 
+≤IF2.5 
+≤ 70 
+≤ 250 
+≤IF3 
+≤ 80 
+≤ 290 
+ 
+* 
+DoD 1A 
+Some damage to 
+structure 
+destruction of less than 1/5th 
+of all walls 
+IF0.5 
+33 
+120 
+IF1 
+40 
+150 
+IF1.5 
+50 
+180 
+IF2 
+60 
+220 
+IF2.5 
+70 
+250 
+IF3 
+80 
+290 
+IF4 
+105 
+380 
+DoD 1B 
+Partial destruction 
+but not more than 2/3 
+IF1 
+40 
+150 
+IF1.5 
+50 
+180 
+IF2 
+60 
+220 
+IF2.5 
+70 
+250 
+IF3 
+80 
+290 
+IF4 
+105 
+380 
+IF5 
+130 
+470 
+DoD 2 
+Near complete 
+destruction 
+more than 2/3 
+≥IF1.5 
+≥ 50 
+≥ 180 
+≥IF2 
+≥ 60 
+≥ 220 
+≥IF2.5 
+≥ 70 
+≥ 250 
+≥IF3 
+≥ 80 
+≥ 290 
+≥IF4 
+≥ 105 
+≥ 380 
+IF5 
+130 
+470 
+IF5 
+130 
+470 
+* Because there is no upper bound to the sturdiness of class “F” there is no upper bound to the 
+wind speeds when no damage is observed.  
+ 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+18 
+ 
+3.2.1.4 Examples 
+ 
+ 
+DI: Building structure, sturdiness AB (BSAB) 
+outbuilding 
+DoD: 1B, partially destroyed 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+Photo: Thilo Kühne, ESSL 
+DI: Building structure, sturdiness C (BSC) 
+strong outbuilding 
+DoD: 1A, partially destroyed 
+Rating: IF2.5 (70 m/s, 250 km/h) 
+ 
+Photo: Thilo Kühne, ESSL 
+ 
+DI: Building structure, sturdiness C (BSC) 
+20 – 40 cm weakened brick wall 
+DoD: 1B, partially destroyed 
+Rating: IF2.5 (70 m/s, 250 km/h) 
+ 
+Photo: Pieter Groenemeijer, ESSL 
+ 
+DI: Building structure, sturdiness E (BSE) 
+20 – 40 cm brick wall 
+DoD: 0, negligible damage to structure 
+Rating: ≤IF3 (≤ 80 m/s, ≤ 290 km/h) 
+  
+Photo: Pieter Groenemeijer, ESSL  
+Note: the roof damage is to be rated 
+separately 
+ 
+ 
+ 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+19 
+ 
+ 
+DI: Building structure, sturdiness E (BSE) 
+wall 20 – 40 cm, brick masonry 
+DoD: 1A, some damage 
+Rating: IF3 (80 m/s, 290 km/h) 
+ 
+Photo: Tomas Púčik, ESSL 
+ 
+ 
+DI: Building structure, sturdiness E (BSE) 
+wall 20 – 40 cm, brick masonry 
+DoD: 1A, some damage 
+Rating: IF3 (80 m/s, 290 km/h)
+ 
+Photo: Tomas Púcik, ESSL 
+ 
+ 
+DI: Building structure, sturdiness E (BSE) 
+wall 20 – 40 cm, brick masonry 
+DoD: 1A, some damage 
+Rating: IF3 (80 m/s, 290 km/h) 
+ 
+Photo: Tomas Púčik, ESSL 
+DI: Building structure, sturdiness D (BSD) 
+wall 20 – 40 cm, weakened brick masonry 
+DoD: 2, near complete destruction 
+Rating: IF4 (105 m/s, 380 km/h) 
+ 
+Photo: Alois M. Holzer, ESSL 
+ 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+20 
+ 
+DI: Building structure, sturdiness E (BSE) 
+20 – 40 cm brick wall 
+DoD: 1B, partial destruction 
+Rating: IF4 (105 m/s, 380 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+DI: Building structure, sturdiness D (BSD) 
+20 – 40 cm weakened brick masonry 
+DoD: 2, near complete destruction 
+Rating: IF4 (105 m/s, 380 km/h)
+ 
+Photo: Tomas Púcik, ESSL 
+ 
+DI: Building structure, sturdiness E (BSE) 
+20 – 40 cm brick wall 
+DoD: 1B, partial destruction 
+Rating: IF4 (105 m/s, 380 km/h) 
+ 
+Photo: Alois M. Holzer, ESSL 
+ 
+ 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+21 
+ 
+3.2.2 
+Damage to roof structure – BR 
+The roof structure of a building is often most exposed to the wind and can have a lower strength 
+than the remainder of the building, or the connection to the rest of the structure may fail.  
+If a building has a roof construction, such as a gable or mansard roof, it shall be rated separately. 
+As a first guess, the sturdiness class of the roof structure can be assumed to be identical to that 
+of the entire building, but a sturdiness one class class lower or higher may be chosen when the 
+roof is evidently weaker or stronger than average.  
+Gables above the highest ceilings are also considered part of the roof structure. Roof covering is 
+not considered here but shall be rated as non-structural elements. 
+Table 5. IF-ratings for DI: Building Roof Structure (BR). Speeds are given in m/s and km/h. 
+Degree of Damage 
+(DoD) 
+to roof structure: 
+Rating for a given sturdiness class and DoD 
+A 
+AB 
+B 
+C 
+D 
+E 
+F 
+DoD 0  
+No visible damage 
+ 
+≤IF0 
+≤ 25 
+≤ 90 
+≤IF0.5 
+≤ 33 
+≤ 120 
+≤IF1 
+≤ 40 
+≤ 150 
+≤IF1.5 
+≤ 50 
+≤ 180 
+≤IF2 
+≤ 60 
+≤ 220 
+≤IF2 
+≤ 60 
+≤ 220 
+* 
+ 
+DoD 1 
+Damaged 
+But less than 2/3 destroyed. 
+IF0 
+25 
+90 
+IF0.5 
+33 
+120 
+IF1 
+40 
+150 
+IF1.5 
+50 
+180 
+IF2 
+60 
+220 
+IF2 
+60 
+220 
+IF2.5 
+70 
+250 
+DoD 2 
+Roof destroyed or 
+blown away 
+Any destruction of walls 
+limited to gables of top floor.  
+≥IF0.5 
+≥ 32 
+≥ 120 
+≥IF1 
+≥ 40 
+≥ 150 
+≥IF1.5 
+≥ 50 
+≥ 180 
+≥IF2 
+≥ 60 
+≥ 220 
+≥IF2 
+≥ 60 
+≥ 220 
+≥IF2.5 
+≥ 70 
+≥ 250 
+≥IF3 
+≥ 80 
+≥ 290 
+Note 
+Because there is no upper bound to the sturdiness of class “F” there is no bound to the wind 
+speeds when no damage is observed. 
+ 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+22 
+ 
+3.2.2.1 Examples 
+DI: Building roof, sturdiness B (BRB) 
+Weak brick masonry – weak roofing 
+3D vulnerable 
+DoD: 1 – Partial destruction (gable) 
+Rating: IF1 (40 m/s, 150 km/h) 
+ 
+Photo: Juan de Dios Soriano, AEMet 
+DI: Building roof, sturdiness E (BRE) 
+DoD: 1 – Damaged 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo: Lukáš Ronge 
+ 
+DI: Building roof, sturdiness D (BRD) 
+DoD: 1 – Damaged 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+23 
+ 
+DI: Building roof, sturdiness E (BRE) 
+DoD: 3 – Roof destroyed or blown away 
+Rating: IF2.5 (70 m/s, 250 km/h) 
+ 
+Photo: Pieter Groenemeijer, ESSL 
+ 
+ 
+ 
+DI: Building roof, sturdiness F (BRF) 
+DoD: 2 – Roof destroyed or blown away 
+Rating: IF3 (80 m/s, 290 km/h) 
+ 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+24 
+ 
+3.2.3 
+Damage to non-structural elements (tiles, shingles, sheathing, ...) – BN 
+Table 6 gives IF-scale ratings for damage to various types of non-structural elements of buildings. 
+A distinction is made between sheathing, roof tiles and thatched roofs, and within these classes 
+between weak and strong attachment.  
+The weak category should be chosen where tiles or sheathing are not physically attached but 
+kept in place by their own weight and are light. When tiles or sheathing are well-attached, or 
+when roof tiles are exceptionally heavy, the strong category applies. For thatched roofs, 
+whenever the roof has small eaves and is smooth, the strong category applies; otherwise, the 
+weak category must be used. 
+Table 6. IF-scale ratings for DI Building: Non-structural elements (BN). Speeds are given in m/s and km/h. 
+ 
+Degree of 
+Damage (DoD) 
+to non-structural 
+elements 
+Rating for a given category and DoD 
+sheathing 
+(metal, cement, wood or 
+other) 
+tiles or shingles 
+solar panels* 
+ 
+thatched roof 
+(straw, reed, ...) 
+SW 
+weak 
+SS 
+strong 
+TW 
+weak 
+TS 
+strong 
+HW 
+weak 
+HS 
+strong 
+DoD0 
+No elements lost 
+(0%) 
+≤IF0.5 
+≤ 33  ≤ 120 
+≤IF1 
+≤ 40  ≤ 150 
+≤IF0.5 
+≤ 33  ≤ 120 
+≤IF1 
+≤ 40  ≤ 150 
+≤IF1 
+≤ 40  ≤ 150 
+≤IF1.5 
+≤ 50  ≤ 180 
+DoD 1  
+Some elements 
+lost (< 25%) 
+IF0.5 
+33  120 
+IF1 
+40  150 
+IF0.5 
+33  120 
+IF1 
+40  150 
+IF1 
+40  150 
+IF1.5 
+50  180 
+DoD 2 
+Many elements 
+lost (25 – 75%) 
+IF1 
+40  150 
+IF1.5 
+50  180 
+IF1 
+40  150 
+IF1.5 
+50  180 
+IF1.5 
+50  180 
+IF2 
+60  220 
+DoD 3 
+Most elements 
+lost (> 75%) 
+≥IF1 
+≥ 40  ≥ 150 
+≥IF1.5 
+≥ 50  ≥ 180 
+≥IF1.5 
+≥ 50  ≥ 180 
+≥IF1.5 
+≥ 50  ≥ 180 
+≥IF1.5 
+≥ 50  ≥ 180 
+≥IF2 
+≥ 60  ≥ 220 
+ 
+* solar panels not fixed to the roof are meant here, and they should be considered in the TS 
+category. Physically connected solar panels are part of the roof structure and should be rated 
+using the DI Building – Roof structure (BR). 
+ 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+25 
+ 
+3.2.3.1 Examples 
+DI: Roof tiles, strong (BNTS) 
+DoD: 1 – Some elements lost 
+Rating: IF1 (40 m/s, 150 km/h) 
+ 
+ 
+Photo: Thilo Kühne, ESSL 
+DI: Roof tiles, strong (BNTS) 
+DoD: 2 – Many elements lost 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+ 
+Photo: Thilo Kühne, ESSL 
+ 
+DI: Roof tiles, strong (BNTS) 
+DoD: 2 – Many elements lost 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+ 
+Photo: Délia Gutierrez Rubio, AEMet 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+26 
+ 
+DI: Sheathing, strong (BNSS) 
+DoD: 3 – Most elements lost 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+ 
+Photo: Thilo Kühne, ESSL 
+DI: Roof tiles, weak (BNTW) 
+DoD: 3, Most elements lost 
+Rating: ≥IF1.5 (≥ 50 m/s, ≥ 180 km/h) 
+ 
+ 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+ 
+ 
+
+DI: Buildings – B (BS, BR, BN, BM) 
+27 
+ 
+ 
+3.2.4 
+Failing anchoring: Structure moved off foundation – BM 
+This failure can occur with frame structures, e.g., wooden houses that moved off their 
+foundation. It only occurs when the anchoring was less wind-resistant than the frame structure 
+of the building.  
+Table 7. IF-scale table for DI Building: Structure moved off foundation (BM). Speeds are given in m/s and km/h. 
+ 
+Degree of Damage (DoD) 
+to anchoring: 
+Rating for a given category and DoD 
+SM 
+small frame shed 
+or outbuilding 
+ 
+SI 
+one-storey 
+frame building 
+DB 
+two-storey or 
+higher frame 
+building 
+DoD 1 
+Building moved off foundations or 
+overturned 
+≥IF0.5 
+33 
+120 
+≥IF1 
+40 
+150 
+≥IF2 
+60 
+220 
+ 
+Note: Similar DI’s exist in the EF-scale (DI FR12 / DoD 5) and JEF-scale (DI 4 / DoD 2-3 and DI 10 / 
+DoD 1,2). Speeds were adjusted upward to account for the instantaneous wind speed definition. 
+ 
+ 
+
+DI: Road Vehicles – VH 
+28 
+ 
+3.3 
+DI: Road Vehicles – VH 
+Table 8. IF-scale ratings for DI Road Vehicles (VH). Speeds are given in m/s and km/h. 
+ 
+Degree of Damage (DoD): 
+Rating for a given category and DoD 
+T 
+towed trailers 
+ 
+E 
+empty 
+trucks/lorries 
+other vehicles 
+with large 
+surface area 
+L* 
+large heavy 
+vehicles: 
+buses,  
+loaded 
+trucks/lorries 
+C 
+cars, vans 
+DoD 0 
+No movement 
+≤IF1 
+≤ 40  ≤ 150 
+≤IF1 
+≤ 40  ≤ 150 
+≤IF1.5 
+≤ 50  ≤ 180 
+≤IF1.5 
+≤ 50  ≤ 180 
+DoD 1 
+Sliding of vehicle 
+IF1 
+40  150 
+IF1 
+40  150 
+IF1.5 
+50  180 
+IF1.5 
+50  180 
+DoD 2 ** 
+Overturning or lifting 
+IF1 
+40  150 
+IF1.5 
+50  180 
+IF2 
+60  220 
+IF2 
+60  220 
+DoD 3 
+Displacement over large distance 
+(> 10 m) by overturning  
+IF1.5 
+50  180  
+IF2 
+60  220 
+IF2.5 
+70  250 
+IF2.5 
+70  250 
+DoD 4 
+Displacement over large distance 
+(> 10 m) by lofting 
+≥IF2 
+≥ 60  ≥ 220 
+≥IF2.5 
+≥ 70  ≥ 250 
+≥IF3 
+≥ 80  ≥ 290 
+≥IF3 
+≥ 80  ≥ 290 
+* For trucks/lorries (L) with several tonnes of load, the DI for shipping containers shall be used 
+instead. 
+** Any overturning should be caused by the wind, and cannot be applied to vehicles being 
+driven into or through the high wind with considerable speed. In that case, choose DoD1. 
+Note 
+These estimates were based on combining JMA(2015), Schmidlin et al. (2002), Haan et al (2017) 
+and then adjusted upward to account for the instantaneous wind definition. 
+ 
+ 
+
+DI: Road Vehicles – VH 
+29 
+ 
+3.3.1 
+Examples 
+DI: Cars, vans (VHC) 
+DoD: 1 – Sliding 
+Rating: IF1.5 (50 m/s, 180 km/h)  
+ 
+Photo: Tomáš Púčik, ESSL 
+DI: Towed trailers (VHT) 
+DoD: 4 – Displacement >10 m by lofting 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+DI: Cars, vans (VHC) 
+DoD: 2 – Overturning 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo: Thilo Kühne, ESSL 
+ 
+DI: Cars, vans (VHC) 
+DoD: 4 – Displacement >10 m by lofting 
+Rating: IF3 (80 m/s, 290 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+ 
+
+DI: Road Vehicles – VH 
+30 
+ 
+DI: Large, heavy vehicles(VHL) 
+DoD: 4 – Displacement >10 m by lofting 
+Rating: IF3 (80 m/s, 290 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+ 
+ 
+ 
+
+DI: Trees - TR 
+31 
+ 
+3.4 
+DI: Trees - TR 
+3.4.1 
+Introduction 
+Damage to trees can be divided in to categories. Either parts of the tree, such as branches or 
+the trunk, sustained structural failure, or the connection of the tree to the ground was broken, 
+i.e. uprooting occurred. Moreover, at high wind speeds, sandblasting may remove the bark off 
+the tree, which is called debarkation. 
+The wind speed needed fro structural failure to occur depends on the strength of the tree, 
+which is influenced by 
+• 
+the tree geometry 
+• 
+the strength of the wood 
+• 
+whether the tree is bearing leaves 
+The resistance of trees against uprooting is controlled mostly by 
+• 
+the size, health, and geometry of the root system 
+• 
+soil type and soil condition, in particular its water content 
+If the anchoring of the root system in the ground is stronger than the strength of the trunk, the 
+trunk will break before the root system fails. Trunk snapping is probably most likely in quickly 
+varying winds, such as in tornadoes. Some tree types are prone to deformation failure, which 
+occurs in trunks with high flexural strength but lower pressure resistance.  
+Some trees may be ill, and be (very) weak as a result. If there are signs for this to be the case, 
+damage to the tree cannot be rated except by an expert.  
+Apart from unhealthy trees, trees in built-up areas or along roads and streets can have their 
+stability compromised by impairments to their root systems or by the fact that the soil type on 
+which they stand is not natural. Such trees should not be used for a wind intensity rating.  
+Especially when single trees are used to rate a tornado or wind event, they should be well 
+documented by photos to allow assessment by an expert. 
+The assessment of damage to trees starts with establishing tree strength and subsequently 
+combine the respective Damage Indicator subclass with the observed DoD in  
+ 
+
+DI: Trees - TR 
+32 
+ 
+Table 10. To rate the uprooting or snapping of a group of trees (a tree stand), see Section 3.5. For 
+rating single trees, use this DI. 
+3.4.2 
+Tree strength 
+Tree strength depends on a number of factors. The tree species can give a first indication. A list 
+of fragile sturdy tree species is given in Table 9. However, this list is not exhaustive, and this list 
+would optimally be adapted regionally to include fragile (sub-)species and to exclude strong 
+subspecies common in a certain region. To rate tree damage, the tree strength number is to be 
+determined. 
+Table 9. List of weak tree species. 
+Common name 
+Scientific name 
+Spruce 
+Douglas 
+Fir 
+Poplar, Aspen 
+Willow 
+Birch 
+Eucalyptus 
+Ash2 
+Picea sp. 
+Pseudotsuga sp. 
+Abies alba 
+Populus sp. 
+Salix sp. 
+Betula sp. 
+Eucalyptus sp. 
+Fraxinus excelsior 
+ 
+To find the strength of the tree, start with the number 3 and follow these steps: 
+• Subtract 1  
+if the tree species is a fragile tree species listed in Table 9. 
+• Subtract 1  
+if uprooting occurred and the tree was rooted in unstable, 
+ 
+ 
+e.g., saturated, soil. 
+• Add 1   
+if the tree is a very stable tree, for example because it  
+ 
+ 
+- has a small height/diameter ratio, or  
+ 
+ 
+- is very well rooted (in case of uprooting), or  
+ 
+ 
+- it grows in a location frequently exposed to strong winds 
+• Add 1   
+if the tree is a deciduous tree without any leaves. 
+The resulting number indicated tree strength can range from 1 to 5. 
+ 
+ 
+ 
+ 
+ 
+2   Healthy ash (Fraxinus exclesior) trees are not weak, however many trees are suffering from ash shoot dieback 
+and should then be regarded as a weak tree. 
+
+DI: Trees - TR 
+33 
+ 
+Table 10. IF-scale ratings for DI tree (TR). Speeds are given in m/s and km/h. 
+ 
+Degree of Damage (DoD): 
+Rating per category 
+W 
+Weak trees 
+(strength 1 or 2) 
+A 
+Average trees 
+(strength 3) 
+S 
+Strong trees 
+(strength 4 or 5) 
+DoD 0 
+No damage 
+≤IF0 
+< 25  < 90 
+≤IF0 
+< 25 < 90 
+≤IF0.5 
+< 33  < 120 
+DoD 1 
+Minimal debranching* 
+Multiple small branches or a single large branch broken off 
+IF0 
+25  90 
+IF0.5 
+33  120 
+IF0.5 
+33  120 
+DoD 2 
+Minor debranching* 
+Multiple large branches or part of crown broken off, but not 
+more than 1/3 of all large branches 
+IF0.5 
+33  120 
+IF1 
+40  150 
+IF1.5 
+50  180 
+DoD 3 
+Uprooting 
+≥IF0.5 
+≥ 33  ≥ 120 
+≥IF1 
+≥ 40  ≥ 150 
+≥IF1.5 
+≥ 50  ≥ 180 
+DoD 4 
+Compression failure 
+wood of tree stem permanently deformed 
+IF0.5 
+33  120 
+IF1 
+40  150 
+IF1.5 
+50  180 
+DoD 5 
+Trunk snapping 
+possibly with removal of parts of the bark as a result 
+≥IF1 
+≥ 40  ≥ 150 
+≥IF1.5 
+≥ 50  ≥ 180 
+≥IF2 
+≥ 60  ≥ 220 
+DoD 6 
+Major debranching* 
+More than 1/3 of large branches broken off; some leaves 
+may be remaining; the trunk is not snapped 
+IF1.5 
+50  180 
+IF2 
+60  220 
+IF2.5 
+70  250 
+DoD 7 
+Complete debranching* 
+All branches broken off; most large branches broken off 
+close to the remaining stem; no leaves left on the remains 
+of the tree; the trunk is not snapped 
+** 
+≥IF3 
+≥ 80  ≥ 290 
+DoD 8 
+Minor debarking (<60%) due to sandblasting 
+or impact of other small debris 
+IF3 
+80   290 
+DoD 9 
+Major debarking (>60%) due to sandblasting 
+or impact of other small debris 
+≥IF4 
+≥ 105  ≥ 380 
+ 
+* Dead branches are not included 
+** This is not expected for weak trees, since snapping of the trunk or uprooting will happen first. 
+
+DI: Trees - TR 
+34 
+ 
+3.4.3 
+Examples 
+DI: Tree, weak (TRW) 
+oak (3) poorly rooted (-1): 
+strength = 2 (weak) 
+DoD: 3 – Uprooting 
+Rating: ≥IF0.5 (33 m/s, 120 km/h) 
+ 
+ 
+Photo: Martin Hubrig 
+DI: Tree, weak (TRW) 
+pine (2), poorly rooted (-1) 
+strength = 1 (weak) 
+DoD: 3 – Uprooting 
+Rating: ≥IF0.5 (33 m/s, 120 km/h) 
+ 
+Photo: Martin Hubrig 
+DI: Tree, weak (TRW) 
+strength 2 (weak) 
+DoD: 4 – Compression failure 
+Rating: IF0.5 (33 m/s, 120 km/h) 
+ 
+Photo: Martin Hubrig 
+
+DI: Trees - TR 
+35 
+ 
+DI: Tree, average (TRA) 
+spruce (2), very well rooted (+1) 
+strength = 3 (average) 
+DoD: 3 – Uprooting 
+Rating: ≥IF1 (≥40 m/s, ≥150 km/h) 
+ 
+  
+Photo: Martin Hubrig 
+ 
+DI: Tree, average (TSA) 
+pine (2), 
+strength = 3 (average) 
+DoD: 5 – Trunk snapping 
+Rating: ≥IF1.5 (≥50 m/s, ≥180 km/h) 
+ 
+Photo: Délia Gutierrez Rubio, AEMet 
+ 
+DI: Tree, strong (TRS) 
+species: 3 
+oak (3), tree without leaves means (+1) 
+strength = 4 (strong) 
+DoD: 3 – Uprooting 
+Rating: ≥IF1.5 (≥50 m/s, ≥180 km/h) 
+ 
+Photo: Martin Hubrig 
+ 
+
+DI: Trees - TR 
+36 
+ 
+DI: Tree, weak (TRW) 
+tree (2) 
+strength = 2 
+DoD: 6 – Major debranching 
+Majority of large branches (> 50 %) broken off. 
+The trunk is not snapped. 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+Photo: Mortimer Müller 
+ 
+DI: Tree, strong (TRS) 
+oak (3), frequently exposed to strong 
+winds (+1) 
+strength = 4 (strong) 
+DoD: 6 – Major debranching 
+Majority of large branches (> 50 %) broken off. 
+The trunk is not snapped. 
+Rating: IF2.5 (70 m/s, 250 km/h) 
+ 
+Photo: Oliver Schlenczek 
+ 
+
+DI: Trees - TR 
+37 
+ 
+DI: Tree (TRA) 
+DoD: 7 – Complete debranching 
+All large and small branches broken; most large 
+branches broken off close to the remaining stem; 
+no leaves left on standing tree remains; the trunk 
+is not snapped  
+Rating: ≥IF3 (80 m/s, 290 km/h) 
+ 
+- Note that the bark was not partially removed by 
+sandblasting but was ripped off when the 
+branches were blown off. 
+ 
+Photo: Tomáš Púčik/Alois M. Holzer, ESSL 
+ 
+DI: Tree (TRA) 
+DoD: 7 – Complete debranching 
+All large and small branches broken; most large 
+branches broken off close to the remaining stem; 
+no leaves left on standing tree remains; the trunk 
+is not snapped 
+Rating: ≥IF3 (80 m/s, 290 km/h) 
+ 
+ 
+Photo: Tomáš Púčik (ESSL) 
+
+ 
+38 
+ 
+DI: Tree, average (TRA) 
+DoD: 7 – Complete debranching 
+Rating: ≥IF3 (≥ 80 m/s, ≥ 290 km/h) 
+All large and small branches broken; most large 
+branches broken off close to the remaining stem; 
+no leaves left on standing tree remains; the trunk 
+is not snapped  
+and 
+DoD: 8 – Minor debarking due to 
+sandblasting 
+Rating: IF3 (80 m/s, 290 km/h) 
+ 
+Photo: Rainer Kaltenberger 
+DI: Tree, average (TRA) 
+DoD: 7 – Complete debranching 
+Rating: ≥IF3 (≥ 80 m/s, ≥ 290 km/h) 
+All large and small branches broken; most large 
+branches broken off close to the remaining stem; 
+no leaves left on standing tree remains; the trunk 
+is not snapped 
+and 
+DoD: 9 – Major debarking due to 
+sandblasting 
+Rating: ≥IF4 (105 m/s, 380 km/h) 
+ 
+Photo: Tomáš Púčik/Alois M. Holzer, ESSL 
+ 
+DI: Tree 
+The tree is rotten from the inside and 
+therefore prone to be blown over. It 
+cannot be used to obtain a rating. 
+DoD: 5 – Trunk snapped 
+Rating: unrated 
+ 
+ 
+ 
+
+DI: Tree stand – TS 
+39 
+ 
+3.5 
+DI: Tree stand – TS 
+A tree stand is a number of trees close together that were exposed to more or less the same 
+winds, such as in a park, or forest, where assessing the sturdiness of every single tree is not 
+feasible. To use this as a Damage Indicator, we need the average tree strength (see: 3.4.2) for 
+the tree stand and the percentage of snapped or uprooted trees. 
+Table 11. IF-scale ratings for DI Tree Stand (TS). Speeds are given in m/s and km/h. 
+ 
+W 
+Weak trees 
+(strengths 1 or 2 
+dominate) 
+A 
+Average trees 
+(strengths 3 dominates) 
+S 
+Strong trees 
+(strengths 4 or 5 
+dominate) 
+DoD 0 
+No trees snapped or 
+uprooted 
+ 
+≤ IF0 
+< 25  < 90 
+≤ IF0.5 
+< 33  < 120 
+≤ IF0.5 
+< 33  < 120 
+DoD 1  
+Isolated trees snapped or 
+uprooted 
+(< 10 %) 
+IF0.5 
+33  120 
+IF1 
+40  150 
+IF1 
+40  150 
+DoD 2 
+Fewer than half of the trees 
+snapped or uprooted  
+(10 – 50 %) 
+IF1 
+40  150 
+IF1 
+40  150 
+IF1.5 
+50  180 
+DoD 3 
+More than half of the trees 
+snapped or uprooted  
+(50 – 90 %) 
+IF1 
+40  150 
+IF1.5 
+50  180 
+IF2 
+60  220 
+DoD 4 
+(almost) all trees snapped or 
+uprooted 
+(90 – 100 %) 
+≥IF1.5 
+≥ 50  ≥ 180 
+≥IF2 
+≥ 60  ≥ 220 
+≥IF2.5 
+≥ 70  ≥ 250 
+Note 
+This table is similar to the equivalent DI in the CEF scale. 
+ 
+ 
+
+DI: Tree stand – TS 
+40 
+ 
+3.5.1 
+Examples 
+DI: Tree Stand (TSA) 
+trees, strength 3 
+DoD: 1 - Isolated trees snapped or 
+uprooted 
+Rating: IF1 (40 m/s, 150 km/h) 
+ 
+Photo: Lukáš Ronge 
+ 
+DI: Tree Stand (TSA) 
+trees, strength 3 
+DoD: 2 – Fewer than half of trees 
+snapped or uprooted 
+Rating: IF1 (40 m/s, 150 km/h) 
+ 
+Photo: Lukáš Ronge 
+ 
+ 
+ 
+DI: Tree, weak (TRW) 
+spruce, strength 2, weak 
+DoD: 5 – (almost) all trees snapped or 
+uprooted 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+Photo: Martin Hubrig 
+ 
+
+DI: Tree stand – TS 
+41 
+ 
+DI: Tree Stand (TSA) 
+trees, strength 2 (mainly birch trees) 
+DoD: 3 – more than half of trees 
+snapped or uprooted 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+Photo: Lukáš Ronge 
+ 
+DI: Tree Stand (TSW) 
+Trees, strength 2 
+DoD: 4 – (almost) all trees snapped or 
+uprooted 
+Rating: IF1.5 (50 m/s, 180 km/h)  
+ 
+Photo: Thilo Kühne, ESSL 
+ 
+DI: Tree Stand (TSA) 
+trees, strength 2 (birch trees) 
+DoD: 4 – (almost) all trees snapped or 
+uprooted 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo: Lukáš Ronge 
+ 
+ 
+ 
+
+DI: Wind turbines – WT 
+42 
+ 
+3.6 
+DI: Wind turbines – WT 
+Table 12. IF-scale ratings for DI Wind Turbines (WT). Speeds are given in m/s and km/h. 
+ 
+A 
+average 
+S 
+strong 
+DoD 0 
+No visible damage 
+ 
+≤IF1.5 
+≤ 50  ≤ 180 
+≤IF2 
+≤ 60  ≤ 220 
+DoD 1 
+Broken or shredded turbine blade 
+ 
+IF1.5 
+50  180 
+IF2 
+60  220 
+DoD 2 
+Permanent deformation of tower 
+or blades 
+IF2 
+60  220 
+IF2.5 
+70  250 
+DoD 3 
+Tower collapse 
+ 
+≥IF2.5 
+≥ 70  ≥ 250 
+≥IF3 
+≥ 80  ≥ 290 
+Note 
+Speeds are based on US ASCE EF-scale V2 standard proposal, adjusted upward to account for 
+the instantaneous wind speed definition. 
+ 
+ 
+
+DI: Greenhouses - GH 
+43 
+ 
+3.7 
+DI: Greenhouses - GH 
+Table 13. IF-scale ratings for DI Greenhouses (GH). Speeds are given in m/s and km/h. 
+Degree of Damage 
+Category 
+ 
+W 
+weak 
+A 
+average 
+S 
+strong 
+DoD 0 
+No damage 
+ 
+<IF0 
+< 25  90 
+≤IF0 
+≤ 25  ≤ 90 
+≤IF0.5 
+≤ 33  ≤ 120 
+DoD 1 
+Cover damaged, or partially 
+lifted 
+IF0 
+25  90 
+IF0.5 
+33  120 
+IF1 
+40  150 
+DoD 2 
+Cover (almost) completely gone 
+IF0.5 
+33  120 
+IF1 
+40  150 
+IF1 
+40  150 
+DoD 3 
+Collapse, lifting or overturning 
+≥IF1 
+≥ 40  ≥ 150 
+≥IF1 
+≥ 40  ≥ 150 
+≥IF1.5 
+≥ 50  ≥ 180 
+ 
+3.7.1 
+Sub-categories 
+For Greenhouses, the following sub-categories are defined: 
+ 
+ 
+W (weak):  
+Plastic / PVC cover  
+Aluminium frames  
+(agricultural) 
+A (average):  
+Glass / PVC cover 
+Wood or light pipe metal 
+frames 
+ 
+S (strong):  
+Glass cover 
+Pipe metal frames 
+(agricultural) 
+ 
+ 
+
+DI: Greenhouses - GH 
+44 
+ 
+3.7.2 
+Examples 
+DI: Greenhouse, weak (GHW) 
+DoD: 2 – Cover damaged 
+Rating: IF0 (25 m/s, 90 km/h) 
+ 
+Photo: Juan de Dios Soriano, AEMet 
+DI: Greenhouse, weak (GHW) 
+DoD: 2 – Cover (almost) completely gone 
+Rating: IF0.5 (33 m/s, 120 km/h) 
+ 
+Photo: Délia Gutierrez Rubio, AEMet 
+ 
+DI: Greenhouse, weak (GHW) 
+DoD: 3 – Collapse 
+Rating: IF1 (40 m/s, 150 km/h) 
+ 
+Photo: Juan de Dios Soriano, AEMet 
+ 
+ 
+ 
+
+DI: Train cars – TC 
+45 
+ 
+3.8 
+DI: Train cars – TC 
+Table 14. IF-scale ratings for DI Train cars (TC). Speeds are given in m/s and km/h. 
+Degree of Damage (DoD): 
+Sub-categories: 
+S 
+Stationary, 
+ or operating at < 25 m/s 
+F 
+Operating at normal speed, 
+≥ 25 m/s 
+ 
+DoD 0 
+No flipping or derailment 
+≤IF1.5 
+ ≤ 50  ≤ 180 
+≤IF1 
+≤ 40   ≤ 140 
+DoD 1 
+Flipping or derailment 
+≥IF2 
+≥ 60  ≥ 220 
+≥IF1.5 
+≥ 50  ≥ 180 
+ 
+ 
+ 
+ 
+Photo: Phil Richards from London, UK - 21.04.10 Sofia 31005, CC BY-SA 2.0, https://commons.wikimedia.org/w/index.php?curid=26695298 
+Photo: Phil Richards from London, UK - 26.03.95 La Pobla de Segur, https://commons.wikimedia.org/w/index.php?curid=23047753 
+Photo:Doug Sim - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=30305173 
+ 
+
+DI: Mobile Homes / Static Caravans – MH 
+46 
+ 
+3.9 
+DI: Mobile Homes / Static Caravans – MH 
+Table 15. IF-scale ratings for DI Mobile Homes/ Static Caravans (MH). Speeds are given in m/s and km/h. 
+Degree of Damage (DoD): 
+ 
+DoD 0 
+No damage 
+≤IF0.5 
+≤ 33  ≤ 120 
+DoD 1 
+Light damage to roof or siding 
+IF0.5 
+33  120 
+DoD 2 
+Unit slides 
+IF1 
+40  150 
+DoD 3 
+Roof gone 
+IF1 
+40  150 
+DoD 4 
+Overturned 
+IF1.5 
+50  180 
+DoD 5 
+Complete destruction or becoming airborne 
+≥IF2 
+≥ 60  ≥ 220 
+Note 
+Estimates based on EF-scale (McDonald and Mehta, 2006), adjusted upward for instantaneous 
+wind speed definition. 
+3.9.1 
+Examples 
+DI: MH 
+DoD: 4 Complete destruction or becoming airborne 
+Note: the caravan was lifted over a garage 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+
+DI: Poles and Towers – PT 
+47 
+ 
+3.10 DI: Poles and Towers – PT 
+Table 16. IF-scale ratings for DI Poles and towers (PT). Speeds are given in m/s and km/h. 
+Degree of Damage 
+W 
+utility pole, light 
+pole, or traffic light 
+pole, weak 
+S 
+utility pole, light 
+pole, or traffic light 
+pole, strong 
+T 
+power 
+transmission 
+tower 
+DoD 0 
+No damage 
+≤IF0.5 
+≤ 33  ≤ 120 
+≤IF1.5 
+≤ 50  ≤ 180 
+≤IF1.5 
+≤ 50  ≤ 180 
+DoD 1 
+Deformed, bent, or leaning 
+IF1 
+40  150 
+IF1.5 
+50  180 
+IF2 
+60  220 
+DoD 2 
+Collapsed 
+≥IF1.5 
+≥ 50  ≥ 180 
+≥IF2 
+≥ 60  ≥ 220 
+≥IF2 
+≥ 60  ≥ 220 
+Note 
+Estimates based on EF-scale (McDonald and Mehta, 2006) with upward adjustments of speeds 
+to adapt for instantaneous 3D wind speed definition. 
+3.10.1 Examples 
+DI: Light pole, strong (PTS) 
+DoD: 1 – Deformed, bent or leaning 
+Rating: IF1.5 (50 m/s , 180 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+DI: Traffic light pole, strong (PTS) 
+DoD: 1 – Deformed, bent, or leaning 
+Rating: IF1.5 (50 m/s , 180 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+ 
+
+DI: Poles and Towers – PT 
+48 
+ 
+DI: Light pole, strong (PTS) 
+DoD: 2 – Collapsed 
+Rating: IF2 (60 m/s , 220 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+DI: Utility pole, strong (PTS) 
+DoD: 1 – Collapsed 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo: Délia Gutierrez Rubio, AEMet 
+DI: Utility pole, strong (PTS) 
+DoD: 2 – Collapsed 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+DI: Power transmission tower (PTT) 
+DoD: 2 – Collapsed 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo:Lukáš Ronge, AMS 
+ 
+ 
+
+DI: Solar Panels – SP 
+49 
+ 
+3.11 DI: Solar Panels – SP 
+This DI is for solar panels that are located in a field rather than on a roof. Solar panels fixed to a 
+roof are part of the roof structure and shall be rated using the DI (BR: Building – roof). Solar 
+panels not attached to a roof can be considered as strong roof tiles/shingles. 
+Table 17. IF-scale ratings for DI Solar Panels (SP). Speeds are given in m/s and km/h. 
+Degree of Damage (DoD): 
+ 
+DoD 0 
+No damage, or damaged by debris impact 
+≤IF1.5 
+≤ 50   180 
+DoD 1 
+Detachment or structural failure 
+≥IF2 
+60  220 
+3.11.1 Examples 
+DI: SP (Solar panels) 
+DoD: 1 – Detachment or structural failure 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo: Lukáš Ronge, AMS 
+ 
+DI: SP (Solar panels) 
+DoD: 1 – Detachment or structural failure 
+Rating: IF2 (60 m/s, 220 km/h) 
+ 
+Photo: Juan de Dios Soriano, AEMet 
+ 
+ 
+
+DI: Fences - FC 
+50 
+ 
+3.12  DI: Fences - FC 
+Table 18. IF-scale ratings for DI Fences (FC). Speeds are given in m/s and km/h. 
+ 
+Sub-class 
+Degree of Damage (DoD): 
+W 
+Metal wire 
+or wooden fence, 
+weak 
+S 
+Metal wire 
+or wooden fence, 
+strong 
+DoD 1 
+Partial or complete collapse 
+≥IF0.5 
+≥ 33  ≥ 120 
+≥IF1 
+≥ 40  ≥ 150 
+3.12.1  Examples 
+DI: Weak fence (FCW) 
+DoD: 1 – Bent, leaning, deformed or collapsed 
+Rating: ≥IF0.5 (33 m/s, 120 km/h)
+ 
+Photo: Délia Gutierrez Rubio, AEMet 
+ 
+DI: Strong fence (FCS) 
+DoD: 1 – Bent, leaning, deformed or collapsed 
+Rating: ≥IF1 (40 m/s, 150 km/h) 
+ 
+Photo: Délia Gutierrez Rubio, AEMet 
+DI: Strong fence (FCW) 
+DoD: 1 – Bent, leaning, deformed or collapsed 
+Rating: ≥IF1 (40 m/s, 150 km/h) 
+ 
+Photo: Délia Gutierrez Rubio, AEMet 
+DI: Strong fence (FCS) 
+DoD: 1 – Bent, leaning, deformed or collapsed 
+Rating: ≥IF1 (40 m/s, 150 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+ 
+
+DI: Free-standing walls – FW 
+51 
+ 
+3.13 DI: Free-standing walls – FW 
+To rate damage to free-standing walls, first determine the wall sturdiness, by combining the 
+wall building material and width of the wall.  
+Damage to the walls by the impact of airborne debris is excluded. 
+In case only sidings of the walls are damaged, these can be rated as Non-structural elements 
+(tiles, shingles, sheathing, etc.) – DI: BN. 
+Table 19. Table to determine sturdiness class of free-standing wall. 
+ 
+Sturdiness class for free-standing walls * ** 
+Wall Quality 
+Wall Thickness: 
+10 – 20 cm 
+20 – 40 cm 
+40 – 80 cm 
+> 80 cm 
+hollow concrete blocks, 
+unreinforced 
+Z 
+A  
+AB 
+B 
+stacked solid bricks or 
+stones, 
+unreinforced concrete 
+A 
+AB 
+B 
+C 
+weak brick masonry, 
+concrete blocks (reinforced) 
+AB 
+B 
+C 
+D 
+brick masonry 
+B 
+C 
+D 
+D 
+reinforced concrete 
+C 
+D 
+E 
+F 
+ 
+* select the next higher sturdiness in case the wall is supported by buttresses or side 
+walls.  
+** select the next lower sturdiness in case the wall is taller than 8 times its width. 
+ 
+Table 20. IF-scale ratings for DI Free-standing walls (FW). Speeds are given in m/s and km/h. 
+Degree of 
+Damage (DoD): 
+Rating for each sturdiness class and DoD 
+Z 
+A 
+AB 
+B 
+C  
+D 
+E 
+F 
+ 
+DoD 1 
+Partial 
+destruction but not 
+more than 2/3 
+IF0.5 
+33 
+120 
+IF1 
+40 
+150 
+IF1.5 
+50 
+180 
+IF2 
+60 
+220 
+IF2.5 
+70 
+250 
+IF3 
+80 
+290 
+IF4 
+105 
+380 
+IF5 
+130 
+470 
+ 
+m/s 
+km/h 
+DoD 2 
+(Near) complete 
+destruction 
+more than 2/3 
+≥IF1 
+≥ 40 
+≥ 150 
+≥IF1.5 
+≥ 50 
+≥ 180 
+≥IF2 
+≥ 60 
+≥ 220 
+≥IF2.5 
+≥ 70 
+≥ 250 
+≥IF3 
+≥ 80 
+≥ 290 
+≥IF4 
+≥ 105 
+≥ 380 
+IF5 
+130 
+470 
+IF5 
+130 
+470 
+ 
+m/s 
+km/h 
+ 
+ 
+ 
+
+DI: Free-standing walls – FW 
+52 
+ 
+3.13.1 Examples 
+DI: Wall, sturdiness Z (FWZ) 
+Stacked hollow concerte blocks – 10-20 cm 
+DoD: 2 – Complete destruction 
+Rating: IF1 (40 m/s, 150 km/h) 
+ 
+Photo: Juan de Dios Soriano, AEMet 
+ 
+DI: Wall, sturdiness Z (FWZ) 
+Stacked hollow concerte blocks – 10-20 cm 
+DoD: 2 – Complete destruction 
+Rating: IF1 (40 m/s, 150 km/h) 
+Photo: Tomáš Púčik, ESSL 
+DI: Wall, sturdiness AB (FWAB) 
+Weak brick masonry – 10-20 cm 
+DoD: 1 – Partial destruction 
+ 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+Photo: Juan de Dios Soriano, AEMet 
+DI: Wall, sturdiness C (FWC) 
+reinforced concrete 20 – 40 cm, but with an 
+extreme height/width ratio  
+DoD: 1 – Partial destruction 
+Rating: IF2.5 (70 m/s, 250 km/h)
+ 
+Photo: Juan de Dios Soriano, AEMet 
+ 
+ 
+ 
+
+DI: Signs and billboards – SN 
+53 
+ 
+3.14 DI: Signs and billboards – SN 
+Billboards or traffic signs with a wooden frame have varying degrees of firmness, because of 
+their design or inadequate maintenance. This makes them poor damage indicators. For that 
+reason, they are not included here. 
+Table 21. IF-scale ratings for DI Sings and billboards (SN). Speeds are given in m/s and km/h. 
+Degree of Damage (DoD): 
+Sub-class 
+T 
+traffic signs 
+M 
+metal frame billboards 
+DoD 0 
+No damage 
+≤IF1 
+40  150 
+≤IF1 
+40  150 
+DoD 1 
+Inclination or buckling of pillar(s) 
+IF1.5 
+50  180 
+IF1.5 
+50  180 
+DoD 2 
+Collapse of pillar(s) or destruction 
+≥IF2 
+60  220 
+≥IF2 
+60  220 
+3.14.1 Examples 
+DI: Traffic sign (SNT) 
+DoD: 1 – Inclination or buckling of pillar 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+Photo: Délia Gutierrez-Rubio, AEMet 
+DI: Traffic sign (SNT) 
+DoD: 2 – Inclination or buckling of pillar 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+Photo: Délia Gutierrez-Rubio, AEMet 
+ 
+ 
+
+DI: Signs and billboards – SN 
+54 
+ 
+DI: Metal frame billboard (SNM) 
+DoD: 2 – Collapse of pillar(s) or destruction 
+Rating: ≥IF2 (≥ 60 m/s, ≥ 220 km/h) 
+Photo: Tomáš Púčik, ESSL 
+ 
+DI: Traffic sign (SNT) 
+DoD: 2 – Collapse of pillar(s) or destruction 
+Rating: ≥IF2 (≥ 60 m/s, ≥ 220 km/h) 
+Photo: Tomáš Púčik, ESSL 
+ 
+3.14.2 Examples (undamaged) 
+Metal frame billboards (M) - undamaged 
+ 
+ 
+ 
+Left: Photo:Kolforn (Kolforn) https://commons.wikimedia.org/w/index.php?curid=43306855 
+Right: Photo:Lišiak - Own work, CC BY-SA 4.0, https://commons.wikimedia.org/w/index.php?curid=39072776 
+ 
+ 
+
+DI: Connected scaffolding – CS 
+55 
+ 
+3.15 DI: Connected scaffolding – CS 
+Table 22. IF-scale rating for DI Scaffolding connected to walls (SW). Speeds are given in m/s and km/h. 
+Degree of Damage (DoD): 
+Rating 
+DoD 1 
+Breakage of connections to walls 
+≥IF0.5 
+≥ 33  ≥ 120 
+Notes: 
+There is no DoD0, because some scaffolding may be very well connected so that an upper 
+bound to the wind speed cannot be given. 
+3.15.1 Examples (undamaged) 
+  
+ 
+ 
+Left: by Plaats - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=17360290 
+Centre: by TheRunnerUp - Own work, CC BY-SA 3.0 at, https://commons.wikimedia.org/w/index.php?curid=28031152 
+Right: by Globetrotter19 - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=44053732 
+ 
+
+DI: Carports / Garages – CP 
+56 
+ 
+3.16 DI: Carports / Garages – CP 
+Table 23. IF-scale rating for DI Carports / garages (CP). Speeds are given in m/s and km/h.  
+Degree of Damage (DoD): 
+Rating 
+DoD 1 
+Collapse 
+≥IF1.5 
+≥ 50  ≥ 180 
+ 
+3.16.1 Examples (undamaged) 
+Left: Photo:Aarp65 - Own work, CC BY-SA 3.0, https://commons.wikimedia.org/w/index.php?curid=30872535 
+Centre: Photo:Ra Boe / Wikipedia, CC BY-SA 3.0 de, https://commons.wikimedia.org/w/index.php?curid=18077883 
+Right: Photo:Dr.Ing.S.Wetzel, de:Benutzer: Analemma - Own work (Original text: Eigenfoto), CC BY-SA 3.0 de, 
+https://commons.wikimedia.org/w/index.php?curid=47928444 
+ 
+ 
+
+DI: Service station canopies – SS 
+57 
+ 
+3.17 DI: Service station canopies – SS 
+Table 24. IF-scale ratings for DI Service station canopies (SS). Speeds are given in m/s and km/h. 
+Degree of Damage (DoD): 
+Rating for given DoD 
+DoD 0 
+No damage 
+≤IF1 
+≤ 40  ≤ 150 
+DoD 1 
+Damage to siding or roof material 
+IF1.5 
+50  180 
+DoD 2 
+Partial or full collapse 
+≥IF2 
+≥ 60  ≥ 220 
+DoD 3 
+Full destruction of canopy 
+≥IF2.5 
+≥ 70  ≥ 250 
+3.17.1 Examples 
+DI: CP 
+DoD: 1 Damage to siding 
+Rating: IF1.5 (50 m/s 180 km/h) 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+DI: CP 
+DoD: 1 Damage to siding 
+Rating: IF1.5 (50 m/s 180 km/h) 
+ 
+Photo: Délia Gutierrez Rubio, AEMet 
+
+DI: Service station canopies – SS 
+58 
+ 
+3.17.2 Examples (undamaged) 
+ 
+ 
+Left: 
+Photo:Kulja - Own work, CC BY 3.0, https://commons.wikimedia.org/w/index.php?curid=837123 5 
+Right: Photo:Tiia Monto - Own work, CC BY-SA 4.0, https://commons.wikimedia.org/w/index.php?curid=47617270 
+ 
+
+DI: Shipping containers – SC 
+59 
+ 
+3.18 DI: Shipping containers – SC 
+The three weight ranges of the contents are given for 40 ft, 20 ft, and 10 ft containers, 
+respectively, whereby 1 t = 1000 kg. The weight ranges have been calculated using the relation 
+that the exerted force is proportional to the square of the wind speed. 
+Table 25. Determination of sub-class on the basis of the weight of the container contents in tonnes (t = 1000 kg) 
+and length. 
+Class: 
+Container length 
+A 
+B 
+C 
+D 
+E 
+F 
+Standard 10 ft 
+< 0.5 t 
+0.5 – 1.5 t 
+1.5 – 2.5 t 
+2.5 – 3.5 t 
+3.5 – 5 t 
+> 5 t 
+Standard 20 ft 
+< 1 t 
+1 – 2 t 
+2.5 – 4 t 
+4 – 6 t 
+6 – 8 t 
+> 8 t 
+Standard 40 ft 
+< 2 t 
+2 – 5 t 
+5 – 8 t 
+8 – 12 t 
+12 – 16 t 
+> 16 t 
+ 
+Table 26. IF-scale ratings for DI Shipping containers (SC). Speeds are given in m/s and km/h. 
+Degree of 
+Damage 
+(DoD): 
+Rating for a given sub-class and DoD 
+ 
+A 
+B 
+C 
+D 
+E 
+F 
+DoD 1 
+Shifting or 
+sliding 
+IF1 
+40  150 
+IF1.5 
+50  180 
+IF2 
+60  220 
+IF2.5 
+70  250 
+IF3 
+80  290 
+IF4 
+105 380 
+DoD 2 
+Lifting > 1 m 
+above ground 
+IF1.5 
+50  180 
+IF2 
+60  220 
+IF2.5 
+70  253 
+IF3 
+80  290 
+IF4 
+105 380 
+IF5 
+130  470 
+DoD 3 
+Lifting and 
+transportation 
+over 50 m or 
+more 
+≥IF2 
+≥ 60  ≥ 220 
+≥IF2.5 
+≥ 70  ≥ 253 
+≥IF3 
+≥ 80  ≥ 290 
+≥IF4 
+≥ 105 ≥ 380 
+IF5 
+≥130  ≥470 
+IF5 
+≥130  ≥470 
+ 
+ 
+
+DI: Shipping containers – SC 
+60 
+ 
+3.18.1 Example 
+DI: Shipping container, sub-class A 
+DoD: 2 – Lifting 
+This was an almost empty 20ft container 
+Rating: IF1.5 (50 m/s, 180 km/h) 
+ 
+ 
+Photo: Tomáš Púčik, ESSL 
+ 
+3.18.2   Examples (undamaged) 
+   
+ 
+Left: Photo:IAEA Imagebank - 02510199, CC BY-SA 2.0, https://commons.wikimedia.org/w/index.php?curid=36209242 
+Right: Photo:Guillaume Baviere, https://www.flickr.com/photos/84554076@N00/6133222589, CC BY 2.0, 
+https://commons.wikimedia.org/w/index.php?curid=37188939 
+ 
+ 
+
+DI: Cranes – CR 
+61 
+ 
+3.19 DI: Cranes – CR 
+Table 27. IF-scale ratings for DI Cranes (CR). Speeds are given in m/s and km/h. 
+Degree of Damage 
+Sub-class 
+G 
+gantry crane 
+T 
+tower crane 
+DoD 1 
+Collapse when in operation 
+IF1 
+40  150 
+IF1 
+40  150 
+DoD 2 
+Collapse when not in operation 
+≥IF2 
+≥ 60  ≥ 220 
+≥IF1.5 
+≥ 50  ≥ 180 
+3.19.1 Example 
+DI: Tower crane (CRT) 
+DoD: 2 – Collapse when not in operation 
+Rating: ≥IF1.5 (≥ 50 m/s, ≥ 180 km/h) 
+ 
+ 
+Photo: https://vertikal.net/en/news/story/42090/fatal-crane-overturn 
+3.19.2 Examples (undamaged) 
+ 
+ 
+Figure 3-1. Container / gantry cranes 
+Left: Photo:Alf van Beem - Own work, Public Domain, https://commons.wikimedia.org/w/index.php?curid=51959144 
+Centre: Photo:Alf van Beem - Own work, CC0, https://commons.wikimedia.org/w/index.php?curid=26869428 
+Right: Photo:Polska Zielona Sieć from Kraków, Poland - Ostatni dzwonek dla Klimatu, CC BY 2.0, https://commons.wikimedia.org/w/index.php?curid=17899828 
+ 
+ 
+
+DI: Outdoor furniture – OF 
+62 
+ 
+3.20 DI: Outdoor furniture – OF 
+Degree of Damage 
+Sub-category 
+L 
+light unanchored 
+objects such as plastic chairs or 
+tables, unanchored trampolines 
+ 
+H 
+heavier unanchored objects 
+ 
+DoD 0 
+Not moved 
+<IF0 
+< 25  < 90 
+≤IF0.5 
+≤ 33  ≤ 120 
+DoD 1 
+Overturned or shifted 
+IF0 
+25  90 
+IF0.5 
+33  120 
+DoD 2 
+Carried through the air for 
+several metres 
+≥IF0.5 
+≥ 33  ≥ 120 
+≥IF1 
+≥ 40  ≥ 150 
+Note: 
+Comparable to Canadian DI C-SFOF “Sheds, fences or outdoor furniture” (Sills et al.), adjusted 
+for instantaneous wind speed definition. 
+3.20.1 Examples 
+DI: Outdoor Furniture, light (OFL) 
+DoD: 1 – Overturned or shifted 
+Rating: IF0 (25 m/s, 90 km/h) 
+ 
+Photo: Délia Gutierrez Rubio, AEMet 
+
+DI: Wind Speed Measurement – WM 
+63 
+ 
+3.21 DI: Wind Speed Measurement – WM 
+Wind gust measurements at a standard measurement height of 10 m or lower may be used to 
+obtain an IF-scale rating. A conversion to estimate the instantaneous rate is to be made, 
+depending on the duration of wind speed averaging to obtain the gust speed. The conversion in 
+Table 28 below assumes that the speed of 3 s, 2 s, and 1 s wind averaged gusts are 88.8 %, 90.9%, 
+and 92.5%, respectively, of the instantaneous gust3.  
+Radar measurements can be considered wind speed measurements if they are taken at an 
+altitude where they can do damage. Since wind speeds in the tornadic boundary layer are 
+typically comparable to those anywhere below 60 m, measurements below that height qualify as 
+well. As averaging time, the time it takes the air to traverse a bin shall be taken, e.g., for a 50 m/s 
+measurement in a 50 m bin, 1 s shall be taken to be the averaging time.  
+Wind speeds from  photogrammetric analyses that reveal an object propelled by the wind in the 
+plane of view no hgher than 60 m above the surface may also be considered as a measurement. 
+Table 28. IF-scale ratings for DI Wind Measurement (WM).  
+ 
+3S 
+3s gust 
+2S 
+2s gust 
+1S 
+1s gust  
+0S 
+10Hz or higher 
+sample rate 
+ 
+Rating 
+DoD 0 
+Measured IF0 speed 
+19 – 25 
+69 – 91 
+20 – 26 
+70 – 94 
+20 – 26 
+71 – 95 
+22 – 28 
+77 – 103 
+m/s 
+km/h 
+IF0 
+25  90 
+DoD 0.5 
+Measured IF0.5 speed 
+26 – 32 
+ 92 – 120 
+27 – 33 
+ 95 – 120 
+27 – 34 
+ 96 – 123 
+29 – 36 
+104 – 132 
+m/s 
+km/h 
+IF0.5 
+33  120 
+DoD 1 
+Measured IF1 speed 
+33 – 40 
+119 – 146 
+34 – 40 
+121 – 150 
+35 – 42 
+124 – 152 
+37 – 45 
+133 – 164 
+m/s 
+km/h 
+IF1 
+40  150 
+DoD 1.5 
+Measured IF1.5 speed 
+41 – 49 
+147 – 176 
+41 – 50 
+151 – 180 
+43 – 51 
+153 – 183 
+46 – 55 
+165 – 198 
+m/s 
+km/h 
+IF1.5 
+50  180 
+DoD 2 
+Measured IF2 speed 
+50 – 57 
+177 – 208 
+51 – 59 
+181 – 213 
+52 – 60 
+184 – 217 
+56 – 65 
+199 – 234 
+m/s 
+km/h 
+IF2 
+60  220 
+DoD 2.5 
+Measured IF2.5 speed 
+58 – 70 
+209 – 242 
+60 – 68 
+214 – 248 
+61 – 70 
+218 – 252 
+66 – 75 
+235 – 273 
+m/s 
+km/h 
+IF2.5 
+70  250 
+DoD 3 
+Measured IF3 speed 
+71 – 82 
+243 – 296 
+69 – 84 
+249 – 303 
+71 – 85 
+253 – 308 
+76 – 92 
+274 – 333 
+m/s 
+km/h 
+IF3 
+80  290 
+DoD 4 
+Measured IF4 speed 
+83 – 103 
+297 – 373 
+85 – 106 
+304 – 382 
+86 – 107 
+309 – 388 
+93 – 116 
+334 – 420 
+m/s 
+km/h 
+IF4 
+105  380 
+DoD 5 
+Measured IF5 speed 
+≥ 104 
+≥ 374 
+≥ 107 
+≥ 383 
+≥ 108 
+≥ 389 
+≥ 117 
+≥ 421 
+m/s 
+km/h 
+IF5 
+≥ 130  ≥ 470 
+ 
+3 These estimates are based on Fig. 10 of Beljaars (1987) assuming a 1.6 gust factor and are valid for a 20 m/s 
+sustained wind. We assumed the values to be similar for higher wind speeds. 
+
+ 
+64 
+ 
+4 Conducting a damage survey 
+4.1 
+Surveying 
+In this chapter, we provide guidance on how to conduct a damage survey and how to interpret 
+the collected data. More guidance, in particular on the output of a damage survey, can be found 
+in Rodriguez et al. (2020). 
+First, the survey must be done as early as possible with permission of public authorities. All public 
+authorities who have or may feel a responsibility related to the event should be invited to take 
+part. It is obviously important to respect the rights and privacy of the people affected by the 
+tornado. Moreover, good equipment such as safety shoes and helmets are needed. A good 
+coordination from a crucial point and in the field is required, in particular when multiple teams 
+are involved. Psychological support may be needed, in particular after events with injuries and 
+loss of life.  
+Second, all individual Damage Indicators and Degrees of Damage should be recorded and geo-
+referenced, along with the resulting IF-rating. Optimally, georeferenced photos of the damage 
+from the survey are stored with as well in conjunction with, and optionally a description. The 
+result will be a table such as listed in Table 29.  
+Table 29. Example of a table with damage survey data. 
+# Lat. 
+Lon. 
+DI  
+DoD 
+IF 
+Dir. 
+Description 
+Photo URL 
+1 45.4461 
+12.0393 
+BSB 
+1A 
+1.5 
+ 
+Light damage to shed  
+http://.... 
+2 45.4482 
+12.0471 
+BRTS 
+1 
+1 
+160 
+Some shingles blown 
+off 
+http://.... 
+3 45.4478 
+12.0476 
+TRS 
+3 
+1.5 
+180 
+Uprooted olive tree 
+http://.... 
+4 45.4484 
+12.0482 
+PTS 
+2 
+2 
+320 
+Light pole collapsed 
+http://.... 
+ 
+To complement the surveying at ground level, areal surveying using drones, or an aircraft can be 
+conducted. This may also be useful in the initial stages when the extent of the affected areas is 
+not yet known but can be seen from a high altitude. A limitation is that from a too high altitude 
+it will not always be possible to make a sufficiently accurate assessment of the damage for single 
+objects.  
+To help determine the nature of a damaging wind event, e.g., a tornado, downburst or other 
+event, the direction of falling of trees, or transportation of debris must be recorded as well. The 
+direction the object originated from is to be recorded, i.e., 180° is correct for a tree fallen towards 
+the north, or an object displaced from the south to the north. This is the convention in 
+meteorology, but opposite of that used in aviation. 
+
+ 
+65 
+ 
+The process of recording all this data can be streamlined using an application on a mobile device. 
+ESSL has developed such an app. Of course, if this is not available, a table can be created 
+manually. As a concise way of noting down instances of wind damage, Damage Indicators, and 
+their subclasses (see later sections) each have a short abbreviation, and degrees of damage a 
+number, occasionally followed by a letter (e.g., “1”, “1B”, “2”). Any particular type of damage 
+foreseen in this guide is unambiguously defined by writing down the Damage Indicator and the 
+Degree of Damage. The IF rating for each instance of damage specifies the wind speed thought 
+to be responsible for having caused the damage. The IF-scale is not suited to rate damage from 
+winds below IF0 (25 m/s) or above IF5 (130 m/s).  
+Examples are: 
+ 
+DoD: BSC, DI: 1B, Rating: 2.5  
+A building’s structure [BS] with sturdiness [C] has sustained a Degree of Damage 
+1B ('partially destroyed'), resulting in a rating of IF2.5. 
+ 
+DoD: TRS, DI: 3, Rating: IF1.5 
+A tree [T] with strong firmness was uprooted [3], resulting in a rating IF1.5. 
+ 
+ 
+It is thinkable that wind speed estimates will require revision in the future as new scientific 
+evidence becomes available. Scientific data may also show that certain wind events are 
+associated with wind speeds that are higher or lower than previously thought. In case of the IF-
+scale such retroactive adjustments can be made, if all damage indicators–degrees of damage 
+combinations that led to ratings are recorded and stored, primarily that which led to the highest 
+rating of a given event. 
+4.2 
+Rating a tornado or wind event 
+The maximum intensity rating for an entire wind event has a big significance. It is the intensity 
+usually reported in communication to the general public and is also relevant for statistical 
+purposes even though the destructiveness of a wind event is better captured by a more elaborate 
+analysis of the surface areas affected by specific wind speeds. 
+The maximum intensity is that of the combination of degree of damage and damage indicator 
+which yields the highest IF-scale rating. That said, this maximum rating must be carefully 
+assessed for consistency with ratings of nearby damage. If only a single DI/DoD combination 
+leads to this specific highest IF-scale rating, this is often too thin evidence that wind speeds 
+corresponding to that rating have occurred, as with all ratings of instances of damage that are 
+conducted, likely a number will be overrated and a number will be underrated. The team of 
+surveyors may on a case-to-case basis find that the particular single instance of damage that 
+
+ 
+66 
+ 
+leads to the highest rating is solid enough to warrant counting as the maximum intensity rating 
+for the whole event. A maximum intensity rating shall never be based on a rating damage to a 
+single tree, which as a living organism is particularly prone to decay over time because of 
+potentially undetected illnesses or other factors.  
+A tornado or downburst shall be assigned a maximum intensity rating of IF0 only if it passes 
+over vulnerable objects, which are not damaged, but in case there were no objects to damage it 
+shall be left unrated for lack of information to assess it intensity. 
+Whenever there is some but incomplete data about tornado or wind damage, the rating must 
+be balanced between putting too high trust in very limited observations, and not adequately 
+acknowledging that an extreme event has occurred. Both can lead to to incorrect conclusions 
+regarding the true climatological frequency of such events. It is not good to trust an observation 
+of a certain damage without knowing the circumstances that could have increased the 
+probability of it to occur (for example, weaker than average construction practices), but neither 
+is dismissing an event because the probability that it has occurred is climatologically very low. 
+After all, extreme events are very rare by definition and what climatology is, is determined by 
+how past events were assessed. 
+4.3 
+Determining the nature of an event 
+Besides the rating of an event, an important question is whether a rotating vortex produced the 
+damage or another type of wind event, such as a downburst. The instantaneous wind field of a 
+tornado (Figure 3-2 a.) is characterized by convergence and rotation, while a downburst (Figure 
+3-2 c. and d.) has a divergent wind pattern. Another possibility is a hybrid event where a 
+downburst and a rapidly travelling vortex occur jointly (Figure 3-2 b.). 
+ 
+Figure 3-2. Near-surface wind patterns of a) a tornado, b) hybrid wind event, c) a translating downburst, and d) 
+a quasi-stationary downburst. 
+To classify a wind event as a tornado, unambiguous evidence of a vortex must be present, i.e., 
+evidence of convergent or rotating winds. In case the tornado was not observed directly, one 
+must infer this from the damage. This is not always straightforward, because the archetypical 
+tornado and downburst are only extremes on a spectrum of wind phenomena (Figure 3-2). It may 
+
+ 
+67 
+ 
+be that not all wind damage in a given case was produced by convergent rotating winds of a 
+tornado, but part occurred from divergent winds.  
+From single instance of damage, it is not possible to 
+say if a tornado or other event occurred. It is 
+thinkable that tornadoes could produce some types 
+of damage more easily than quasi-horizontal winds, 
+such as e.g., torsion of trees when ripped off, or 
+uplifting of roofs. This could result from extreme 
+horizontal wind shear or a vertical wind component. 
+That said, scientific support for this notion is thin 
+and a clear criterion non-existent and should not be 
+considered. 
+Additionally, one can analyse the directions in 
+which objects have been transported by the wind 
+or and the directions trees have fallen toward and 
+look for convergent damage patterns which occur 
+with some tornadoes. That said, fast-moving 
+tornadoes do not always produce convergent 
+patterns, as was shown by Beck and Dotzek (2010; 
+Figure 3-3). A divergent damage pattern is 
+therefore not a reason to rule out a tornado. A 
+thorough analysis can be undertaken using such a 
+tree fall model to find out if the damage pattern is 
+consistent with a tornado and not with a 
+downburst.  
+An easier method is to use the fact that tornadoes typically produce much longer and narrower 
+tracks than other wind phenomena. If a damage track is more than 10 times longer than wide, 
+one can safely classify the event as a tornado. Combining this, we can formulate the following 
+criterion:  
+If either  
+1) the damage track is more than 10 
+times longer than it is wide, 
+2) there is a convergent damage pattern over an extended area4, or 
+3) there is evidence of lifting of heavy and compact objects by several metres5, 
+ 
+4 The convergence must not be the result of two colliding downdrafts, and consistent means that the convergent 
+damage must be more than one or two isolated instances  
+5 The primarily horizontal displacement of objects from a high place, e.g. a roof, is not included 
+Figure 3-3. Simulated treefall patterns for 
+tornadoes,  simulated with a model similar to 
+Beck and Dotzek’s (2010), showing convergence 
+in some, but not all patterns. 
+
+ 
+68 
+ 
+the event can be characterized as a tornado. In all other cases it shall be recorded as a severe 
+wind event. Using this criterion, short-tracked tornadoes without a convergent pattern may not 
+detected, but there is no simple solution for this. 
+4.4 
+Definition of track length, width, and number of events 
+The track length and width of tornadoes are important parameters for risk assessment models 
+and need to be recorded. Determining the area affected by winds exceeding a particular speed 
+is important as well. In case when, unfortunately, resourced do not allow surveying a track at 
+very great detail, it is therefore important to make frequent cross-sections across the track while 
+recording the damage while traversing it. Through interpolation between individual cross 
+sections, a fairly accurate estimate of the areas affected by certain wind speeds can then still be 
+made. For determining the path width within a cross section, the distance between the left most 
+point of visible damage and the right most point of visible damage shall be taken.  
+A difficulty in determining track length may arise when the damage path is interrupted, and it is 
+not clear if a persistent wind phenomenon was responsible. If the damage path is interrupted, 
+but there are damage indicators that would be affected if the path were continuous, then the 
+two areas of damage cannot be attributed to the same phenomenon, and they shall be 
+considered two separate phenomena. However, if the damage path is interrupted because of a 
+lack of damage indicators that would be affected, it is not possible to ascertain the continuity of 
+the phenomenon. We suggest using the following practical rule: 
+Damages should be assigned to separate events if the gap between damages 
+exceeds 3 km, unless a clear indication exists of continuous wind effects not 
+described as damage indicators in this guide. In case damage indicators are 
+present between two damage locations, which indicate that no damage was 
+done at some point between them, and there is no other evidence that a 
+continuous event has occurred, such a shorter gap already suffices for the 
+damages to be assigned to two separate events.  
+ 
+ 
+
+ 
+69 
+ 
+References 
+ASCE, American Society of Engineers, “Wind Speed Estimation in Tornadoes” in Minimum 
+Design Loads for Buildings and Other Structures. ASCE/SEI Standard 7-20, ASCE draft, 2022. 
+Beck, V. and N. Dotzek, 2010: Reconstruction of Near-Surface Tornado Wind Fields from Forest 
+Damage, J. Applied Meteorology and Climatology, 49, 1517 – 1537.  
+Beljaars, A. C. M., 1987: The influence of sampling and filtering on measured wind gusts, J. 
+Atmospheric and Oceanic Technology, 4, 613 – 626.  
+Doswell, C. A. III, H. E. Brooks, and N. Dotzek, 2009: On the implementation of the Enhanced 
+Fujita scale in the USA. Atmos. Res., 93, 554 – 563, 
+https://doi.org/10.1016/j.atmosres.2008.11.003. 
+Dotzek, N., 2009: Derivation of physically motivated wind speed scales, Atmos. Res., 93, 564 – 
+574. 
+Environment Canada, 2018: Enhanced Fujita scale for wind damage, website: 
+https://www.canada.ca/en/environment-climate-change/services/seasonal-weather-
+hazards/enhanced-fujita-scale-wind-damage.html 
+Feuerstein, B., P. Groenemeijer, E. Dirksen, M. Hubrig, A. M. Holzer, and N. Dotzek, 2012: 
+Towards an improved wind speed scale vs. damage description adapted for Central Europe. 
+Atmos. Res., 100, 547 – 564, http://dx.doi.org/10.1016/j.atmosres.2010.12.026 
+Fujita, T. Theodore, 1971: Proposed Characterization of Tornadoes and Hurricanes by Area and 
+Intensity, The University of Chicago, 1971. 
+Fujita, T. T., 1980: Tornadoes and downbursts in the context of generalized planetary scales. J. 
+Atmos. Sci., 38, 1511 – 1534,  
+https://doi.org/10.1175/1520-0469(1980)038<1511:TADITC>2.0.CO;2. 
+Fujita, T.T., 1992: Memoirs of an Effort to Unlock the Mystery of Severe Storms During the 50 
+Years 1942-1992, The University of Chicago, 1992.  
+Green, David W., Jerrold E. Winandy, and David E. Kretschmann, 1999: Mechanical Properties of 
+Wood, in: “Wood handbook : wood as an engineering material”, General Technical Report GTR-
+113, USDA Forest Service, Forest Products Laboratory, Madison, WI, USA, pp. 4.1-4.45, 
+https://www.fs.usda.gov/treesearch/pubs/7150. 
+Haan, F.L., Jr., P.P. Sarkarb, Gregory A. Kopp, and Derek A. Stedman, 2017: Critical wind speeds 
+for tornado-induced vehicle movements, Journal of Wind Engineering, and Industrial 
+Aerodynamics, 168, 1-8. 
+
+ 
+70 
+ 
+Hangan, H. (2014). The wind engineering energy and environment (WindEEE) dome at Western 
+University, Canada. Wind Engineers, JAWE, 39(4), 350-351. 
+Holzer, Alois M., Thomas M. E. Schreiner, and Tomáš Púčik, 2018: A forensic re-analysis of one 
+of the deadliest European tornadoes. Nat. Hazards Earth Syst. Sci., 18, 1555-1565, 
+https://doi.org/10.5194/nhess-18-1555-2018 
+Hubrig, Martin, 2015: EF – Scale enlargement for wooden plants, 8th European Conference on 
+Severe Storms, Wiener Neustadt, Austria. 
+JMA, Japanese Meteorological Agency, 2015: Guidelines for the Japanese Enhanced Fujita 
+Scale, retrieved from: 
+http://www.data.jma.go.jp/obd/stats/data/bosai/tornado/kaisetsu/guideline_en.pdf 
+IAWE, 2017: International Approaches to Tornado Damage and Intensity Classification, 
+International Association of Wind Engineers (IAWE), International Tornado Working Group 
+Kosiba, K. A. & Wurman, J., 2013: The three-dimensional structure and evolution of a tornado 
+boundary layer. Weather Forecast., 28, 1552–1561. 
+Kosiba, K., Wurman, J., 2023: The strongest winds in tornadoes are very near the ground. 
+Commun Earth Environ 4, 50, https://doi.org/10.1038/s43247-023-00716-6 
+Mahieu, P., & Wesolek, E., 2011. Contribution to an European adaptation of the enhanced 
+Fujita scale: Analysis of damage caused by tornadoes in France. 
+McDonald,  James and Kishor C. Mehta, 2006: A recommendation for an Enhanced Fujita scale 
+(EF-Scale), Wind Science and Engineering Research Center, Texas Tech University, 
+http://www.depts.ttu.edu/weweb/Pubs/fscale/EFScale.pdf. 
+Meaden, G.T., 1976. Tornadoes in Britain: their intensities and distribution in space and time. 
+The International Journal of Meteorology, 1, 242–251. 
+Morrison, M. J., & Kopp, G. A., 2011. Performance of toe-nail connections under realistic wind 
+loading. Engineering Structures, 33, 69-76. 
+Schmidlin, Thomas, B. Hammer, P. King, Y. Ono, L Scott-Miller, and G. Thumann, 2002: Unsafe 
+at any (wind) speed?, Bulletin of the American Meteorological Society, 83, 1801–1830. 
+Sills, David, M.L., Patrick J. McCarthy and Gregory A. Kopp, 2014: Implementation and 
+Application of the EF-Scale in Canada, 24th Conference on Severe Local Storms, American 
+Meteorological Society. 
+http://www.yorku.ca/pat/research/dsills/papers/SLS27/SLS2014_Sillsetal_EF-
+Scale_ExtendedAbstract_Final2.pdf 
+
+ 
+71 
+ 
+Rodríguez, O., Bech, J., Soriano, J. D. D., Gutiérrez, D., and Castán, S., 2020: A methodology to 
+conduct wind damage field surveys for high-impact weather events of convective origin, Nat. 
+Hazards Earth Syst. Sci., 20, 1513–1531, https://doi.org/10.5194/nhess-20-1513-2020. 
+Wurman, J., C. Alexander, P. Robinson, and Y. Richardson, 2007: Low-Level Winds in Tornadoes 
+and Potential Catastrophic Tornado Impacts in Urban Areas. Bull. Amer. Meteor. Soc., 88, 31–
+46, https://doi.org/10.1175/BAMS-88-1-31  
+ 
+ 
+
+ 
+72 
+ 
+Appendix 
+Photos and descriptions of undamaged 
+buildings  
+4.4.1 
+Class A 
+Characteristics: 
+• Thin wooden or metal panels, glass, or mud walls 
+• Unanchored 
+• Lightweight 
+Typical examples:  
+sheds, weak outbuildings, with weak connections between walls and roof if any 
+ 
+very weak frame with metal panels 
+Photo:Robin van Mourik - Flickr: Old garden shed near Glenorchy, CC BY-SA 2.0 
+https://commons.wikimedia.org/w/index.php?curid=19323803 
+ 
+ 
+ 
+ 
+ 
+
+ 
+73 
+ 
+4.4.2 
+Class B 
+Characteristics: 
+• Wood or metal frame with wood, metal panel, or glass siding 
+• Fairly poor connections between roof and walls 
+• Weak anchoring 
+Typical examples: structures typically not intended for permanent inhabitation such as sheds, 
+barns, stables, and garages. 
+ 
+weak wooden frame with wooden panels 
+Photo:Renelibrary - Own work, CC BY-SA 3.0 
+https://commons.wikimedia.org/w/index.php?curid=31366017 
+ 
+ 
+metal frame structure with wooden panels 
+Photo:Micov - Own work, CC BY 3.0, 
+https://commons.wikimedia.org/w/index.php?curid=4324950 
+ 
+ 
+ 
+ 
+
+ 
+74 
+ 
+4.4.3 
+Class C 
+Characteristics: 
+• Wood or metal frame with wood or metal panels, with or without brick veneer, stucco, 
+external insulation layers 
+• CMU block masonry without any reinforcement 
+• Brick structures with defunct connections between bricks, or stacked bricks or stones 
+Typical examples: Frame houses with comparatively weak frame as well as strong outbuildings, 
+such are sturdy stables 
+weak wooden frame structure with brick 
+veneer 
+Photo:25or6to4 - Own work, CC BY-SA 4.0, 
+https://commons.wikimedia.org/w/index.php?curid=66166439 
+weak wooden frame structure 
+Photo:Remisc at English Wikipedia - Remisc (talk), CC0, 
+https://commons.wikimedia.org/w/index.php?curid=15371546 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+75 
+ 
+4.4.4 
+Class D 
+• Weaker mass wall construction of brick masonry, stone, concrete blocks, logs 
+• Strong frame structures, or brick/concrete block masonry structures with thin or 
+degraded walls, e.g., because of aged cement. 
+Typical: one family residences, small commercial buildings 
+ 
+strong wooden frame structure 
+Photo:User: (WT-shared) Aiko99ann at wts wikivoyage, CC BY-SA 3.0, 
+https://commons.wikimedia.org/w/index.php?curid=22848045 
+  
+strong wooden frame structure brick veneer 
+Adapted from ProfReader - Own work, CC BY-SA 4.0, 
+https://commons.wikimedia.org/w/index.php?curid=70432802 
+ 
+ 
+strong wooden frame structure 
+Photo:Werner Popken - taken by author, Panasonic FZ1, CC BY-SA 2.5, 
+https://commons.wikimedia.org/w/index.php?curid=497074 
+ 
+ 
+weakened brick wall structure  
+Adapted from Kate Jewell, CC BY-SA 2.0, 
+https://commons.wikimedia.org/w/index.php?curid=13470471 
+ 
+strong wooden frame structure with brick 
+veneer 
+Photo:MelvinMelvinMelvin - Own work, CC BY-SA 3.0, 
+https://commons.wikimedia.org/w/index.php?curid=21200700 
+ 
+
+ 
+76 
+ 
+4.4.5 
+Class E 
+• Strong mass wall construction of brick masonry, stone, concrete blocks, logs 
+• Very strong frame structures 
+Typical: one family residences, commercial buildings 
+ 
+brick masonry mass wall structure 
+Photo:Evelyn Simak, CC BY-SA 2.0, 
+https://commons.wikimedia.org/w/index.php?curid=13523321 
+ 
+ 
+wood log (load carrying) building structure  
+Adapted from Pudelek - Own work, CC BY-SA 4.0, 
+https://commons.wikimedia.org/w/index.php?curid=40665727 
+ 
+concrete block mass wall structure 
+Photo:Pavel Hrdlička, Wikipedia, CC BY-SA 3.0, 
+https://commons.wikimedia.org/w/index.php?curid=34234877  
+ 
+brick masonry mass wall structure 
+Photo:Vincent van Zeijst - Own work, CC BY-SA 3.0, 
+https://commons.wikimedia.org/w/index.php?curid=23404912 
+ 
+
+ 
+77 
+ 
+wood log (load carrying) building structure 
+Photo:Daniel Schwen - Own work, CC BY-SA 4.0, 
+https://commons.wikimedia.org/w/index.php?curid=7743664 
+ 
+ 
+brick masonry mass wall structure 
+Photo:Basotxerri - Own work, CC BY-SA 4.0, 
+https://commons.wikimedia.org/w/index.php?curid=57525194 
+4.4.6 
+Class F 
+ 
+concrete structure 
+Photo:Antoine - Own work, CC BY-SA 3.0, 
+https://commons.wikimedia.org/w/index.php?curid=25895474 
+ 
+concrete structure 
+Photo:Ddogas - Own work, CC BY-SA 3.0 
+https://commons.wikimedia.org/w/index.php?curid=5763609 
+ 
+ 
+ 

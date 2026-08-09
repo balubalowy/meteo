@@ -9,7 +9,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Brak",
         "desc": "Pojedyncze, białe włókna o wyglądzie prostolinijnym lub nieregularnie wygiętym, lecz niezakończone haczykami. Zwiastują zazwyczaj stabilną pogodę.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cirrus uncinus",
@@ -37,7 +37,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Brak",
         "desc": "Przypominają małe kłaczki z waty, z których opadają smugi virgi.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cirrus intortus",
@@ -51,21 +51,21 @@ window.KNOWLEDGE_BASE = [
         "danger": "Brak",
         "desc": "Pasma włókien rozchodzące się promieniście, zbiegające się w jednym punkcie na horyzoncie.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cirrus vertebratus",
         "danger": "Brak",
         "desc": "Przypominają kręgosłup ryby lub szkielet. Związane z prądem strumieniowym.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cirrus duplicatus",
         "danger": "Brak",
         "desc": "Odmiana ułożona w więcej niż jednej, nakładającej się na siebie warstwie.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cirrus mamma",
@@ -149,14 +149,14 @@ window.KNOWLEDGE_BASE = [
         "danger": "Brak",
         "desc": "Kilka nakładających się na siebie warstw Cirrostratusa.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cirrostratus undulatus",
         "danger": "Brak",
         "desc": "Jednolity woal z delikatnymi, falistymi zmarszczkami.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       }
     ]
   },
@@ -170,14 +170,14 @@ window.KNOWLEDGE_BASE = [
         "danger": "Niskie",
         "desc": "Obszerna warstwa ułożonych regularnie elementów o wyglądzie płatów, bułek.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altocumulus lenticularis",
         "danger": "Ostrzega przed halnym",
         "desc": "Chmura soczewkowata (UFO) powstająca z fal orograficznych.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altocumulus castellanus",
@@ -198,56 +198,56 @@ window.KNOWLEDGE_BASE = [
         "danger": "Niskie",
         "desc": "Samotna, podłużna, rurkowata chmura pozioma, niezwiązana z Cumulonimbusem.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altocumulus translucidus",
         "danger": "Brak",
         "desc": "Warstwa półprzezroczysta, pozwalająca dojrzeć słońce.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altocumulus perlucidus",
         "danger": "Brak",
         "desc": "Człony chmur poprzecinane wyraźnymi przerwami, przez które widać błękit.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altocumulus opacus",
         "danger": "Umiarkowane",
         "desc": "Gęsta warstwa całkowicie przesłaniająca słońce.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altocumulus duplicatus",
         "danger": "Brak",
         "desc": "Wiele nałożonych na siebie, falistych warstw.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altocumulus undulatus",
         "danger": "Brak",
         "desc": "Pofałdowane wały chmurowe, wyglądające jak morskie fale.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altocumulus radiatus",
         "danger": "Brak",
         "desc": "Chmury ułożone w równoległe pasma, pozornie zbiegające się na horyzoncie.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altocumulus lacunosus",
         "danger": "Brak",
         "desc": "Warstwa z wyraźnymi, zaokrąglonymi przerwami i postrzępionymi brzegami.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Asperitas (Altocumulus)",
@@ -268,35 +268,35 @@ window.KNOWLEDGE_BASE = [
         "danger": "Umiarkowane",
         "desc": "Półprzezroczysta szara warstwa, słońce prześwieca jak przez matowe szkło.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altostratus opacus",
         "danger": "Wysokie (długi opad)",
         "desc": "Zupełnie mętna, gęsta warstwa, dająca często długotrwały opad deszczu/śniegu.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altostratus duplicatus",
         "danger": "Umiarkowane",
         "desc": "Nałożone na siebie szare warstwy As.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altostratus undulatus",
         "danger": "Brak",
         "desc": "Lekko pofalowana warstwa średnia.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altostratus radiatus",
         "danger": "Brak",
         "desc": "Szerokie pasma As rozbiegające się z jednego punktu na niebie.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       }
     ]
   },
@@ -310,7 +310,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Niskie",
         "desc": "Warstwa przylegających do siebie płatów lub wałów o barwie białej i szarej.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Stratocumulus lenticularis",
@@ -324,49 +324,49 @@ window.KNOWLEDGE_BASE = [
         "danger": "Umiarkowane (Konwekcja)",
         "desc": "Wierzchołki w kształcie wieżyczek wyrastające z warstwy.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Stratocumulus floccus",
         "danger": "Niskie",
         "desc": "Postrzępione, oddzielne bryły Sc.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Stratocumulus volutus",
         "danger": "Niskie",
         "desc": "Niska, samotna pozioma rurka wiatrowa (Roll cloud).",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Stratocumulus translucidus",
         "danger": "Brak",
         "desc": "Rzadka warstwa Sc pozwalająca słońcu prześwitywać.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Stratocumulus perlucidus",
         "danger": "Brak",
         "desc": "Z dużymi przerwami na czyste niebo.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Stratocumulus opacus",
         "danger": "Niskie (mżawka)",
         "desc": "Gęsty i gruby Stratocumulus blokujący światło słoneczne w pełni.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Stratocumulus lacunosus",
         "danger": "Brak",
         "desc": "Podobnie jak w Ac, układ podobny do plastra miodu.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Stratus nebulosus",
@@ -380,49 +380,49 @@ window.KNOWLEDGE_BASE = [
         "danger": "Widzialność",
         "desc": "Postrzępione strzępy chmur, często widoczne pod ulewą burzową jako pannus.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Stratus opacus",
         "danger": "Ograniczona widzialność",
         "desc": "Bardzo gruby, szary i nieprzezroczysty Stratus.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Stratus undulatus",
         "danger": "Brak",
         "desc": "Pofalowana podstawa niskiego Stratusa.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cumulus humilis",
         "danger": "Brak (Pogoda piękna)",
         "desc": "Płaskie, małe kłębki - typowe chmury pięknej pogody letniej.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cumulus mediocris",
         "danger": "Niskie (Rozwój konwekcji)",
         "desc": "Umiarkowanie wypiętrzone chmury kłębiaste.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cumulus congestus",
         "danger": "Wysokie (Silny opad)",
         "desc": "Wysoko wypiętrzone jak kalafiory, mocno rozwinięte pionowo, dające ulewne deszcze.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cumulus fractus",
         "danger": "Brak",
         "desc": "Postrzępione resztki Cumulusów rozbijanych przez silny wiatr.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cumulus radiatus",
@@ -436,7 +436,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Wskazuje gwałtowny updraft",
         "desc": "Chmurka w formie gładkiej czapeczki nad Cumulusem, powstająca z nagłego wypchnięcia wilgotnego powietrza w górę.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Tuba (Lejek Kondensacyjny)",
@@ -478,7 +478,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Ograniczona widzialność",
         "desc": "Ciemne, postrzępione fragmenty chmur (Stratus fractus) przemieszczające się pod podstawą chmury dającej ulewę.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cumulonimbus calvus",
@@ -520,14 +520,14 @@ window.KNOWLEDGE_BASE = [
         "danger": "Sygnał mezocyklonu",
         "desc": "Chmura przypominająca ogon, zasysana bezpośrednio do chmury stropowej (Murus).",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Flumen (Beaver's tail)",
         "danger": "Silny prąd zasilający burzę",
         "desc": "Płaskie, przypominające ogon bobra pasmo chmur ciągnące się wzdłuż bazy głównego updraftu superkomórki.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Altocumulogenitus",
@@ -576,7 +576,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Pozostałość po burzy",
         "desc": "Chmury powstałe ze śmierci gigantycznej burzy Cb (np. rozpadające się kowadło w postaci ogromnego Ac cumulonimbogenitus).",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Nimbostratogenitus",
@@ -646,7 +646,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Brak",
         "desc": "Procentowy stosunek pary wodnej do maksymalnej wartości pojemności w danej temperaturze.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Celsjusz a Fahrenheit (Celsius to Fahrenheit)",
@@ -737,7 +737,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Microburst",
         "desc": "Prąd opadający napędzany grawitacją opadu. Jego uderzenie o ziemię powoduje rozchodzący się na wszystkie strony szkwał.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Tylny Prąd Zstępujący (Rear Flank Downdraft / RFD)",
@@ -758,14 +758,14 @@ window.KNOWLEDGE_BASE = [
         "danger": "Lokalne zalania",
         "desc": "Krótkotrwała burza (30-60min). Updraft wciąga ciepło, opad wraca tą samą drogą, wychładza grunt (downdraft dusi updraft) i burza zabija sama siebie w godzinę.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Multikomórka (Multi cell storms)",
         "danger": "Ulewy i zalania",
         "desc": "Zlepek komórek: starsza, umierająca, zrzuca deszcz, który na chłodnym frocie szkwałowym (Gust front) wymiata ciepło z przodu budując nową komórkę przed sobą. Tworzy cykl życiowy.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Linia Szkwału (Squall line)",
@@ -821,7 +821,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Pomiary zniszczeń",
         "desc": "Tornada mierzone są WYŁĄCZNIE na podstawie zniszczeń po fakcie (prędkość wiatru wewnątrz mierzona Dopplerem jest tylko szacunkiem). EF5 niszczy stalowe, potężne domostwa do fundamentów.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Klimatologia tornad (Tornado climatology)",
@@ -849,7 +849,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Wymusza wiatr",
         "desc": "Wiatr zawsze wieje z Wyżu (H) do Niżu (L). Im ciaśniej ułożone izobary na mapie, tym wyższy gradient - porywy wiatru są gwałtowniejsze.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Izobary (Isobars)",
@@ -870,7 +870,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Tworzy cyrkulację",
         "desc": "Gdy siła gradientu zrównuje się w górze z siłą Coriolisa, wiatr wieje równolegle do izobar, okrążając ośrodki niżowe zamiast lecieć bezpośrednio do ich środka.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Niż (Low pressure system)",
@@ -933,7 +933,7 @@ window.KNOWLEDGE_BASE = [
         "danger": "Katastrofy naturalne",
         "desc": "Skala Cat 1 do Cat 5 oceniająca maksymalny stały (nie w porywach) wiatr huraganu. Cat 3 i wyżej (>= 178 km/h) to 'Major hurricane'.",
         "url": "",
-        "image": "assets/img/placeholder_cc.png"
+        "image": ""
       },
       {
         "name": "Cyklon zewnątrz-zwrotnikowy (Extratropical cyclone)",
@@ -1066,28 +1066,28 @@ window.KNOWLEDGE_BASE = [
         "danger": "Ryzyko Superkomórek i Tornad",
         "desc": "Skrętność wiatru względem poruszającej się burzy. Określa skłonność prądów wstępujących do ruchu wirowego. Obliczana poprzez całkowanie od gruntu do konkretnej wysokości. Duże SRH w warstwie 0-3km (>250 m2/s2) i 0-1km (>100 m2/s2) drastycznie zwiększa zagrożenie potężnymi tornadami.",
         "url": "",
-        "image": "assets/img/wiedza/if_scale_2.png"
+        "image": ""
       },
       {
         "name": "SBCAPE, MLCAPE i MUCAPE",
         "danger": "Paliwo do burz (Metody Liczenia)",
         "desc": "CAPE można policzyć dla różnych cząstek startowych. SB (Surface Based) to cząstka z samej ziemi. ML (Mixed Layer) bierze uśrednioną cząstkę z dolnych 100 hPa - bardzo realistyczna dla letnich burz. MU (Most Unstable) bierze cząstkę z poziomu o największej chwiejności (ważne zimą i w burzach wzniesionych ponad frontem).",
         "url": "",
-        "image": "assets/img/wiedza/if_scale_1.png"
+        "image": ""
       },
       {
         "name": "Lifted Index (LI)",
         "danger": "Ryzyko uniesienia",
         "desc": "Różnica między temperaturą otoczenia a temperaturą hipotetycznie uniesionej cząstki na wys. 500 hPa. Wartości ujemne (np. LI = -6) oznaczają potężną konwekcję. Ostrzega, że cząstka na górze będzie znacznie gorętsza niż otoczenie, a więc wystrzeli jak z procy.",
         "url": "",
-        "image": "assets/img/wiedza/if_scale_7.png"
+        "image": ""
       },
       {
         "name": "Poziom Swobodnej Konwekcji (LFC) i Równowagi (EL)",
         "danger": "Dynamika Prądu",
         "desc": "LFC (Level of Free Convection): Wysokość, od której cząstka staje się cieplejsza od otoczenia i unosi się SAMA dzięki sile wyporu. EL (Equilibrium Level): Poziom blisko stratosfery, gdzie cząstka traci wyporność - tu buduje się gigantyczne płaskie kowadło (incus) superkomórki.",
         "url": "",
-        "image": "assets/img/wiedza/if_scale_8.png"
+        "image": ""
       }
     ]
   }
