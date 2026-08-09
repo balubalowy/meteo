@@ -1216,5 +1216,110 @@ window.KNOWLEDGE_BASE = [
         "image": ""
       }
     ]
+  },
+  {
+    "id": "noaa_spc",
+    "name": "Skala Ryzyka SPC (USA)",
+    "icon": "alert-circle",
+    "items": [
+      {
+        "name": "Poziom 1: MRGL (Marginal Risk)",
+        "danger": "Niskie",
+        "desc": "Możliwe izolowane, zazwyczaj krótkotrwałe lub słabe gwałtowne zjawiska burzowe (np. silny podmuch lub mniejszy grad). Przeważają zjawiska poniżej kryteriów ostrzeżeń.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "Poziom 2: SLGT (Slight Risk)",
+        "danger": "Umiarkowane",
+        "desc": "Możliwe rozproszone gwałtowne burze. Choć ryzyko powszechnych, długotrwałych nawałnic jest małe, lokalnie mogą pojawić się np. pojedyncze superkomórki z dużym gradem i wiatrem.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "Poziom 3: ENH (Enhanced Risk)",
+        "danger": "Wysokie",
+        "desc": "Spodziewane są liczne i bardziej uciążliwe zjawiska burzowe (np. bardzo duży grad, trąby powietrzne, bow echo). Szansa na zjawiska długotrwałe staje się duża.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "Poziom 4: MDT (Moderate Risk)",
+        "danger": "Bardzo Wysokie",
+        "desc": "Powszechne gwałtowne zjawiska burzowe, w tym potężne linie szkwału i silne, długotrwałe trąby powietrzne. Zjawiska na znacznym obszarze stanowią duże zagrożenie życia i mienia.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "Poziom 5: HIGH (High Risk)",
+        "danger": "Ekstremalne",
+        "desc": "Najwyższy stopień zagrożenia (rzadko wydawany). Długotrwałe (tzw. tornado outbreak / derecho) ekstremalne zjawiska pogodowe powodujące katastrofalne szkody. Pewność niszczycielskich tornad o olbrzymiej sile.",
+        "url": "",
+        "image": ""
+      }
+    ]
+  },
+  {
+    "id": "formacje_wizualne",
+    "name": "Fascynujące Formacje Chmurowe",
+    "icon": "camera",
+    "items": [
+      {
+        "name": "Asperitas (Wzburzone Fale)",
+        "danger": "Brak",
+        "desc": "Rzadka, efektownie pofalowana forma przypominająca wzburzony ocean widziany od spodu. Najczęściej występuje pod chmurami Stratocumulus / Altocumulus. Odkryta i skatalogowana przez WMO dopiero w 2017 roku. Nie przynosi niebezpiecznych zjawisk.",
+        "url": "https://pl.wikipedia.org/wiki/Asperitas",
+        "image": ""
+      },
+      {
+        "name": "Mammatus",
+        "danger": "Wysokie (jeśli to Cb)",
+        "desc": "Charakterystyczne, obłe bąble (przypominające wymiona) zwisające najczęściej spod potężnego kowadła (Incus) chmury Cumulonimbus. Powstają pod wpływem parowania opadów i zapadania chłodnych mas powietrza. Wskazują na obecność bardzo silnej konwekcji.",
+        "url": "https://pl.wikipedia.org/wiki/Mammatus",
+        "image": ""
+      },
+      {
+        "name": "Arcus (Wał Szkwałowy / Shelf Cloud)",
+        "danger": "Bardzo Wysokie",
+        "desc": "Potężny, najczęściej postrzępiony wał chmurowy pędzący na czele burzy wzdłuż krawędzi zimnego powietrza zstępującego (Gust Front). Bezpośrednio za nim nadchodzi najsilniejsze, porywiste uderzenie niszczącego wiatru (Downburst / Szkwał) oraz nawalny deszcz.",
+        "url": "https://pl.wikipedia.org/wiki/Arcus",
+        "image": ""
+      },
+      {
+        "name": "Overshooting Top (Przebicie)",
+        "danger": "Ekstremalne",
+        "desc": "Bąbel lub kopuła wystająca wyraźnie ponad spłaszczone kowadło (wierzchołek chmury burzowej). Przebija warstwę tropopauzy. Świadczy o występowaniu potężnego, silnie nasyconego prądu wstępującego wewnątrz najsilniejszych superkomórek.",
+        "url": "https://en.wikipedia.org/wiki/Overshooting_top",
+        "image": ""
+      }
+    ]
+  },
+  {
+    "id": "pdf_badania",
+    "name": "Badania i Skale Zniszczeń (Z PDF)",
+    "icon": "book-open",
+    "items": [
+      {
+        "name": "Międzynarodowa Skala IF (Tornada / Wiatr)",
+        "danger": "Zależne (IF0 - IF5)",
+        "desc": "Stworzona w Europie modyfikacja skal F i EF. Szacuje siłę wiatru na podstawie zaawansowanych Indykatorów Zniszczeń (DI), dopasowanych specyficznie do europejskiego i globalnego leśnictwa, solidnej zabudowy ceglanej i pojazdów.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "Klimatologia Trąb Powietrznych w PL (M. Taszarek)",
+        "danger": "Ostrzeżenie statystyczne",
+        "desc": "Doktorat badający częstotliwość trąb powietrznych nad Polską. Dowodzi, że szczyt sezonu przypada od maja do sierpnia, zwłaszcza w pasie centralnym, woj. śląskim oraz opolskim, bardzo często w godzinach popołudniowych podczas nachodzenia fal krótkich.",
+        "url": "",
+        "image": ""
+      },
+      {
+        "name": "Radiosondaże i Pomiary Aerologiczne",
+        "danger": "Informacja Prognozowa",
+        "desc": "Pomiar fizycznych właściwości atmosfery (temperatura, punkt rosy, ciśnienie i wiatr) wzdłuż pionowego profilu pionowego za pomocą balonu meteo (sondy). W Polsce stacje (Łeba, Wrocław, Legionowo) wypuszczają balony zazwyczaj dwa razy na dobę (00 i 12 UTC), a wyniki obrazowane są na diagramach Skew-T (np. LCL, CAPE).",
+        "url": "",
+        "image": ""
+      }
+    ]
   }
 ];
