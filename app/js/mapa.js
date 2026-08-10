@@ -313,12 +313,13 @@ window.initMapa = function() {
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
             .then(data => {
-                timestamps = data.radar.past.map(t => t.time).concat(data.radar.nowcast.map(t => t.time));
+                const host = data.host;
+                timestamps = data.radar.past.concat(data.radar.nowcast);
                 document.getElementById('rv-slider').max = timestamps.length - 1;
                 document.getElementById('rv-slider').value = timestamps.length - 1;
 
-                timestamps.forEach((time, index) => {
-                    const layer = L.tileLayer(`https://tilecache.rainviewer.com/v2/radar/${time}/256/{z}/{x}/{y}/2/1_1.png`, {
+                timestamps.forEach((frame, index) => {
+                    const layer = L.tileLayer(`${host}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
                         opacity: index === timestamps.length - 1 ? 0.7 : 0, pane: 'weatherPane'
                     }).addTo(map);
                     radarLayers.push(layer);
@@ -328,7 +329,7 @@ window.initMapa = function() {
 
         function updateTimeDisplay(index) {
             if(!timestamps[index]) return;
-            document.getElementById('rv-time').textContent = new Date(timestamps[index] * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('rv-time').textContent = new Date(timestamps[index].time * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
         }
 
         function showFrame(index) {
@@ -679,18 +680,19 @@ window.initMapa = function() {
                     } else {
                         // Standard marker
                         if(showTxt) htmlContent += `<div style="color: white; text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}</div>`;
-                        if(showPt) {
-                            if ((zmienna === 'wiatr' || zmienna === 'wiatr_sr') && data.pt_dirs && !isNaN(data.pt_dirs[i]) && data.pt_dirs[i] !== null) {
-                                const dir = data.pt_dirs[i] + 180; // Wiatr wieje Z podanego kierunku (np. 0° = z Północy), więc strzałka leci na Południe
-                                htmlContent += `<div style="width:18px; height:18px; margin:2px auto; transform: rotate(${dir}deg); color: ${ptColor}; text-shadow: 0 0 2px black;">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 1px black);">
-                                        <line x1="12" y1="21" x2="12" y2="3"></line>
-                                        <polyline points="5 10 12 3 19 10"></polyline>
-                                    </svg>
-                                </div>`;
-                            } else {
-                                htmlContent += `<div style="width:10px;height:10px;background:${ptColor};border-radius:50%;margin:2px auto;box-shadow:0 0 2px black; border:1px solid rgba(255,255,255,0.7);"></div>`;
-                            }
+                        
+                        const isWind = (zmienna === 'wiatr' || zmienna === 'wiatr_sr');
+                        
+                        if (isWind && data.pt_dirs && !isNaN(data.pt_dirs[i]) && data.pt_dirs[i] !== null) {
+                            const dir = data.pt_dirs[i] + 180;
+                            htmlContent += `<div style="width:18px; height:18px; margin:2px auto; transform: rotate(${dir}deg); color: ${ptColor}; text-shadow: 0 0 2px black;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 1px black);">
+                                    <line x1="12" y1="21" x2="12" y2="3"></line>
+                                    <polyline points="5 10 12 3 19 10"></polyline>
+                                </svg>
+                            </div>`;
+                        } else if(showPt) {
+                            htmlContent += `<div style="width:10px;height:10px;background:${ptColor};border-radius:50%;margin:2px auto;box-shadow:0 0 2px black; border:1px solid rgba(255,255,255,0.7);"></div>`;
                         }
                     }
                     
