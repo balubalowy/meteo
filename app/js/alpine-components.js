@@ -10,14 +10,19 @@ document.addEventListener('alpine:init', () => {
         async fetchSOB() {
             try {
                 const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://obserwatorzy.info/prognoza-burz/'));
-                const data = await res.json();
+                const htmlText = await res.text();
                 const parser = new DOMParser();
-                const doc = parser.parseFromString(data.contents, 'text/html');
+                const doc = parser.parseFromString(htmlText, 'text/html');
                 const imgs = Array.from(doc.querySelectorAll('img'));
                 const targetImg = imgs.find(img => img.src && (img.src.includes('forecast') || img.src.includes('sob') || img.src.includes('prognoza')));
-                if (targetImg) this.sobImg = targetImg.src;
-                else this.sobImg = 'https://obserwatorzy.info/wp-content/uploads/2026/08/forecast-20260807.png';
+                if (targetImg) {
+                    this.sobImg = targetImg.src.replace('https://corsproxy.io/?', ''); 
+                    // Sometimes corsproxy might prepend its URL if relative paths are used incorrectly, just in case
+                } else {
+                    this.sobImg = 'https://obserwatorzy.info/wp-content/uploads/2026/08/forecast-20260807.png';
+                }
             } catch(e) {
+                console.error("Błąd obserwatorzy:", e);
                 this.sobImg = 'https://obserwatorzy.info/wp-content/uploads/2026/08/forecast-20260807.png';
             }
             this.loading = false;
