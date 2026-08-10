@@ -173,6 +173,7 @@ body {
 .form-label { display: block; margin-bottom: 4px; font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
 .form-input, .form-select { 
     width: 100%; 
+    max-width: 100%;
     padding: 10px 12px; 
     background: var(--bg-tertiary); 
     border: 1px solid var(--border-subtle); 
@@ -180,6 +181,9 @@ body {
     border-radius: var(--radius-sm); 
     font-family: var(--font-sans); 
     transition: var(--transition);
+}
+.form-select {
+    text-overflow: ellipsis;
 }
 .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 2px rgba(43,191,113,0.2); }
 
@@ -330,5 +334,64 @@ body {
 @keyframes shimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
+}
+
+/* Tabela responsywna dla mobilnych */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Responsywność panelu mapy */
+.map-dashboard-container {
+    height: 100%; 
+    width: 100%; 
+    display: flex; 
+    flex-direction: row; 
+    position: relative; 
+    overflow: hidden;
+}
+
+.map-sidebar {
+    width: 320px; 
+    background: var(--bg-primary); 
+    border-right: 1px solid var(--border-subtle); 
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto; 
+    z-index: 1000; 
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+    .data-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    .map-dashboard-container {
+        flex-direction: column-reverse !important;
+    }
+    .map-sidebar {
+        width: 100% !important;
+        height: 45vh !important;
+        border-right: none !important;
+        border-top: 1px solid var(--border-subtle) !important;
+    }
+    #premium-map {
+        width: 100% !important;
+        height: 55vh !important;
+        flex: none !important;
+    }
+    .if-example-photo {
+        width: 100% !important;
+        margin-top: 15px;
+    }
+    .card-body > .flex.items-start {
+        flex-direction: column !important;
+    }
 }
 

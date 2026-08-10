@@ -2,7 +2,7 @@
   "name": "Antigravity Meteo",
   "short_name": "Meteo",
   "description": "Profesjonalny panel meteo, radar, ostrzeżenia i baza wiedzy dla łowców burz.",
-  "start_url": "/meteo/app/",
+  "start_url": "/meteo/",
   "display": "standalone",
   "background_color": "#121212",
   "theme_color": "#0d6efd",
