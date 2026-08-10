@@ -23,7 +23,7 @@ function initApp() {
   safeRun('initLeafletMap', () => typeof initLeafletMap === 'function' && initLeafletMap());
   safeRun('initRepoStats', () => typeof initRepoStats === 'function' && initRepoStats());
   safeRun('loadDashboardLinks', () => typeof loadDashboardLinks === 'function' && loadDashboardLinks());
-  safeRun('initSortableGrid', () => typeof initSortableGrid === 'function' && initSortableGrid());
+  // Sortable jest teraz obsługiwany w index.html przyciskiem "Edytuj Układ"
   safeRun('initLightbox', () => typeof initLightbox === 'function' && initLightbox());
   safeRun('initCmmSynop', () => typeof initCmmSynop === 'function' && initCmmSynop());
   safeRun('renderLocalStats', () => typeof renderLocalStats === 'function' && renderLocalStats());
@@ -56,43 +56,6 @@ function initCmmSynop() {
   window._cmmLoadFn = loadCmm;
 }
 
-function initSortableGrid() {
-   const grid = document.getElementById('dashboard-tiles');
-   if (grid && typeof Sortable !== 'undefined') {
-       // Odtwórz zapisaną kolejność kafelek z localStorage
-       const savedOrder = localStorage.getItem('bmeteo_tile_order');
-       if (savedOrder) {
-           try {
-               const orderArray = JSON.parse(savedOrder);
-               const tileMap = {};
-               Array.from(grid.children).forEach(child => {
-                   const id = child.getAttribute('data-id');
-                   if (id) tileMap[id] = child;
-               });
-               orderArray.forEach(id => {
-                   if (tileMap[id]) {
-                       grid.appendChild(tileMap[id]);
-                   }
-               });
-           } catch(e) {
-               console.error("Błąd odczytu kolejności kafelek:", e);
-           }
-       }
-
-       // Inicjalizuj przeciąganie i zapisuj pożądany układ po przeciągnięciu
-       new Sortable(grid, {
-           animation: 150,
-           ghostClass: 'sortable-ghost',
-           handle: 'h3',
-           onEnd: function() {
-               const currentOrder = Array.from(grid.children)
-                   .map(child => child.getAttribute('data-id'))
-                   .filter(Boolean);
-               localStorage.setItem('bmeteo_tile_order', JSON.stringify(currentOrder));
-           }
-       });
-   }
-}
 
 function initLightbox() {
    const lightbox = document.getElementById('lightbox');
