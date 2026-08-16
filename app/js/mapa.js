@@ -311,39 +311,47 @@ window.initMapa = function() {
         // ----------------------------------------------------
         // RAINVIEWER RADAR
         // ----------------------------------------------------
-        let radarLayers = [], timestamps = [], currentFrame = 0, animationTimer = null;
+        // ----------------------------------------------------
+        // RAINVIEWER RADAR (Optymalizacja: maxNativeZoom 8 zapobiega znikaniu przy zoomie)
+        // ----------------------------------------------------
+        let radarTileLayer = null, radarHost = '', radarFrames = [], currentFrame = 0, animationTimer = null;
         
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
             .then(data => {
-                const host = data.host;
-                timestamps = data.radar.past.concat(data.radar.nowcast);
-                document.getElementById('rv-slider').max = timestamps.length - 1;
-                document.getElementById('rv-slider').value = timestamps.length - 1;
+                radarHost = data.host;
+                radarFrames = data.radar.past.concat(data.radar.nowcast);
+                if (!radarFrames.length) return;
 
-                timestamps.forEach((frame, index) => {
-                    const layer = L.tileLayer(`${host}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        opacity: index === timestamps.length - 1 ? 0.7 : 0, 
-                        pane: 'radarPane',
-                        maxZoom: 20,
-                        maxNativeZoom: 12
-                    }).addTo(map);
-                    radarLayers.push(layer);
-                });
-                if(timestamps.length) updateTimeDisplay(timestamps.length - 1);
-            });
+                const slider = document.getElementById('rv-slider');
+                slider.max = radarFrames.length - 1;
+                slider.value = radarFrames.length - 1;
+                currentFrame = radarFrames.length - 1;
+
+                radarTileLayer = L.tileLayer(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`, {
+                    opacity: 0.7, 
+                    pane: 'radarPane',
+                    maxZoom: 18,
+                    maxNativeZoom: 8 // RainViewer serwuje kafelki do zoomu 8 — powyżej Leaflet skaluje je w górę
+                }).addTo(map);
+
+                updateTimeDisplay(currentFrame);
+            })
+            .catch(err => console.error("Błąd pobierania danych RainViewer:", err));
 
         function updateTimeDisplay(index) {
-            if(!timestamps[index]) return;
-            document.getElementById('rv-time').textContent = new Date(timestamps[index].time * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+            if(!radarFrames[index]) return;
+            document.getElementById('rv-time').textContent = new Date(radarFrames[index].time * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
         }
 
         function showFrame(index) {
-            radarLayers.forEach((layer, i) => layer.setOpacity(i === parseInt(index) ? 0.7 : 0));
-            updateTimeDisplay(index);
+            if(!radarFrames[index] || !radarTileLayer) return;
+            currentFrame = parseInt(index);
+            radarTileLayer.setUrl(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`);
+            updateTimeDisplay(currentFrame);
         }
 
-        document.getElementById('rv-slider').addEventListener('input', e => showFrame(currentFrame = parseInt(e.target.value)));
+        document.getElementById('rv-slider').addEventListener('input', e => showFrame(parseInt(e.target.value)));
         document.getElementById('rv-play-btn').addEventListener('click', e => {
             const btn = e.currentTarget;
             if (animationTimer) {
@@ -351,12 +359,12 @@ window.initMapa = function() {
                 btn.innerHTML = '<i data-lucide="play"></i>';
             } else {
                 btn.innerHTML = '<i data-lucide="pause"></i>';
-                if(currentFrame >= radarLayers.length - 1) currentFrame = 0;
+                if(currentFrame >= radarFrames.length - 1) currentFrame = 0;
                 animationTimer = setInterval(() => {
-                    currentFrame = currentFrame >= radarLayers.length - 1 ? 0 : currentFrame + 1;
+                    currentFrame = currentFrame >= radarFrames.length - 1 ? 0 : currentFrame + 1;
                     document.getElementById('rv-slider').value = currentFrame;
                     showFrame(currentFrame);
-                }, 500);
+                }, 600);
             }
             lucide.createIcons();
         });
