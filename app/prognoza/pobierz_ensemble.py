@@ -18,12 +18,23 @@ def download_data():
     print("═" * 65)
     print("  KROK 1: POBIERANIE DANYCH Z MODELI (API)")
     
-    try:
-        threshold = float(input("  Podaj próg temperatury (np. 30 dla T_max > 30°C): ").replace(',', '.'))
-        days_ahead = int(input("  Na ile dni do przodu? (0 = dzisiaj, 1 = jutro, max 14): "))
-    except ValueError:
-        print("  ⚠ Błędna wartość, zamykam skrypt.")
-        return
+    import sys
+    if len(sys.argv) >= 3:
+        try:
+            threshold = float(str(sys.argv[1]).replace(',', '.'))
+            days_ahead = int(sys.argv[2])
+            print(f"  Parametry: Próg = {threshold}°C, Dni w przód = +{days_ahead}")
+        except ValueError:
+            threshold = 30.0
+            days_ahead = 1
+    else:
+        try:
+            threshold = float(input("  Podaj próg temperatury (np. 30 dla T_max > 30°C): ").replace(',', '.'))
+            days_ahead = int(input("  Na ile dni do przodu? (0 = dzisiaj, 1 = jutro, max 14): "))
+        except (ValueError, EOFError):
+            print("  [Domyślnie] Ustawiono próg: 30°C, dni w przód: +1")
+            threshold = 30.0
+            days_ahead = 1
 
     print("  Generowanie siatki (ok. 270 punktów)...")
     lats = [round(49.0 + i*0.5, 2) for i in range(13)]

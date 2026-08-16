@@ -309,13 +309,20 @@ def generate_dashboard():
 
         
         html_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Dashboard_Pogody.html")
+        dash_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dashboard.html")
         with open(html_file, "w", encoding="utf-8") as f:
             f.write(dashboard_html)
+        with open(dash_file, "w", encoding="utf-8") as f:
+            f.write(dashboard_html)
             
-        print(f"  ✓ Gotowe! Interaktywny Dashboard zapisany jako: {os.path.basename(html_file)}")
+        print(f"  ✓ Gotowe! Interaktywny Dashboard zapisany jako: {os.path.basename(html_file)} oraz {os.path.basename(dash_file)}")
         
-        import webbrowser
-        webbrowser.open('file://' + html_file.replace('\\', '/'))
+        if not os.environ.get("CI") and not os.environ.get("GITHUB_ACTIONS"):
+            try:
+                import webbrowser
+                webbrowser.open('file://' + html_file.replace('\\', '/'))
+            except:
+                pass
         
     except Exception as e:
         traceback.print_exc()

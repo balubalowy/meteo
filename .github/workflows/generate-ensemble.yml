@@ -32,21 +32,19 @@ jobs:
       - name: Install dependencies
         run: pip install requests openpyxl pandas numpy scipy shapely matplotlib plotly
 
-      - name: Prepare inputs and run pobierz_ensemble
+      - name: Run pobierz_ensemble
         run: |
-          echo "${{ github.event.inputs.threshold }}" > inputs.txt
-          echo "${{ github.event.inputs.days_ahead }}" >> inputs.txt
-          cd .private/archiwum/prognoza
-          python pobierz_ensemble.py < ../../../inputs.txt
+          cd app/prognoza
+          python pobierz_ensemble.py "${{ github.event.inputs.threshold }}" "${{ github.event.inputs.days_ahead }}"
 
       - name: Run generuj_dashboard
         run: |
-          cd .private/archiwum/prognoza
+          cd app/prognoza
           python generuj_dashboard.py
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "📈 auto: wygenerowano nowy dashboard ensemble"
-          file_pattern: ".private/archiwum/prognoza/Dashboard_Pogody.html .private/archiwum/prognoza/dashboard.html .private/archiwum/prognoza/config.json .private/archiwum/prognoza/Dane_Mapy_Polska.xlsx"
+          file_pattern: "app/prognoza/Dashboard_Pogody.html app/prognoza/dashboard.html app/prognoza/config.json app/prognoza/Dane_Mapy_Polska.xlsx"
           branch: main
