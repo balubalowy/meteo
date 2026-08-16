@@ -78,16 +78,25 @@ def kier_na_strzalke(kier):
 # ================================================================
 # FUNKCJE POMOCNICZE MAPY
 # ================================================================
+_CACHED_POLAND_POLY = None
+_PREPARED_POLAND_POLY = None
+
 def pobierz_polske():
+    global _CACHED_POLAND_POLY, _PREPARED_POLAND_POLY
+    if _CACHED_POLAND_POLY is not None:
+        return _CACHED_POLAND_POLY
     try:
         url = 'https://raw.githubusercontent.com/ppatrzyk/polska-geojson/master/wojewodztwa/wojewodztwa-min.geojson'
         geo_data = requests.get(url, timeout=10).json()
         polygons = [shape(f['geometry']).buffer(0) for f in geo_data['features']]
-        return unary_union(polygons)
+        _CACHED_POLAND_POLY = unary_union(polygons)
     except:
         url = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries/POL.geo.json'
-        geo_data = requests.get(url).json()
-        return shape(geo_data['features'][0]['geometry']).buffer(0)
+        geo_data = requests.get(url, timeout=10).json()
+        _CACHED_POLAND_POLY = shape(geo_data['features'][0]['geometry']).buffer(0)
+    from shapely.prepared import prep
+    _PREPARED_POLAND_POLY = prep(_CACHED_POLAND_POLY)
+    return _CACHED_POLAND_POLY
 
 def extract_contours(grid_z, grid_lon, grid_lat, interval):
     if len(grid_z) == 0: return [], [], []
@@ -117,12 +126,12 @@ def extract_contours(grid_z, grid_lon, grid_lat, interval):
 # GŁÓWNA FUNKCJA
 # ================================================================
 def create_grid(lats, lons, vals, u_vals=None, v_vals=None):
-    """Tworzy interpolowaną siatkę dla heatmapy oraz wektorów."""
+    """Tworzy interpolowaną siatkę dla heatmapy oraz wektorów (ściśle ograniczoną do Polski)."""
     if len(vals) < 3:
-        return [], [], [], [], [], []
+        return [], [], [], [], [], [], [], [], []
     
-    # 1. Tworzenie regularnej siatki (zmniejszona rozdzielczość 0.08 dla mniejszego JSONa)
-    grid_lon, grid_lat = np.mgrid[13.5:24.5:0.08, 48.5:55.5:0.08]
+    # 1. Tworzenie regularnej siatki 0.10° dla optymalnego rozmiaru JSON i płynnego renderowania
+    grid_lon, grid_lat = np.mgrid[13.5:24.5:0.10, 48.5:55.5:0.10]
     
     points = np.array([lons, lats]).T
     
@@ -142,22 +151,23 @@ def create_grid(lats, lons, vals, u_vals=None, v_vals=None):
         grid_v_near = griddata(points, v_vals, (grid_lon, grid_lat), method='nearest')
         grid_v = np.where(np.isnan(grid_v_lin), grid_v_near, grid_v_lin)
     
-    poland_polygon = pobierz_polske()
+    pobierz_polske()
+    prep_poly = _PREPARED_POLAND_POLY
     
     glats, glons, gvals = [], [], []
     gu, gv = [], []
     
     grid_masked = np.full(grid_lon.shape, np.nan)
     
-    # Maskowanie
+    # Maskowanie - ściśle do granic Polski
     for i in range(grid_lon.shape[0]):
         for j in range(grid_lon.shape[1]):
             lon, lat = grid_lon[i, j], grid_lat[i, j]
             val = grid_z[i, j]
-            if not np.isnan(val) and poland_polygon.contains(Point(lon, lat)):
-                glats.append(round(lat,2))
-                glons.append(round(lon,2))
-                gvals.append(round(val,1))
+            if not np.isnan(val) and (prep_poly is None or prep_poly.contains(Point(lon, lat))):
+                glats.append(round(lat, 2))
+                glons.append(round(lon, 2))
+                gvals.append(round(val, 1))
                 grid_masked[i, j] = val
                 if grid_u is not None and grid_v is not None:
                     gu.append(grid_u[i, j])
@@ -166,18 +176,13 @@ def create_grid(lats, lons, vals, u_vals=None, v_vals=None):
     # Generowanie siatki wektorów strzałek wiatru
     w_lats, w_lons, w_txts = [], [], []
     if len(gu) > 0 and len(gv) > 0:
-        # Pamiętajmy, że chcemy próbkować "co n-ty" punkt dla czytelności mapy:
-        for i in range(0, len(glats), 40): # Rzadsza siatka wektorów (mniej więcej co 40 punkt w 1D)
+        for i in range(0, len(glats), 25): # Co 25 punkt
             u = gu[i]
             v = gv[i]
             spd = math.sqrt(u*u + v*v)
-            if spd > 2.0: # Pokazujemy strzałki tylko gdy wiatr > 2 km/h
-                # Obliczanie kierunku (odwrócony atan2 bo u/v są wektorami ruchu powietrza)
+            if spd > 2.0:
                 angle = math.degrees(math.atan2(u, v))
                 if angle < 0: angle += 360
-                
-                # Zmiana kąta na strzałkę Unicode
-                # 0=N, 90=E, 180=S, 270=W
                 idx = int(round(angle / 45.0)) % 8
                 arrows = ['⬆', '↗', '➡', '↘', '⬇', '↙', '⬅', '↖']
                 w_txts.append(arrows[idx])
@@ -401,17 +406,28 @@ def generate_dashboard():
 
     try:
         print(f"  Wysyłanie metadanych do bazy {FIREBASE_URL}/imgw_map_data.json")
-        # Aktualizujemy bazowy obiekt (patch aby nie nadpisać dzieci jeśli nie wysyłamy od nowa)
-        requests.patch(f"{FIREBASE_URL}/imgw_map_data.json{auth_param}", json=final_payload_base).raise_for_status()
+        resp_meta = requests.patch(f"{FIREBASE_URL}/imgw_map_data.json{auth_param}", json=final_payload_base)
+        if resp_meta.status_code != 200:
+            print(f"  [!] Błąd metadanych Firebase ({resp_meta.status_code}): {resp_meta.text}")
+            resp_meta.raise_for_status()
 
-        # Wysyłamy każdą zmienną w oddzielnym zapytaniu (Chunking = Ominięcie limitu Firebase)
-        for z_key, z_data in js_data.items():
-            print(f"  Wysyłanie warstwy {z_key} ({len(str(z_data))} bajtów)...")
-            requests.put(f"{FIREBASE_URL}/imgw_map_data/MAP_DATA/{z_key}.json{auth_param}", json=z_data).raise_for_status()
+        # Wysyłamy każdą zmienną i każdy okres w oddzielnym zapytaniu (Chunking per okres = brak błędu 400 Bad Request)
+        total_chunks = sum(len(periods) for periods in js_data.values())
+        chunk_i = 0
+        for z_key, z_dict in js_data.items():
+            for okres, okres_data in z_dict.items():
+                chunk_i += 1
+                payload_str = json.dumps(okres_data)
+                sys.stdout.write(f"\r  Wysyłanie [{chunk_i}/{total_chunks}] {z_key}/{okres} ({len(payload_str)} B)...      ")
+                sys.stdout.flush()
+                resp = requests.put(f"{FIREBASE_URL}/imgw_map_data/MAP_DATA/{z_key}/{okres}.json{auth_param}", json=okres_data)
+                if resp.status_code != 200:
+                    print(f"\n  [!] Błąd Firebase ({resp.status_code}) dla {z_key}/{okres}: {resp.text}")
+                    resp.raise_for_status()
 
-        print("  [OK] Dane przestrzenne zaktualizowane w Firebase (Porcjami)!")
+        print("\n  [OK] Dane przestrzenne zaktualizowane w Firebase (Porcjami per okres)!")
     except Exception as e:
-        print(f"  [!] Błąd wysyłania do Firebase: {e}")
+        print(f"\n  [!] Błąd wysyłania do Firebase: {e}")
         sys.exit(1)
         
     print("=" * 65)

@@ -13,6 +13,9 @@ window.initMapa = function() {
         map.createPane('weatherPane');
         map.getPane('weatherPane').style.zIndex = 300;
         
+        map.createPane('radarPane');
+        map.getPane('radarPane').style.zIndex = 400;
+        
         map.createPane('labelsPane');
         map.getPane('labelsPane').style.zIndex = 650;
         map.getPane('labelsPane').style.pointerEvents = 'none';
@@ -320,7 +323,10 @@ window.initMapa = function() {
 
                 timestamps.forEach((frame, index) => {
                     const layer = L.tileLayer(`${host}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        opacity: index === timestamps.length - 1 ? 0.7 : 0, pane: 'weatherPane'
+                        opacity: index === timestamps.length - 1 ? 0.7 : 0, 
+                        pane: 'radarPane',
+                        maxZoom: 20,
+                        maxNativeZoom: 12
                     }).addTo(map);
                     radarLayers.push(layer);
                 });
@@ -384,45 +390,70 @@ window.initMapa = function() {
             return [rgb[0], rgb[1], rgb[2], 160];
         }
 
+        // Uproszczony obrys granic Polski do maskowania interpolacji (Canvas clip)
+        const POLAND_POLY_COORDS = [
+            [19.443, 49.609], [19.362, 49.536], [19.234, 49.511], [19.188, 49.41], [18.98, 49.395], [18.972, 49.504], [18.837, 49.524],
+            [18.805, 49.679], [18.625, 49.722], [18.575, 49.915], [18.322, 49.916], [18.035, 50.066], [18.009, 50.031], [18.046, 50.016],
+            [17.869, 49.972], [17.705, 50.114], [17.65, 50.111], [17.601, 50.17], [17.759, 50.207], [17.713, 50.323], [17.617, 50.267],
+            [17.35, 50.264], [17.34, 50.323], [17.248, 50.332], [17.204, 50.386], [16.908, 50.449], [16.86, 50.411], [17.003, 50.302],
+            [17.028, 50.23], [16.847, 50.207], [16.704, 50.096], [16.58, 50.143], [16.548, 50.23], [16.361, 50.38], [16.287, 50.368],
+            [16.198, 50.429], [16.445, 50.58], [16.343, 50.661], [16.234, 50.671], [16.188, 50.627], [16.104, 50.663], [16.006, 50.606],
+            [15.989, 50.685], [15.861, 50.674], [15.814, 50.755], [15.706, 50.737], [15.439, 50.809], [15.375, 50.778], [15.368, 50.838],
+            [15.277, 50.891], [15.274, 50.98], [15.189, 50.98], [15.172, 51.02], [14.985, 51.011], [15.002, 50.869], [14.823, 50.871],
+            [14.965, 51.05], [15.037, 51.258], [14.947, 51.472], [14.729, 51.531], [14.758, 51.66], [14.591, 51.82], [14.694, 51.901],
+            [14.758, 52.067], [14.682, 52.117], [14.715, 52.237], [14.576, 52.289], [14.535, 52.394], [14.633, 52.49], [14.605, 52.528],
+            [14.64, 52.57], [14.124, 52.845], [14.162, 52.888], [14.144, 52.961], [14.352, 53.059], [14.377, 53.202], [14.45, 53.26],
+            [14.306, 53.544], [14.284, 53.772], [14.208, 53.916], [14.409, 53.92], [15.286, 54.147], [16.102, 54.274], [16.53, 54.541],
+            [16.89, 54.592], [17.263, 54.734], [17.968, 54.832], [18.329, 54.835], [18.733, 54.682], [18.829, 54.608], [18.451, 54.78],
+            [18.396, 54.746], [18.542, 54.585], [18.58, 54.438], [18.88, 54.348], [19.307, 54.363], [19.638, 54.459], [21.446, 54.318],
+            [22.642, 54.354], [22.888, 54.409], [23.476, 54.163], [23.529, 54.066], [23.481, 53.999], [23.549, 53.768], [23.799, 53.274],
+            [23.917, 53.157], [23.872, 53.082], [23.946, 52.959], [23.939, 52.713], [23.756, 52.614], [23.467, 52.549], [23.178, 52.283],
+            [23.2, 52.23], [23.507, 52.174], [23.654, 52.071], [23.689, 51.992], [23.612, 51.917], [23.602, 51.833], [23.64, 51.805],
+            [23.527, 51.73], [23.565, 51.534], [23.67, 51.483], [23.651, 51.446], [23.701, 51.41], [23.646, 51.292], [23.858, 51.158],
+            [23.97, 50.951], [24.145, 50.87], [23.957, 50.794], [24.087, 50.669], [24.035, 50.445], [23.727, 50.388], [23.279, 50.1],
+            [22.641, 49.53], [22.747, 49.36], [22.715, 49.227], [22.747, 49.217], [22.707, 49.175], [22.893, 49.095], [22.892, 49.008],
+            [22.225, 49.153], [22.03, 49.225], [21.961, 49.349], [21.84, 49.392], [21.778, 49.356], [21.631, 49.447], [21.434, 49.412],
+            [21.277, 49.461], [21.192, 49.401], [21.124, 49.437], [21.047, 49.417], [21.094, 49.365], [20.94, 49.299], [20.723, 49.42],
+            [20.576, 49.376], [20.325, 49.403], [20.314, 49.343], [20.146, 49.318], [20.076, 49.179], [19.982, 49.232], [19.795, 49.198],
+            [19.758, 49.216], [19.823, 49.277], [19.791, 49.411], [19.639, 49.409], [19.529, 49.573], [19.443, 49.609]
+        ];
+
         function generateIDWImage(lats, lons, vals, scale, cmin, cmax, drawIso) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 240; 
-            canvas.height = 160;
-            const ctx = canvas.getContext('2d');
-            const imgData = ctx.createImageData(canvas.width, canvas.height);
-            const valGrid = new Float32Array(canvas.width * canvas.height);
+            const w = 260, h = 180;
+            const offCanvas = document.createElement('canvas');
+            offCanvas.width = w; 
+            offCanvas.height = h;
+            const offCtx = offCanvas.getContext('2d');
+            const imgData = offCtx.createImageData(w, h);
+            const valGrid = new Float32Array(w * h);
             
             const minLat = 48.5, maxLat = 55.5;
             const minLon = 13.5, maxLon = 24.5;
             
-            const radiusScale = 15; // stały promień po usunięciu z UI
-            const maxD2 = radiusScale * radiusScale; // kwadrat promienia, wpływa na gładkość
-            
             const pts = [];
             for(let i=0; i<lats.length; i++) {
-                const px = ((lons[i] - minLon) / (maxLon - minLon)) * canvas.width;
-                const py = (1 - (lats[i] - minLat) / (maxLat - minLat)) * canvas.height;
+                const px = ((lons[i] - minLon) / (maxLon - minLon)) * w;
+                const py = (1 - (lats[i] - minLat) / (maxLat - minLat)) * h;
                 pts.push({x: px, y: py, v: vals[i]});
             }
 
-            for (let y = 0; y < canvas.height; y++) {
-                for (let x = 0; x < canvas.width; x++) {
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
                     let num = 0, den = 0;
                     for(let i=0; i<pts.length; i++) {
                         const dx = x - pts[i].x;
                         const dy = y - pts[i].y;
                         let d2 = dx*dx + dy*dy;
                         if(d2 < 0.5) d2 = 0.5;
-                        const w = 1.0 / (d2 * d2);
-                        num += w * pts[i].v;
-                        den += w;
+                        const weight = 1.0 / (d2 * d2);
+                        num += weight * pts[i].v;
+                        den += weight;
                     }
                     const val = num / den;
-                    const idx = (y * canvas.width + x);
+                    const idx = (y * w + x);
                     valGrid[idx] = val;
                     
                     const rgba = getColorRGBA(val, scale, cmin, cmax);
-                    
                     const pIdx = idx * 4;
                     imgData.data[pIdx] = rgba[0];
                     imgData.data[pIdx+1] = rgba[1];
@@ -432,28 +463,61 @@ window.initMapa = function() {
             }
             
             if (drawIso) {
-                const step = (cmax - cmin) / 15; // np. co ~2 stopnie dla temp
-                for (let y = 0; y < canvas.height - 1; y++) {
-                    for (let x = 0; x < canvas.width - 1; x++) {
-                        const idx = y * canvas.width + x;
+                const step = (cmax - cmin) / 15;
+                for (let y = 0; y < h - 1; y++) {
+                    for (let x = 0; x < w - 1; x++) {
+                        const idx = y * w + x;
                         const v1 = valGrid[idx];
                         const v2 = valGrid[idx + 1];
-                        const v3 = valGrid[idx + canvas.width];
+                        const v3 = valGrid[idx + w];
                         
                         if (Math.floor(v1 / step) !== Math.floor(v2 / step) || Math.floor(v1 / step) !== Math.floor(v3 / step)) {
                             const pIdx = idx * 4;
                             imgData.data[pIdx] = 0;
                             imgData.data[pIdx+1] = 0;
                             imgData.data[pIdx+2] = 0;
-                            imgData.data[pIdx+3] = 120; // lekko przezroczyste czarne linie
+                            imgData.data[pIdx+3] = 120;
                         }
                     }
                 }
             }
             
-            ctx.putImageData(imgData, 0, 0);
-            return canvas.toDataURL();
+            offCtx.putImageData(imgData, 0, 0);
+
+            // Główny canvas z precyzyjnym przycięciem (clip) ściśle do konturów Polski
+            const mainCanvas = document.createElement('canvas');
+            mainCanvas.width = w;
+            mainCanvas.height = h;
+            const mainCtx = mainCanvas.getContext('2d');
+
+            mainCtx.beginPath();
+            for (let i = 0; i < POLAND_POLY_COORDS.length; i++) {
+                const [pLon, pLat] = POLAND_POLY_COORDS[i];
+                const px = ((pLon - minLon) / (maxLon - minLon)) * w;
+                const py = (1 - (pLat - minLat) / (maxLat - minLat)) * h;
+                if (i === 0) mainCtx.moveTo(px, py);
+                else mainCtx.lineTo(px, py);
+            }
+            mainCtx.closePath();
+            mainCtx.clip(); // Maskowanie: poza Polską piksele pozostają w 100% przezroczyste
+
+            mainCtx.drawImage(offCanvas, 0, 0);
+            return mainCanvas.toDataURL();
         }
+
+        // Zarządzanie kolejnością warstw (Z-Index Panes)
+        window.setLayerPriority = function(layerName, position) {
+            const zValues = {
+                'inter': position === 'top' ? 420 : 300,
+                'radar': position === 'top' ? 430 : 350,
+                'drawings': position === 'top' ? 480 : 380
+            };
+            if (layerName === 'radar' && map.getPane('radarPane')) {
+                map.getPane('radarPane').style.zIndex = zValues['radar'];
+            } else if (layerName === 'inter' && map.getPane('weatherPane')) {
+                map.getPane('weatherPane').style.zIndex = zValues['inter'];
+            }
+        };
 
         function calculateDewPoint(temp_c, rh_pct) {
             if(temp_c == null || rh_pct == null || rh_pct <= 0) return null;
