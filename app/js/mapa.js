@@ -1082,6 +1082,7 @@ window.initMapa = function() {
                     'wiatr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
                     'wiatr_sr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
                     'rosy': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
+                    'lcl': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
                     'wilg': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
                     'grunt': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
                     'synop': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] }
@@ -1131,6 +1132,12 @@ window.initMapa = function() {
                     
                     const dewPoint = calculateDewPoint(temp, wilg);
                     
+                    // Obliczenie wysokości podstawy chmur (LCL) wg wzoru Espy'ego: h_LCL = 125 * (T - Td)
+                    let lcl_m = NaN;
+                    if (!isNaN(temp) && dewPoint !== null && !isNaN(dewPoint)) {
+                        lcl_m = Math.round(125 * Math.max(0, temp - dewPoint));
+                    }
+                    
                     const porywy = [wiatr_poryw, wiatr_max].filter(v => !isNaN(v)).map(v => v * 3.6);
                     const wiatr_poryw_kmh = porywy.length ? Math.max(...porywy) : NaN;
                     const wiatr_sr_kmh = !isNaN(wiatr_sr) ? wiatr_sr * 3.6 : NaN;
@@ -1153,6 +1160,7 @@ window.initMapa = function() {
                     addData('grunt', temp_grunt, temp_grunt?.toFixed(1) + '°', `Temp. Gruntu: ${temp_grunt?.toFixed(1)}°C${formatTime(grunt_t)}`, undefined, grunt_t);
                     addData('wilg', wilg, wilg?.toFixed(0) + '%', `Wilgotność: ${wilg?.toFixed(0)}%${formatTime(wilg_t)}`, undefined, wilg_t);
                     addData('rosy', dewPoint, dewPoint?.toFixed(1) + '°', `Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
+                    addData('lcl', lcl_m, !isNaN(lcl_m) ? (lcl_m + 'm') : '', `Podstawa Chmur (LCL): <b>${lcl_m} m n.p.g.</b><br>Temperatura: ${temp?.toFixed(1)}°C, Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
                     addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}`, wiatr_kier, wiatr_por_t);
                     addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`, wiatr_kier, wiatr_sr_t);
                     
@@ -1210,6 +1218,17 @@ window.initMapa = function() {
                 // Hardcoded scales based on variable if ZMIENNE not loaded yet
                 if (zmienna.includes('temp') || zmienna === 'rosy' || zmienna === 'grunt' || zmienna === 'synop') {
                     scale = [[0,"#0000ff"],[0.25,"#00ffff"],[0.5,"#00ff00"],[0.75,"#ffff00"],[1,"#ff0000"]];
+                } else if (zmienna === 'lcl') {
+                    scale = [
+                        [0, "#312e81"],    // < 300m - ciemny fiolet / indygo
+                        [0.15, "#2563eb"], // ~450m - niebieski
+                        [0.30, "#06b6d4"], // ~900m - błękit / cyan
+                        [0.45, "#10b981"], // ~1350m - zielony
+                        [0.60, "#eab308"], // ~1800m - żółty
+                        [0.75, "#f97316"], // ~2250m - pomarańczowy
+                        [0.90, "#ef4444"], // ~2700m - czerwony
+                        [1.00, "#831843"]  // 3000m+ - bordowy
+                    ];
                 } else if (zmienna.includes('wiatr')) {
                     scale = [[0,"#ffffff"],[0.2,"#a1dab4"],[0.4,"#41b6c4"],[0.6,"#2c7fb8"],[1,"#253494"]];
                 } else if (zmienna === 'wilg') {
@@ -1219,8 +1238,8 @@ window.initMapa = function() {
                 }
             }
             
-            const cmin = zInfo && zInfo.cmin !== undefined ? zInfo.cmin : (zmienna === 'wilg' ? 0 : -20);
-            const cmax = zInfo && zInfo.cmax !== undefined ? zInfo.cmax : (zmienna === 'wilg' ? 100 : 40);
+            const cmin = zInfo && zInfo.cmin !== undefined ? zInfo.cmin : (zmienna === 'wilg' ? 0 : (zmienna === 'lcl' ? 0 : -20));
+            const cmax = zInfo && zInfo.cmax !== undefined ? zInfo.cmax : (zmienna === 'wilg' ? 100 : (zmienna === 'lcl' ? 3000 : 40));
             
             const showStations = window.MAP_LAYERS && window.MAP_LAYERS['stations'] ? window.MAP_LAYERS['stations'].visible : true;
             const showInter = window.MAP_LAYERS && window.MAP_LAYERS['inter'] ? window.MAP_LAYERS['inter'].visible : true;
