@@ -774,6 +774,71 @@ window.initMapa = function() {
         window.renderLayerManagerUI();
 
         // ----------------------------------------------------
+        // PEŁNY EKRAN I ZWIJANIE PANELU BOCZNEGO
+        // ----------------------------------------------------
+        window.toggleMapFullscreen = function() {
+            const container = document.querySelector('.map-dashboard-container');
+            const fsBtn = document.getElementById('map-fs-btn');
+            if (!container) return;
+
+            const isFs = container.classList.toggle('map-fullscreen');
+
+            if (isFs) {
+                if (fsBtn) fsBtn.innerHTML = '<i data-lucide="minimize" style="width: 15px; height: 15px;"></i> <span id="map-fs-text">Zamknij Pełny Ekran</span>';
+                if (container.requestFullscreen && !document.fullscreenElement) {
+                    container.requestFullscreen().catch(() => {});
+                }
+            } else {
+                if (fsBtn) fsBtn.innerHTML = '<i data-lucide="maximize" style="width: 15px; height: 15px;"></i> <span id="map-fs-text">Pełny Ekran</span>';
+                if (document.fullscreenElement && document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                }
+            }
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            
+            setTimeout(() => {
+                if (map) map.invalidateSize();
+            }, 150);
+        };
+
+        window.toggleMapSidebar = function() {
+            const sidebar = document.getElementById('map-sidebar');
+            const icon = document.getElementById('sidebar-toggle-icon');
+            if (!sidebar) return;
+
+            const isHidden = sidebar.classList.toggle('sidebar-collapsed');
+            if (icon) {
+                icon.setAttribute('data-lucide', isHidden ? 'panel-left-open' : 'panel-left-close');
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            setTimeout(() => {
+                if (map) map.invalidateSize();
+            }, 100);
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const container = document.querySelector('.map-dashboard-container');
+                if (container && container.classList.contains('map-fullscreen')) {
+                    window.toggleMapFullscreen();
+                }
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            const container = document.querySelector('.map-dashboard-container');
+            const fsBtn = document.getElementById('map-fs-btn');
+            if (container && !document.fullscreenElement && container.classList.contains('map-fullscreen')) {
+                container.classList.remove('map-fullscreen');
+                if (fsBtn) fsBtn.innerHTML = '<i data-lucide="maximize" style="width: 15px; height: 15px;"></i> <span id="map-fs-text">Pełny Ekran</span>';
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                setTimeout(() => { if (map) map.invalidateSize(); }, 150);
+            }
+        });
+
+        // ----------------------------------------------------
         // IMGW DATA (Firebase + IDW Interpolation)
         // ----------------------------------------------------
         let imgwData = null;
