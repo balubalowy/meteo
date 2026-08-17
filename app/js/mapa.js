@@ -6,15 +6,27 @@ window.initMapa = function() {
         window.premiumMap = map;
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // KROK 1: MAP PANES (Miasta na wierzchu)
+        // KROK 1: MAP PANES (Precyzyjne zarządzanie kolejnością Z-Index)
         map.createPane('basePane');
         map.getPane('basePane').style.zIndex = 200;
         
+        map.createPane('satellitePane');
+        map.getPane('satellitePane').style.zIndex = 260;
+        
         map.createPane('weatherPane');
-        map.getPane('weatherPane').style.zIndex = 300;
+        map.getPane('weatherPane').style.zIndex = 290;
         
         map.createPane('radarPane');
-        map.getPane('radarPane').style.zIndex = 400;
+        map.getPane('radarPane').style.zIndex = 320;
+        
+        map.createPane('lightningPane');
+        map.getPane('lightningPane').style.zIndex = 350;
+        
+        map.createPane('drawingsPane');
+        map.getPane('drawingsPane').style.zIndex = 380;
+        
+        map.createPane('stationsPane');
+        map.getPane('stationsPane').style.zIndex = 410;
         
         map.createPane('labelsPane');
         map.getPane('labelsPane').style.zIndex = 650;
@@ -309,9 +321,6 @@ window.initMapa = function() {
         basemaps["Ciemny (Dark)"].addTo(map);
 
         // ----------------------------------------------------
-        // RAINVIEWER RADAR
-        // ----------------------------------------------------
-        // ----------------------------------------------------
         // RAINVIEWER RADAR (Optymalizacja: maxNativeZoom 8 zapobiega znikaniu przy zoomie)
         // ----------------------------------------------------
         let radarTileLayer = null, radarHost = '', radarFrames = [], currentFrame = 0, animationTimer = null;
@@ -324,16 +333,22 @@ window.initMapa = function() {
                 if (!radarFrames.length) return;
 
                 const slider = document.getElementById('rv-slider');
-                slider.max = radarFrames.length - 1;
-                slider.value = radarFrames.length - 1;
+                if (slider) {
+                    slider.max = radarFrames.length - 1;
+                    slider.value = radarFrames.length - 1;
+                }
                 currentFrame = radarFrames.length - 1;
 
                 radarTileLayer = L.tileLayer(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`, {
                     opacity: 0.7, 
                     pane: 'radarPane',
                     maxZoom: 18,
-                    maxNativeZoom: 8 // RainViewer serwuje kafelki do zoomu 8 — powyżej Leaflet skaluje je w górę
-                }).addTo(map);
+                    maxNativeZoom: 8
+                });
+
+                if (window.MAP_LAYERS && window.MAP_LAYERS['radar'].visible) {
+                    radarTileLayer.addTo(map);
+                }
 
                 updateTimeDisplay(currentFrame);
             })
@@ -341,7 +356,8 @@ window.initMapa = function() {
 
         function updateTimeDisplay(index) {
             if(!radarFrames[index]) return;
-            document.getElementById('rv-time').textContent = new Date(radarFrames[index].time * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+            const timeEl = document.getElementById('rv-time');
+            if (timeEl) timeEl.textContent = new Date(radarFrames[index].time * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
         }
 
         function showFrame(index) {
@@ -351,23 +367,158 @@ window.initMapa = function() {
             updateTimeDisplay(currentFrame);
         }
 
-        document.getElementById('rv-slider').addEventListener('input', e => showFrame(parseInt(e.target.value)));
-        document.getElementById('rv-play-btn').addEventListener('click', e => {
-            const btn = e.currentTarget;
-            if (animationTimer) {
-                clearInterval(animationTimer); animationTimer = null;
-                btn.innerHTML = '<i data-lucide="play"></i>';
-            } else {
-                btn.innerHTML = '<i data-lucide="pause"></i>';
-                if(currentFrame >= radarFrames.length - 1) currentFrame = 0;
-                animationTimer = setInterval(() => {
-                    currentFrame = currentFrame >= radarFrames.length - 1 ? 0 : currentFrame + 1;
-                    document.getElementById('rv-slider').value = currentFrame;
-                    showFrame(currentFrame);
-                }, 600);
-            }
-            lucide.createIcons();
+        const rvSlider = document.getElementById('rv-slider');
+        if (rvSlider) rvSlider.addEventListener('input', e => showFrame(parseInt(e.target.value)));
+        
+        const rvPlayBtn = document.getElementById('rv-play-btn');
+        if (rvPlayBtn) {
+            rvPlayBtn.addEventListener('click', e => {
+                const btn = e.currentTarget;
+                if (animationTimer) {
+                    clearInterval(animationTimer); animationTimer = null;
+                    btn.innerHTML = '<i data-lucide="play"></i>';
+                } else {
+                    btn.innerHTML = '<i data-lucide="pause"></i>';
+                    if(currentFrame >= radarFrames.length - 1) currentFrame = 0;
+                    animationTimer = setInterval(() => {
+                        currentFrame = currentFrame >= radarFrames.length - 1 ? 0 : currentFrame + 1;
+                        if (document.getElementById('rv-slider')) document.getElementById('rv-slider').value = currentFrame;
+                        showFrame(currentFrame);
+                    }, 600);
+                }
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        }
+
+        // ----------------------------------------------------
+        // SATELITA (EUMETSAT Meteosat IR 10.8)
+        // ----------------------------------------------------
+        const satelliteLayer = L.tileLayer.wms('https://view.eumetsat.int/geoserver/ows', {
+            layers: 'msg_fes:ir108',
+            format: 'image/png',
+            transparent: true,
+            opacity: 0.6,
+            pane: 'satellitePane',
+            maxZoom: 18,
+            attribution: '© EUMETSAT'
         });
+
+        // ----------------------------------------------------
+        // WYŁADOWANIA (EUMETSAT MTG Lightning Imager)
+        // ----------------------------------------------------
+        const lightningLayer = L.tileLayer.wms('https://view.eumetsat.int/geoserver/ows', {
+            layers: 'mtg_fd:li_afa',
+            format: 'image/png',
+            transparent: true,
+            opacity: 0.85,
+            pane: 'lightningPane',
+            maxZoom: 18,
+            attribution: '© EUMETSAT MTG-LI'
+        });
+
+        // ----------------------------------------------------
+        // MENEDŻER WARSTW (Layer State & Reordering)
+        // ----------------------------------------------------
+        window.MAP_LAYERS = {
+            'stations':  { id: 'stations',  name: 'Stacje i Pomiary IMGW',         icon: '📍', visible: true,  opacity: 100, pane: 'stationsPane' },
+            'drawings':  { id: 'drawings',  name: 'Kreator Ostrzeżeń (Rysunki)',   icon: '✏️', visible: true,  opacity: 100, pane: 'drawingsPane' },
+            'lightning': { id: 'lightning', name: 'Wyładowania (EUMETSAT MTG-LI)', icon: '⚡', visible: false, opacity: 85,  pane: 'lightningPane' },
+            'radar':     { id: 'radar',     name: 'Radar Opadów (RainViewer)',     icon: '🌧️', visible: true,  opacity: 70,  pane: 'radarPane' },
+            'inter':     { id: 'inter',     name: 'Interpolacja IMGW',             icon: '🌡️', visible: true,  opacity: 70,  pane: 'weatherPane' },
+            'sat':       { id: 'sat',       name: 'Satelita IR (EUMETSAT)',        icon: '🛰️', visible: false, opacity: 60,  pane: 'satellitePane' }
+        };
+
+        // Kolejność od wierzchu (index 0 = najwyższy z-index) do spodu
+        window.layerOrder = ['stations', 'drawings', 'lightning', 'radar', 'inter', 'sat'];
+
+        window.applyLayerOrder = function() {
+            const total = window.layerOrder.length;
+            window.layerOrder.forEach((key, idx) => {
+                const item = window.MAP_LAYERS[key];
+                if (item && item.pane && map.getPane(item.pane)) {
+                    // idx 0 to wierzch (najwyższy z-index)
+                    const z = 260 + (total - idx) * 30;
+                    map.getPane(item.pane).style.zIndex = z;
+                }
+            });
+        };
+
+        window.moveLayer = function(key, dir) {
+            const idx = window.layerOrder.indexOf(key);
+            if (idx === -1) return;
+            const targetIdx = dir === 'up' ? idx - 1 : idx + 1;
+            if (targetIdx < 0 || targetIdx >= window.layerOrder.length) return;
+            
+            const tmp = window.layerOrder[idx];
+            window.layerOrder[idx] = window.layerOrder[targetIdx];
+            window.layerOrder[targetIdx] = tmp;
+            
+            window.applyLayerOrder();
+            window.renderLayerManagerUI();
+        };
+
+        window.toggleLayer = function(key, isChecked) {
+            if (!window.MAP_LAYERS[key]) return;
+            window.MAP_LAYERS[key].visible = isChecked;
+            
+            if (key === 'sat') {
+                if (isChecked) { if (!map.hasLayer(satelliteLayer)) map.addLayer(satelliteLayer); }
+                else { if (map.hasLayer(satelliteLayer)) map.removeLayer(satelliteLayer); }
+            } else if (key === 'lightning') {
+                if (isChecked) { if (!map.hasLayer(lightningLayer)) map.addLayer(lightningLayer); }
+                else { if (map.hasLayer(lightningLayer)) map.removeLayer(lightningLayer); }
+            } else if (key === 'radar') {
+                if (radarTileLayer) {
+                    if (isChecked) { if (!map.hasLayer(radarTileLayer)) map.addLayer(radarTileLayer); }
+                    else { if (map.hasLayer(radarTileLayer)) map.removeLayer(radarTileLayer); }
+                }
+            } else if (key === 'inter' || key === 'stations') {
+                window.renderIMGW();
+            }
+        };
+
+        window.setLayerOpacity = function(key, val) {
+            const op = parseInt(val) / 100.0;
+            if (window.MAP_LAYERS[key]) window.MAP_LAYERS[key].opacity = parseInt(val);
+            
+            if (key === 'sat' && satelliteLayer) satelliteLayer.setOpacity(op);
+            else if (key === 'lightning' && lightningLayer) lightningLayer.setOpacity(op);
+            else if (key === 'radar' && radarTileLayer) radarTileLayer.setOpacity(op);
+            else if (key === 'inter' && idwOverlay) idwOverlay.setOpacity(op);
+        };
+
+        window.renderLayerManagerUI = function() {
+            const container = document.getElementById('layer-manager-list');
+            if (!container) return;
+            
+            container.innerHTML = window.layerOrder.map((key, idx) => {
+                const item = window.MAP_LAYERS[key];
+                const isTop = idx === 0;
+                const isBottom = idx === window.layerOrder.length - 1;
+                return `
+                    <div class="layer-item-card" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 7px 10px; display: flex; flex-direction: column; gap: 5px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; margin: 0; color: var(--text-primary);">
+                                <input type="checkbox" ${item.visible ? 'checked' : ''} onchange="window.toggleLayer('${key}', this.checked)">
+                                <span>${item.icon} ${item.name}</span>
+                            </label>
+                            <div style="display: flex; gap: 3px;">
+                                <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń wyżej (nad inne)" onclick="window.moveLayer('${key}', 'up')" ${isTop ? 'disabled style="opacity:0.25; cursor:default;"' : ''}>▲</button>
+                                <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń niżej (pod inne)" onclick="window.moveLayer('${key}', 'down')" ${isBottom ? 'disabled style="opacity:0.25; cursor:default;"' : ''}>▼</button>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-muted);">
+                            <span style="min-width: 42px;">Krycie:</span>
+                            <input type="range" min="0" max="100" value="${item.opacity}" oninput="window.setLayerOpacity('${key}', this.value); document.getElementById('lbl-op-${key}').textContent = this.value + '%'" style="flex: 1; accent-color: var(--accent-primary); height: 4px;">
+                            <span id="lbl-op-${key}" style="width: 32px; text-align: right;">${item.opacity}%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.applyLayerOrder();
+        window.renderLayerManagerUI();
 
         // ----------------------------------------------------
         // IMGW DATA (Firebase + IDW Interpolation)
@@ -693,14 +844,15 @@ window.initMapa = function() {
             const cmin = zInfo && zInfo.cmin !== undefined ? zInfo.cmin : (zmienna === 'wilg' ? 0 : -20);
             const cmax = zInfo && zInfo.cmax !== undefined ? zInfo.cmax : (zmienna === 'wilg' ? 100 : 40);
             
-            const showTxt = document.getElementById('chk-txt').checked;
-            const showPt = document.getElementById('chk-pt').checked;
-            const showInter = document.getElementById('chk-inter').checked;
+            const showStations = window.MAP_LAYERS && window.MAP_LAYERS['stations'] ? window.MAP_LAYERS['stations'].visible : true;
+            const showInter = window.MAP_LAYERS && window.MAP_LAYERS['inter'] ? window.MAP_LAYERS['inter'].visible : true;
+            const showTxt = document.getElementById('chk-txt') ? document.getElementById('chk-txt').checked : true;
+            const showPt = document.getElementById('chk-pt') ? document.getElementById('chk-pt').checked : false;
             const showIso = document.getElementById('chk-iso') ? document.getElementById('chk-iso').checked : false;
             const ptColorMode = document.getElementById('pt-color-mode') ? document.getElementById('pt-color-mode').value : 'scale';
-            const opacityBg = parseInt(document.getElementById('opa-bg').value) / 100;
+            const opacityBg = window.MAP_LAYERS && window.MAP_LAYERS['inter'] ? (window.MAP_LAYERS['inter'].opacity / 100) : (document.getElementById('opa-bg') ? parseInt(document.getElementById('opa-bg').value) / 100 : 0.7);
             
-            if(data.pt_lats && (showTxt || showPt)) {
+            if(showStations && data.pt_lats && (showTxt || showPt)) {
                 for(let i=0; i<data.pt_lats.length; i++) {
                     let htmlContent = '';
                     const val = data.pt_vals[i];
@@ -738,7 +890,6 @@ window.initMapa = function() {
                         // Wind Barb (Feathers)
                         if(!isNaN(ex.wiatr_kier) && ex.wiatr_sr_kmh > 0) {
                             const dir = ex.wiatr_kier + 180;
-                            // Simplify barb: just a line with a small feather indicating speed (very basic)
                             htmlContent += `<div style="position: absolute; top: 11px; left: 11px; width: 18px; height: 18px; transform: rotate(${dir}deg); transform-origin: center;">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 2px black);">
                                     <line x1="12" y1="24" x2="12" y2="4"></line>
@@ -775,7 +926,7 @@ window.initMapa = function() {
                         iconAnchor: [15, 12]
                     });
                     
-                    L.marker([data.pt_lats[i], data.pt_lons[i]], {icon: icon})
+                    L.marker([data.pt_lats[i], data.pt_lons[i]], {icon: icon, pane: 'stationsPane'})
                      .bindTooltip(data.pt_hov[i])
                      .addTo(imgwLayerGroup);
                 }

@@ -58,42 +58,35 @@
                     </select>
                 </div>
                 
-                <!-- Checkboxy IMGW -->
+                <!-- Szczegóły Wyświetlania IMGW -->
                 <div style="background: var(--bg-secondary); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-top: 5px;">
-                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px; display: block;">Warstwy Mapy:</label>
+                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px; display: block;">Elementy Pomiary IMGW:</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8rem;">
-                        <label><input type="checkbox" id="chk-inter" onchange="renderIMGW()" checked> Interpolacja</label>
                         <label><input type="checkbox" id="chk-iso" onchange="renderIMGW()"> Izolinie</label>
                         <label><input type="checkbox" id="chk-pt" onchange="renderIMGW()"> Punkty</label>
                         <label><input type="checkbox" id="chk-txt" onchange="renderIMGW()" checked> Wartości</label>
                     </div>
                     <div style="margin-top: 8px; border-top: 1px solid var(--border-subtle); padding-top: 6px;">
-                        <label style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 4px;">Kolejność Warstw (Na wierzchu):</label>
-                        <select id="sel-layer-order" class="form-select" onchange="setLayerPriority(this.value, 'top')" style="font-size: 0.75rem; padding: 4px 6px; width: 100%;">
-                            <option value="radar">Radar Opadów na wierzchu</option>
-                            <option value="inter">Interpolacja IMGW na wierzchu</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Suwaki Przezroczystości IMGW -->
-                <div style="background: var(--bg-secondary); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle);">
-                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px; display: block;">Wygląd i Przezroczystość:</label>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
-                            <span>Przezrocz. Tła (Interpolacji):</span> <span id="val-opa-bg">70%</span>
-                        </div>
-                        <input type="range" id="opa-bg" min="0" max="100" value="70" onchange="renderIMGW(); document.getElementById('val-opa-bg').textContent = this.value + '%'" style="width: 100%; accent-color: #22c55e;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">
-                            <span>Kolor Punktów:</span>
-                        </div>
-                        <select id="pt-color-mode" class="form-select" onchange="window.renderIMGW()" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); color: var(--text-primary);">
+                        <label style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 4px;">Kolor Punktów:</label>
+                        <select id="pt-color-mode" class="form-select" onchange="window.renderIMGW()" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); color: var(--text-primary); width: 100%;">
                             <option value="scale">Zależny od Skali</option>
                             <option value="white">Białe</option>
                             <option value="black">Czarne</option>
                         </select>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- SEKCJA: Menedżer Warstw i Kolejność (Z-Index) -->
+        <div style="padding: 15px; border-bottom: 1px solid var(--border-subtle);">
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
+                <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="layers" style="width: 16px; height: 16px; color: var(--accent-primary);"></i> Menedżer Warstw</span>
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">Warstwy u góry listy leżą <b>na wierzchu</b> mapy (użyj ▲/▼ do zmiany):</div>
+            
+            <div id="layer-manager-list" style="display: flex; flex-direction: column; gap: 6px;">
+                <!-- Generowane dynamicznie przez JS -->
             </div>
         </div>
 
