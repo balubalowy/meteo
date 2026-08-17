@@ -391,16 +391,31 @@ window.initMapa = function() {
         }
 
         // ----------------------------------------------------
-        // SATELITA (EUMETSAT Meteosat IR 10.8)
+        // SATELITA (Dzienny HRV HD + Nocny IR Podczerwień)
         // ----------------------------------------------------
-        const satelliteLayer = L.tileLayer.wms('https://view.eumetsat.int/geoserver/ows', {
-            layers: 'msg_fes:ir108',
+        map.createPane('satelliteNightPane');
+        map.getPane('satelliteNightPane').style.zIndex = 250;
+
+        // Dzienny: European High-Resolution Visible (RGB Eview) - krystalicznie ostry obraz chmur w dzień
+        const satelliteDayLayer = L.tileLayer.wms('https://view.eumetsat.int/geoserver/ows', {
+            layers: 'msg_fes:rgb_eview',
             format: 'image/png',
             transparent: true,
-            opacity: 0.6,
+            opacity: 0.65,
             pane: 'satellitePane',
             maxZoom: 18,
-            attribution: '© EUMETSAT'
+            attribution: '© EUMETSAT HRV'
+        });
+
+        // Nocny / IR: Meteosat Third Generation FCI High-Rate IR 10.5 µm - wysoka rozdzielczość w nocy i dzień
+        const satelliteNightLayer = L.tileLayer.wms('https://view.eumetsat.int/geoserver/ows', {
+            layers: 'mtg_fd:ir105_hrfi',
+            format: 'image/png',
+            transparent: true,
+            opacity: 0.60,
+            pane: 'satelliteNightPane',
+            maxZoom: 18,
+            attribution: '© EUMETSAT MTG-IR'
         });
 
         // ----------------------------------------------------
@@ -543,16 +558,17 @@ window.initMapa = function() {
         // MENEDŻER WARSTW (Domyślna kolejność, widoczność i krycie wg preferencji)
         // ----------------------------------------------------
         window.MAP_LAYERS = {
-            'drawings':  { id: 'drawings',  name: 'Kreator Ostrzeżeń (Rysunki)',    icon: '✏️', visible: true,  opacity: 100, pane: 'drawingsPane' },
-            'stations':  { id: 'stations',  name: 'Stacje i Pomiary IMGW',          icon: '📍', visible: true,  opacity: 100, pane: 'stationsPane' },
-            'lightning': { id: 'lightning', name: 'Wyładowania (Blitzortung Live)', icon: '⚡', visible: true,  opacity: 95,  pane: 'lightningPane' },
-            'radar':     { id: 'radar',     name: 'Radar Opadów (RainViewer)',      icon: '🌧️', visible: true,  opacity: 87,  pane: 'radarPane' },
-            'sat':       { id: 'sat',       name: 'Satelita IR (EUMETSAT)',         icon: '🛰️', visible: true,  opacity: 63,  pane: 'satellitePane' },
-            'inter':     { id: 'inter',     name: 'Interpolacja IMGW',              icon: '🌡️', visible: true,  opacity: 100, pane: 'weatherPane' }
+            'drawings':  { id: 'drawings',  name: 'Kreator Ostrzeżeń (Rysunki)',     icon: '✏️', visible: true,  opacity: 100, pane: 'drawingsPane' },
+            'stations':  { id: 'stations',  name: 'Stacje i Pomiary IMGW',           icon: '📍', visible: true,  opacity: 100, pane: 'stationsPane' },
+            'lightning': { id: 'lightning', name: 'Wyładowania (Blitzortung Live)',  icon: '⚡', visible: true,  opacity: 95,  pane: 'lightningPane' },
+            'radar':     { id: 'radar',     name: 'Radar Opadów (RainViewer)',       icon: '🌧️', visible: true,  opacity: 87,  pane: 'radarPane' },
+            'sat_day':   { id: 'sat_day',   name: 'Satelita Dzienny (HRV HD)',       icon: '☀️', visible: true,  opacity: 65,  pane: 'satellitePane' },
+            'sat_night': { id: 'sat_night', name: 'Satelita Nocny / IR (Podczerwień)', icon: '🌙', visible: false, opacity: 60,  pane: 'satelliteNightPane' },
+            'inter':     { id: 'inter',     name: 'Interpolacja IMGW',               icon: '🌡️', visible: true,  opacity: 100, pane: 'weatherPane' }
         };
 
         // Domyślna kolejność od góry (wierzch) do dołu
-        window.layerOrder = ['drawings', 'stations', 'lightning', 'radar', 'sat', 'inter'];
+        window.layerOrder = ['drawings', 'stations', 'lightning', 'radar', 'sat_day', 'sat_night', 'inter'];
 
         // Wczytaj zapisany stan z localStorage jeśli istnieje
         try {
@@ -588,7 +604,7 @@ window.initMapa = function() {
                 const item = window.MAP_LAYERS[key];
                 if (item && item.pane && map.getPane(item.pane)) {
                     // idx 0 to wierzch (najwyższy z-index)
-                    const z = 260 + (total - idx) * 30;
+                    const z = 240 + (total - idx) * 30;
                     map.getPane(item.pane).style.zIndex = z;
                 }
             });
@@ -614,9 +630,12 @@ window.initMapa = function() {
             window.MAP_LAYERS[key].visible = isChecked;
             saveLayerState();
             
-            if (key === 'sat') {
-                if (isChecked) { if (!map.hasLayer(satelliteLayer)) map.addLayer(satelliteLayer); }
-                else { if (map.hasLayer(satelliteLayer)) map.removeLayer(satelliteLayer); }
+            if (key === 'sat_day') {
+                if (isChecked) { if (!map.hasLayer(satelliteDayLayer)) map.addLayer(satelliteDayLayer); }
+                else { if (map.hasLayer(satelliteDayLayer)) map.removeLayer(satelliteDayLayer); }
+            } else if (key === 'sat_night') {
+                if (isChecked) { if (!map.hasLayer(satelliteNightLayer)) map.addLayer(satelliteNightLayer); }
+                else { if (map.hasLayer(satelliteNightLayer)) map.removeLayer(satelliteNightLayer); }
             } else if (key === 'lightning') {
                 if (isChecked) {
                     if (!map.hasLayer(lightningLayerGroup)) map.addLayer(lightningLayerGroup);
@@ -639,7 +658,8 @@ window.initMapa = function() {
             if (window.MAP_LAYERS[key]) window.MAP_LAYERS[key].opacity = parseInt(val);
             saveLayerState();
             
-            if (key === 'sat' && satelliteLayer) satelliteLayer.setOpacity(op);
+            if (key === 'sat_day' && satelliteDayLayer) satelliteDayLayer.setOpacity(op);
+            else if (key === 'sat_night' && satelliteNightLayer) satelliteNightLayer.setOpacity(op);
             else if (key === 'lightning') {
                 activeStrikes.forEach(s => {
                     if (s.marker) s.marker.setStyle({ fillOpacity: op, opacity: op });
@@ -655,6 +675,7 @@ window.initMapa = function() {
             
             container.innerHTML = window.layerOrder.map((key, idx) => {
                 const item = window.MAP_LAYERS[key];
+                if (!item) return '';
                 const isTop = idx === 0;
                 const isBottom = idx === window.layerOrder.length - 1;
                 const extraInfo = key === 'lightning' ? ` <span id="bo-strike-count" style="font-size: 0.65rem; color: #eab308; font-weight: normal;">(0)</span>` : '';
@@ -681,8 +702,11 @@ window.initMapa = function() {
         };
 
         // Automatyczny start warstw jeśli są włączone
-        if (window.MAP_LAYERS['sat'].visible) {
-            satelliteLayer.addTo(map);
+        if (window.MAP_LAYERS['sat_day'] && window.MAP_LAYERS['sat_day'].visible) {
+            satelliteDayLayer.addTo(map);
+        }
+        if (window.MAP_LAYERS['sat_night'] && window.MAP_LAYERS['sat_night'].visible) {
+            satelliteNightLayer.addTo(map);
         }
         if (window.MAP_LAYERS['lightning'].visible) {
             lightningLayerGroup.addTo(map);
