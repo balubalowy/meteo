@@ -404,32 +404,155 @@ window.initMapa = function() {
         });
 
         // ----------------------------------------------------
-        // WYŁADOWANIA (EUMETSAT MTG Lightning Imager)
+        // WYŁADOWANIA LIVE (Blitzortung WebSocket + Vector Points)
         // ----------------------------------------------------
-        const lightningLayer = L.tileLayer.wms('https://view.eumetsat.int/geoserver/ows', {
-            layers: 'mtg_fd:li_afa',
-            format: 'image/png',
-            transparent: true,
-            opacity: 0.85,
-            pane: 'lightningPane',
-            maxZoom: 18,
-            attribution: '© EUMETSAT MTG-LI'
-        });
+        const lightningLayerGroup = L.layerGroup([], { pane: 'lightningPane' });
+        let activeStrikes = [];
+        let boSocket = null;
+        let boReconnectTimer = null;
+        let boRefreshInterval = null;
+
+        function decodeBlitzortung(b) {
+            let e = {};
+            let d = b.split('');
+            let c = d[0];
+            let f = c;
+            let g = [c];
+            let h = 256;
+            let o = h;
+            for (let i = 1; i < d.length; i++) {
+                let a = d[i].charCodeAt(0);
+                a = h > a ? d[i] : (e[a] ? e[a] : f + c);
+                g.push(a);
+                c = a.charAt(0);
+                e[o] = f + c;
+                o++;
+                f = a;
+            }
+            return g.join('');
+        }
+
+        function getStrikeStyle(ageMinutes) {
+            if (ageMinutes < 5) {
+                return { radius: 5.5, color: '#ffffff', fillColor: '#ffffff', fillOpacity: 0.95, weight: 2 };
+            } else if (ageMinutes < 15) {
+                return { radius: 4.5, color: '#eab308', fillColor: '#fde047', fillOpacity: 0.9, weight: 1.5 };
+            } else if (ageMinutes < 30) {
+                return { radius: 4, color: '#f97316', fillColor: '#fb923c', fillOpacity: 0.85, weight: 1 };
+            } else if (ageMinutes < 60) {
+                return { radius: 3.5, color: '#ef4444', fillColor: '#f87171', fillOpacity: 0.75, weight: 1 };
+            } else {
+                return { radius: 3, color: '#7f1d1d', fillColor: '#991b1b', fillOpacity: 0.6, weight: 0.8 };
+            }
+        }
+
+        function refreshStrikeStyles() {
+            const now = Date.now();
+            activeStrikes = activeStrikes.filter(s => {
+                const ageMin = (now - s.time) / 60000;
+                if (ageMin >= 120) {
+                    if (s.marker) lightningLayerGroup.removeLayer(s.marker);
+                    return false;
+                }
+                if (s.marker) {
+                    const st = getStrikeStyle(ageMin);
+                    s.marker.setStyle(st);
+                    s.marker.setRadius(st.radius);
+                }
+                return true;
+            });
+            updateStrikeCounterUI();
+        }
+
+        function updateStrikeCounterUI() {
+            const countEl = document.getElementById('bo-strike-count');
+            if (countEl) {
+                const plCount = activeStrikes.filter(s => s.lat >= 48.8 && s.lat <= 55.2 && s.lon >= 13.9 && s.lon <= 24.3).length;
+                countEl.textContent = `${activeStrikes.length} (${plCount} w PL)`;
+            }
+        }
+
+        function initBlitzortungWS() {
+            if (boSocket) {
+                try { boSocket.close(); } catch(e) {}
+                boSocket = null;
+            }
+            if (boReconnectTimer) clearTimeout(boReconnectTimer);
+
+            const hosts = ['wss://ws1.blitzortung.org/', 'wss://ws7.blitzortung.org/', 'wss://ws8.blitzortung.org/'];
+            const host = hosts[Math.floor(Math.random() * hosts.length)];
+            
+            try {
+                boSocket = new WebSocket(host);
+                boSocket.onopen = () => {
+                    boSocket.send(JSON.stringify({ a: 111 }));
+                };
+                boSocket.onmessage = (event) => {
+                    try {
+                        const decoded = decodeBlitzortung(event.data);
+                        const strike = JSON.parse(decoded);
+                        if (strike && strike.lat && strike.lon) {
+                            if (strike.lat >= 35 && strike.lat <= 65 && strike.lon >= -15 && strike.lon <= 35) {
+                                addStrikePoint(strike);
+                            }
+                        }
+                    } catch(err) {}
+                };
+                boSocket.onerror = () => {
+                    if (window.MAP_LAYERS && window.MAP_LAYERS['lightning'].visible) {
+                        boReconnectTimer = setTimeout(initBlitzortungWS, 4000);
+                    }
+                };
+                boSocket.onclose = () => {
+                    if (window.MAP_LAYERS && window.MAP_LAYERS['lightning'].visible) {
+                        boReconnectTimer = setTimeout(initBlitzortungWS, 3000);
+                    }
+                };
+            } catch(err) {
+                console.error("Blitzortung connect err:", err);
+            }
+        }
+
+        function addStrikePoint(strike) {
+            const now = Date.now();
+            const strikeTime = strike.time ? (strike.time > 1e15 ? Math.floor(strike.time / 1000000) : strike.time) : now;
+            const ageMin = Math.max(0, (now - strikeTime) / 60000);
+            
+            const st = getStrikeStyle(ageMin);
+            const marker = L.circleMarker([strike.lat, strike.lon], {
+                ...st,
+                pane: 'lightningPane'
+            });
+
+            const timeStr = new Date(strikeTime).toLocaleTimeString('pl-PL');
+            marker.bindTooltip(`⚡ Wyładowanie: ${timeStr}<br>Pozycja: ${strike.lat.toFixed(3)}°N, ${strike.lon.toFixed(3)}°E`, { sticky: true });
+            
+            marker.addTo(lightningLayerGroup);
+            activeStrikes.push({ lat: strike.lat, lon: strike.lon, time: strikeTime, marker });
+            
+            if (activeStrikes.length > 1500) {
+                const oldest = activeStrikes.shift();
+                if (oldest.marker) lightningLayerGroup.removeLayer(oldest.marker);
+            }
+            updateStrikeCounterUI();
+        }
+
+        boRefreshInterval = setInterval(refreshStrikeStyles, 10000);
 
         // ----------------------------------------------------
         // MENEDŻER WARSTW (Layer State & Reordering)
         // ----------------------------------------------------
         window.MAP_LAYERS = {
-            'stations':  { id: 'stations',  name: 'Stacje i Pomiary IMGW',         icon: '📍', visible: true,  opacity: 100, pane: 'stationsPane' },
-            'drawings':  { id: 'drawings',  name: 'Kreator Ostrzeżeń (Rysunki)',   icon: '✏️', visible: true,  opacity: 100, pane: 'drawingsPane' },
-            'lightning': { id: 'lightning', name: 'Wyładowania (EUMETSAT MTG-LI)', icon: '⚡', visible: false, opacity: 85,  pane: 'lightningPane' },
-            'radar':     { id: 'radar',     name: 'Radar Opadów (RainViewer)',     icon: '🌧️', visible: true,  opacity: 70,  pane: 'radarPane' },
-            'inter':     { id: 'inter',     name: 'Interpolacja IMGW',             icon: '🌡️', visible: true,  opacity: 70,  pane: 'weatherPane' },
-            'sat':       { id: 'sat',       name: 'Satelita IR (EUMETSAT)',        icon: '🛰️', visible: false, opacity: 60,  pane: 'satellitePane' }
+            'lightning': { id: 'lightning', name: 'Wyładowania (Blitzortung Live)', icon: '⚡', visible: true,  opacity: 95,  pane: 'lightningPane' },
+            'stations':  { id: 'stations',  name: 'Stacje i Pomiary IMGW',          icon: '📍', visible: true,  opacity: 100, pane: 'stationsPane' },
+            'drawings':  { id: 'drawings',  name: 'Kreator Ostrzeżeń (Rysunki)',    icon: '✏️', visible: true,  opacity: 100, pane: 'drawingsPane' },
+            'radar':     { id: 'radar',     name: 'Radar Opadów (RainViewer)',      icon: '🌧️', visible: true,  opacity: 70,  pane: 'radarPane' },
+            'inter':     { id: 'inter',     name: 'Interpolacja IMGW',              icon: '🌡️', visible: true,  opacity: 70,  pane: 'weatherPane' },
+            'sat':       { id: 'sat',       name: 'Satelita IR (EUMETSAT)',         icon: '🛰️', visible: false, opacity: 60,  pane: 'satellitePane' }
         };
 
         // Kolejność od wierzchu (index 0 = najwyższy z-index) do spodu
-        window.layerOrder = ['stations', 'drawings', 'lightning', 'radar', 'inter', 'sat'];
+        window.layerOrder = ['lightning', 'stations', 'drawings', 'radar', 'inter', 'sat'];
 
         window.applyLayerOrder = function() {
             const total = window.layerOrder.length;
@@ -465,8 +588,12 @@ window.initMapa = function() {
                 if (isChecked) { if (!map.hasLayer(satelliteLayer)) map.addLayer(satelliteLayer); }
                 else { if (map.hasLayer(satelliteLayer)) map.removeLayer(satelliteLayer); }
             } else if (key === 'lightning') {
-                if (isChecked) { if (!map.hasLayer(lightningLayer)) map.addLayer(lightningLayer); }
-                else { if (map.hasLayer(lightningLayer)) map.removeLayer(lightningLayer); }
+                if (isChecked) {
+                    if (!map.hasLayer(lightningLayerGroup)) map.addLayer(lightningLayerGroup);
+                    if (!boSocket || boSocket.readyState !== WebSocket.OPEN) initBlitzortungWS();
+                } else {
+                    if (map.hasLayer(lightningLayerGroup)) map.removeLayer(lightningLayerGroup);
+                }
             } else if (key === 'radar') {
                 if (radarTileLayer) {
                     if (isChecked) { if (!map.hasLayer(radarTileLayer)) map.addLayer(radarTileLayer); }
@@ -482,7 +609,11 @@ window.initMapa = function() {
             if (window.MAP_LAYERS[key]) window.MAP_LAYERS[key].opacity = parseInt(val);
             
             if (key === 'sat' && satelliteLayer) satelliteLayer.setOpacity(op);
-            else if (key === 'lightning' && lightningLayer) lightningLayer.setOpacity(op);
+            else if (key === 'lightning') {
+                activeStrikes.forEach(s => {
+                    if (s.marker) s.marker.setStyle({ fillOpacity: op, opacity: op });
+                });
+            }
             else if (key === 'radar' && radarTileLayer) radarTileLayer.setOpacity(op);
             else if (key === 'inter' && idwOverlay) idwOverlay.setOpacity(op);
         };
@@ -495,12 +626,13 @@ window.initMapa = function() {
                 const item = window.MAP_LAYERS[key];
                 const isTop = idx === 0;
                 const isBottom = idx === window.layerOrder.length - 1;
+                const extraInfo = key === 'lightning' ? ` <span id="bo-strike-count" style="font-size: 0.65rem; color: #eab308; font-weight: normal;">(0)</span>` : '';
                 return `
                     <div class="layer-item-card" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 7px 10px; display: flex; flex-direction: column; gap: 5px;">
                         <div style="display: flex; align-items: center; justify-content: space-between;">
                             <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; margin: 0; color: var(--text-primary);">
                                 <input type="checkbox" ${item.visible ? 'checked' : ''} onchange="window.toggleLayer('${key}', this.checked)">
-                                <span>${item.icon} ${item.name}</span>
+                                <span>${item.icon} ${item.name}${extraInfo}</span>
                             </label>
                             <div style="display: flex; gap: 3px;">
                                 <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń wyżej (nad inne)" onclick="window.moveLayer('${key}', 'up')" ${isTop ? 'disabled style="opacity:0.25; cursor:default;"' : ''}>▲</button>
@@ -516,6 +648,12 @@ window.initMapa = function() {
                 `;
             }).join('');
         };
+
+        // Automatyczny start wyładowań jeśli warstwa jest włączona
+        if (window.MAP_LAYERS['lightning'].visible) {
+            lightningLayerGroup.addTo(map);
+            initBlitzortungWS();
+        }
 
         window.applyLayerOrder();
         window.renderLayerManagerUI();
