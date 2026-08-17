@@ -540,19 +540,47 @@ window.initMapa = function() {
         boRefreshInterval = setInterval(refreshStrikeStyles, 10000);
 
         // ----------------------------------------------------
-        // MENEDŻER WARSTW (Layer State & Reordering)
+        // MENEDŻER WARSTW (Domyślna kolejność, widoczność i krycie wg preferencji)
         // ----------------------------------------------------
         window.MAP_LAYERS = {
-            'lightning': { id: 'lightning', name: 'Wyładowania (Blitzortung Live)', icon: '⚡', visible: true,  opacity: 95,  pane: 'lightningPane' },
-            'stations':  { id: 'stations',  name: 'Stacje i Pomiary IMGW',          icon: '📍', visible: true,  opacity: 100, pane: 'stationsPane' },
             'drawings':  { id: 'drawings',  name: 'Kreator Ostrzeżeń (Rysunki)',    icon: '✏️', visible: true,  opacity: 100, pane: 'drawingsPane' },
-            'radar':     { id: 'radar',     name: 'Radar Opadów (RainViewer)',      icon: '🌧️', visible: true,  opacity: 70,  pane: 'radarPane' },
-            'inter':     { id: 'inter',     name: 'Interpolacja IMGW',              icon: '🌡️', visible: true,  opacity: 70,  pane: 'weatherPane' },
-            'sat':       { id: 'sat',       name: 'Satelita IR (EUMETSAT)',         icon: '🛰️', visible: false, opacity: 60,  pane: 'satellitePane' }
+            'stations':  { id: 'stations',  name: 'Stacje i Pomiary IMGW',          icon: '📍', visible: true,  opacity: 100, pane: 'stationsPane' },
+            'lightning': { id: 'lightning', name: 'Wyładowania (Blitzortung Live)', icon: '⚡', visible: true,  opacity: 95,  pane: 'lightningPane' },
+            'radar':     { id: 'radar',     name: 'Radar Opadów (RainViewer)',      icon: '🌧️', visible: true,  opacity: 87,  pane: 'radarPane' },
+            'sat':       { id: 'sat',       name: 'Satelita IR (EUMETSAT)',         icon: '🛰️', visible: true,  opacity: 63,  pane: 'satellitePane' },
+            'inter':     { id: 'inter',     name: 'Interpolacja IMGW',              icon: '🌡️', visible: true,  opacity: 100, pane: 'weatherPane' }
         };
 
-        // Kolejność od wierzchu (index 0 = najwyższy z-index) do spodu
-        window.layerOrder = ['lightning', 'stations', 'drawings', 'radar', 'inter', 'sat'];
+        // Domyślna kolejność od góry (wierzch) do dołu
+        window.layerOrder = ['drawings', 'stations', 'lightning', 'radar', 'sat', 'inter'];
+
+        // Wczytaj zapisany stan z localStorage jeśli istnieje
+        try {
+            const savedLayers = localStorage.getItem('meteo_map_layers');
+            const savedOrder = localStorage.getItem('meteo_map_order');
+            if (savedLayers) {
+                const parsed = JSON.parse(savedLayers);
+                Object.keys(parsed).forEach(k => {
+                    if (window.MAP_LAYERS[k]) {
+                        window.MAP_LAYERS[k].visible = parsed[k].visible;
+                        window.MAP_LAYERS[k].opacity = parsed[k].opacity;
+                    }
+                });
+            }
+            if (savedOrder) {
+                const parsedOrder = JSON.parse(savedOrder);
+                if (Array.isArray(parsedOrder) && parsedOrder.length === window.layerOrder.length) {
+                    window.layerOrder = parsedOrder;
+                }
+            }
+        } catch(e) {}
+
+        function saveLayerState() {
+            try {
+                localStorage.setItem('meteo_map_layers', JSON.stringify(window.MAP_LAYERS));
+                localStorage.setItem('meteo_map_order', JSON.stringify(window.layerOrder));
+            } catch(e) {}
+        }
 
         window.applyLayerOrder = function() {
             const total = window.layerOrder.length;
@@ -564,6 +592,7 @@ window.initMapa = function() {
                     map.getPane(item.pane).style.zIndex = z;
                 }
             });
+            saveLayerState();
         };
 
         window.moveLayer = function(key, dir) {
@@ -583,6 +612,7 @@ window.initMapa = function() {
         window.toggleLayer = function(key, isChecked) {
             if (!window.MAP_LAYERS[key]) return;
             window.MAP_LAYERS[key].visible = isChecked;
+            saveLayerState();
             
             if (key === 'sat') {
                 if (isChecked) { if (!map.hasLayer(satelliteLayer)) map.addLayer(satelliteLayer); }
@@ -607,6 +637,7 @@ window.initMapa = function() {
         window.setLayerOpacity = function(key, val) {
             const op = parseInt(val) / 100.0;
             if (window.MAP_LAYERS[key]) window.MAP_LAYERS[key].opacity = parseInt(val);
+            saveLayerState();
             
             if (key === 'sat' && satelliteLayer) satelliteLayer.setOpacity(op);
             else if (key === 'lightning') {
@@ -649,7 +680,10 @@ window.initMapa = function() {
             }).join('');
         };
 
-        // Automatyczny start wyładowań jeśli warstwa jest włączona
+        // Automatyczny start warstw jeśli są włączone
+        if (window.MAP_LAYERS['sat'].visible) {
+            satelliteLayer.addTo(map);
+        }
         if (window.MAP_LAYERS['lightning'].visible) {
             lightningLayerGroup.addTo(map);
             initBlitzortungWS();
