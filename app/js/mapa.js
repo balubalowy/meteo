@@ -403,6 +403,7 @@ window.initMapa = function() {
             transparent: true,
             opacity: 0.65,
             pane: 'satellitePane',
+            maxNativeZoom: 7,
             maxZoom: 18,
             attribution: '© EUMETSAT HRV'
         });
@@ -414,6 +415,7 @@ window.initMapa = function() {
             transparent: true,
             opacity: 0.60,
             pane: 'satelliteNightPane',
+            maxNativeZoom: 7,
             maxZoom: 18,
             attribution: '© EUMETSAT MTG-IR'
         });
