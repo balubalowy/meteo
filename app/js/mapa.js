@@ -419,6 +419,49 @@ window.initMapa = function() {
         });
 
         // ----------------------------------------------------
+        // GRANICE PAŃSTW I WOJEWÓDZTW (Subtelny obrys wektorowy nad chmurami/radarem)
+        // ----------------------------------------------------
+        map.createPane('boundariesPane');
+        map.getPane('boundariesPane').style.zIndex = 500;
+        map.getPane('boundariesPane').style.pointerEvents = 'none';
+
+        const boundariesLayerGroup = L.layerGroup([], { pane: 'boundariesPane' });
+
+        // Granice państw Europy
+        fetch('assets/geo/europe_countries.json')
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    pane: 'boundariesPane',
+                    style: {
+                        color: 'rgba(255, 255, 255, 0.75)',
+                        weight: 1.5,
+                        dashArray: '4, 4',
+                        fill: false,
+                        interactive: false
+                    }
+                }).addTo(boundariesLayerGroup);
+            })
+            .catch(err => console.error("Błąd ładowania granic państw:", err));
+
+        // Granice województw Polski
+        fetch('assets/geo/wojewodztwa.geojson')
+            .then(res => res.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    pane: 'boundariesPane',
+                    style: {
+                        color: 'rgba(255, 255, 255, 0.45)',
+                        weight: 1.1,
+                        dashArray: '2, 3',
+                        fill: false,
+                        interactive: false
+                    }
+                }).addTo(boundariesLayerGroup);
+            })
+            .catch(err => console.error("Błąd ładowania granic województw:", err));
+
+        // ----------------------------------------------------
         // WYŁADOWANIA LIVE (Blitzortung WebSocket + Vector Points)
         // ----------------------------------------------------
         const lightningLayerGroup = L.layerGroup([], { pane: 'lightningPane' });
@@ -558,17 +601,18 @@ window.initMapa = function() {
         // MENEDŻER WARSTW (Domyślna kolejność, widoczność i krycie wg preferencji)
         // ----------------------------------------------------
         window.MAP_LAYERS = {
-            'drawings':  { id: 'drawings',  name: 'Kreator Ostrzeżeń (Rysunki)',     icon: '✏️', visible: true,  opacity: 100, pane: 'drawingsPane' },
-            'stations':  { id: 'stations',  name: 'Stacje i Pomiary IMGW',           icon: '📍', visible: true,  opacity: 100, pane: 'stationsPane' },
-            'lightning': { id: 'lightning', name: 'Wyładowania (Blitzortung Live)',  icon: '⚡', visible: true,  opacity: 95,  pane: 'lightningPane' },
-            'radar':     { id: 'radar',     name: 'Radar Opadów (RainViewer)',       icon: '🌧️', visible: true,  opacity: 87,  pane: 'radarPane' },
-            'sat_day':   { id: 'sat_day',   name: 'Satelita Dzienny (HRV HD)',       icon: '☀️', visible: true,  opacity: 65,  pane: 'satellitePane' },
-            'sat_night': { id: 'sat_night', name: 'Satelita Nocny / IR (Podczerwień)', icon: '🌙', visible: false, opacity: 60,  pane: 'satelliteNightPane' },
-            'inter':     { id: 'inter',     name: 'Interpolacja IMGW',               icon: '🌡️', visible: true,  opacity: 100, pane: 'weatherPane' }
+            'drawings':   { id: 'drawings',   name: 'Kreator Ostrzeżeń (Rysunki)',     icon: '✏️', visible: true,  opacity: 100, pane: 'drawingsPane' },
+            'stations':   { id: 'stations',   name: 'Stacje i Pomiary IMGW',           icon: '📍', visible: true,  opacity: 100, pane: 'stationsPane' },
+            'boundaries': { id: 'boundaries', name: 'Granice Państw i Województw',    icon: '🗺️', visible: true,  opacity: 85,  pane: 'boundariesPane' },
+            'lightning':  { id: 'lightning',  name: 'Wyładowania (Blitzortung Live)',  icon: '⚡', visible: true,  opacity: 95,  pane: 'lightningPane' },
+            'radar':      { id: 'radar',      name: 'Radar Opadów (RainViewer)',       icon: '🌧️', visible: true,  opacity: 87,  pane: 'radarPane' },
+            'sat_day':    { id: 'sat_day',    name: 'Satelita Dzienny (HRV HD)',       icon: '☀️', visible: true,  opacity: 65,  pane: 'satellitePane' },
+            'sat_night':  { id: 'sat_night',  name: 'Satelita Nocny / IR (Podczerwień)', icon: '🌙', visible: false, opacity: 60,  pane: 'satelliteNightPane' },
+            'inter':      { id: 'inter',      name: 'Interpolacja IMGW',               icon: '🌡️', visible: true,  opacity: 100, pane: 'weatherPane' }
         };
 
         // Domyślna kolejność od góry (wierzch) do dołu
-        window.layerOrder = ['drawings', 'stations', 'lightning', 'radar', 'sat_day', 'sat_night', 'inter'];
+        window.layerOrder = ['drawings', 'stations', 'boundaries', 'lightning', 'radar', 'sat_day', 'sat_night', 'inter'];
 
         // Wczytaj zapisany stan z localStorage jeśli istnieje
         try {
@@ -636,6 +680,9 @@ window.initMapa = function() {
             } else if (key === 'sat_night') {
                 if (isChecked) { if (!map.hasLayer(satelliteNightLayer)) map.addLayer(satelliteNightLayer); }
                 else { if (map.hasLayer(satelliteNightLayer)) map.removeLayer(satelliteNightLayer); }
+            } else if (key === 'boundaries') {
+                if (isChecked) { if (!map.hasLayer(boundariesLayerGroup)) map.addLayer(boundariesLayerGroup); }
+                else { if (map.hasLayer(boundariesLayerGroup)) map.removeLayer(boundariesLayerGroup); }
             } else if (key === 'lightning') {
                 if (isChecked) {
                     if (!map.hasLayer(lightningLayerGroup)) map.addLayer(lightningLayerGroup);
@@ -660,6 +707,11 @@ window.initMapa = function() {
             
             if (key === 'sat_day' && satelliteDayLayer) satelliteDayLayer.setOpacity(op);
             else if (key === 'sat_night' && satelliteNightLayer) satelliteNightLayer.setOpacity(op);
+            else if (key === 'boundaries') {
+                boundariesLayerGroup.eachLayer(l => {
+                    if (l.setStyle) l.setStyle({ opacity: op });
+                });
+            }
             else if (key === 'lightning') {
                 activeStrikes.forEach(s => {
                     if (s.marker) s.marker.setStyle({ fillOpacity: op, opacity: op });
@@ -702,6 +754,9 @@ window.initMapa = function() {
         };
 
         // Automatyczny start warstw jeśli są włączone
+        if (window.MAP_LAYERS['boundaries'] && window.MAP_LAYERS['boundaries'].visible) {
+            boundariesLayerGroup.addTo(map);
+        }
         if (window.MAP_LAYERS['sat_day'] && window.MAP_LAYERS['sat_day'].visible) {
             satelliteDayLayer.addTo(map);
         }
