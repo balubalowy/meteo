@@ -12,7 +12,7 @@ function isUserAuthorized(email) {
     if (!AUTH_CONFIG.requireWhitelist) return true;
     if (!email) return false;
     const lowerEmail = email.toLowerCase().trim();
-    return AUTH_CONFIG.allowedEmails.some(allowed => lowerEmail.includes(allowed.toLowerCase().trim()));
+    return AUTH_CONFIG.allowedEmails.some(allowed => lowerEmail === allowed.toLowerCase().trim());
 }
 
 if (isConfigured) {
