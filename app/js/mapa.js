@@ -1364,5 +1364,12 @@ window.initMapa = function() {
 
         lucide.createIcons();
         setTimeout(() => map.invalidateSize(), 500);
+
+        window.addEventListener('bmeteo-authenticated', () => {
+            setTimeout(() => {
+                if (map) map.invalidateSize();
+                window.renderIMGW();
+            }, 250);
+        });
     }, 200);
 };
