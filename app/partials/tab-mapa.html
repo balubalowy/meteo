@@ -18,8 +18,8 @@
             </div>
             <!-- Przełącznik Źródła Radaru -->
             <div style="display: flex; gap: 6px; margin-bottom: 8px;">
-                <button id="radar-src-imgw" class="btn btn-primary" onclick="setRadarSource('imgw')" style="flex: 1; padding: 4px 6px; font-size: 0.72rem; font-weight: 600; text-align: center;">🛰️ IMGW CMAX (5 min)</button>
-                <button id="radar-src-rv" class="btn btn-ghost" onclick="setRadarSource('rv')" style="flex: 1; padding: 4px 6px; font-size: 0.72rem; border: 1px solid var(--border-subtle); text-align: center;">🌍 RainViewer (Live)</button>
+                <button id="radar-src-imgw" class="btn btn-primary" onclick="setRadarSource('imgw')" style="flex: 1; padding: 4px 6px; font-size: 0.72rem; font-weight: 600; text-align: center;">IMGW CMAX (5 min)</button>
+                <button id="radar-src-rv" class="btn btn-ghost" onclick="setRadarSource('rv')" style="flex: 1; padding: 4px 6px; font-size: 0.72rem; border: 1px solid var(--border-subtle); text-align: center;">RainViewer (Live)</button>
             </div>
 
             <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-secondary); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
@@ -43,7 +43,7 @@
                         <option value="temp">Temperatura (°C)</option>
                         <option value="wiatr">Wiatr Porywy (km/h)</option>
                         <option value="rosy">Punkt Rosy (°C)</option>
-                        <option value="lcl">☁️ Podstawa Chmur (LCL) [m]</option>
+                        <option value="lcl">Podstawa Chmur (LCL) [m]</option>
                         <option value="wilg">Wilgotność (%)</option>
                         <option value="grunt">Temperatura Gruntu (°C)</option>
                         <option value="wiatr_sr">Średnia Prędkość Wiatru (km/h)</option>
@@ -84,7 +84,7 @@
             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
                 <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="layers" style="width: 16px; height: 16px; color: var(--accent-primary);"></i> Menedżer Warstw</span>
             </div>
-            <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">Warstwy u góry listy leżą <b>na wierzchu</b> mapy (użyj ▲/▼ do zmiany):</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">Kolejność warstw od góry (użyj ▲/▼ do zmiany):</div>
             
             <div id="layer-manager-list" style="display: flex; flex-direction: column; gap: 6px;">
                 <!-- Generowane dynamicznie przez JS -->
@@ -99,38 +99,38 @@
             
             <div style="display: flex; flex-direction: column; gap: 8px;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                     <button class="btn btn-ghost" style="font-size: 0.75rem; padding: 4px;" onclick="if(window.premiumMap) window.premiumMap.setView([52.069, 19.480], 6);">Cała PL</button>
+                     <button class="btn btn-ghost" style="font-size: 0.75rem; padding: 4px;" onclick="if(window.premiumMap) window.premiumMap.setView([52.069, 19.480], 6);">Polska</button>
                      <button class="btn btn-ghost" style="font-size: 0.75rem; padding: 4px;" onclick="if(window.premiumMap) window.premiumMap.setView([49.5, 17.5], 5);">Europa Śr.</button>
                 </div>
                 <hr style="border-color: var(--border-subtle); margin: 5px 0;">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Rysuj strefy zagrożeń (kliknij i rysuj na mapie):</div>
-                <button class="btn btn-ghost" style="border: 1px solid #22c55e; color: #22c55e; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#22c55e')">■ MRG (1)</button>
-                <button class="btn btn-ghost" style="border: 1px solid #eab308; color: #eab308; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#eab308')">■ NWL (2)</button>
-                <button class="btn btn-ghost" style="border: 1px solid #f97316; color: #f97316; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#f97316')">■ SRD (3)</button>
-                <button class="btn btn-ghost" style="border: 1px solid #ef4444; color: #ef4444; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#ef4444')">■ DZ (4)</button>
-                <button class="btn btn-ghost" style="border: 1px solid #d946ef; color: #d946ef; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#d946ef')">■ EXT (5)</button>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Rysuj strefy zagrożeń:</div>
+                <button class="btn btn-ghost" style="border: 1px solid #22c55e; color: #22c55e; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#22c55e')">MRG (1)</button>
+                <button class="btn btn-ghost" style="border: 1px solid #eab308; color: #eab308; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#eab308')">NWL (2)</button>
+                <button class="btn btn-ghost" style="border: 1px solid #f97316; color: #f97316; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#f97316')">SRD (3)</button>
+                <button class="btn btn-ghost" style="border: 1px solid #ef4444; color: #ef4444; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#ef4444')">DZ (4)</button>
+                <button class="btn btn-ghost" style="border: 1px solid #d946ef; color: #d946ef; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#d946ef')">EXT (5)</button>
                 
                 <hr style="border-color: var(--border-subtle); margin: 5px 0;">
                 <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Narzędzia Synoptyczne:</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                    <button class="btn btn-ghost" style="border: 1px solid #f97316; color: #f97316; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('zbieznosc')">Zbieżność (Linia)</button>
+                    <button class="btn btn-ghost" style="border: 1px solid #f97316; color: #f97316; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('zbieznosc')">Zbieżność</button>
                     <button class="btn btn-ghost" style="border: 1px solid #3b82f6; color: #3b82f6; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('front_chlodny')">Fr. Chłodny</button>
                     <button class="btn btn-ghost" style="border: 1px dashed #3b82f6; color: #3b82f6; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('front_chlodny_2')">Fr. Chłodny II</button>
                     <button class="btn btn-ghost" style="border: 1px solid #ef4444; color: #ef4444; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('front_cieply')">Fr. Ciepły</button>
                     <button class="btn btn-ghost" style="border: 1px solid #d946ef; color: #d946ef; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('front_zokludowany')">Fr. Zokludowany</button>
-                    <button class="btn btn-ghost" style="border: 1px solid #a8a29e; color: #a8a29e; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('strzalka')">Strzałka ➡</button>
+                    <button class="btn btn-ghost" style="border: 1px solid #a8a29e; color: #a8a29e; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('strzalka')">Strzałka</button>
                 </div>
                 
                 <hr style="border-color: var(--border-subtle); margin: 5px 0;">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Zjawiska / Punkty:</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Zjawiska:</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
                     <button class="btn btn-ghost" style="border: 1px solid #3b82f6; color: #3b82f6; padding: 4px; font-size: 0.75rem; font-weight: bold;" onclick="setDrawingMode('wyz')">W (Wyż)</button>
                     <button class="btn btn-ghost" style="border: 1px solid #ef4444; color: #ef4444; padding: 4px; font-size: 0.75rem; font-weight: bold;" onclick="setDrawingMode('niz')">N (Niż)</button>
-                    <button class="btn btn-ghost" style="border: 1px solid #ef4444; color: #ef4444; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('burza')">☈ Burza</button>
-                    <button class="btn btn-ghost" style="border: 1px solid #22c55e; color: #22c55e; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('deszcz')">● Deszcz</button>
-                    <button class="btn btn-ghost" style="border: 1px solid #3b82f6; color: #3b82f6; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('snieg')">✱ Śnieg</button>
-                    <button class="btn btn-ghost" style="border: 1px solid #eab308; color: #eab308; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('mgla')">≡ Mgła</button>
-                    <button class="btn btn-ghost" style="border: 1px solid #22c55e; color: #22c55e; padding: 4px; font-size: 0.75rem; grid-column: span 3;" onclick="setDrawingMode('kolko')">Strefa Zagrożenia (Kółko) ⭕</button>
+                    <button class="btn btn-ghost" style="border: 1px solid #ef4444; color: #ef4444; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('burza')">Burza</button>
+                    <button class="btn btn-ghost" style="border: 1px solid #22c55e; color: #22c55e; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('deszcz')">Deszcz</button>
+                    <button class="btn btn-ghost" style="border: 1px solid #3b82f6; color: #3b82f6; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('snieg')">Śnieg</button>
+                    <button class="btn btn-ghost" style="border: 1px solid #eab308; color: #eab308; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('mgla')">Mgła</button>
+                    <button class="btn btn-ghost" style="border: 1px solid #22c55e; color: #22c55e; padding: 4px; font-size: 0.75rem; grid-column: span 3;" onclick="setDrawingMode('kolko')">Strefa (Kółko)</button>
                 </div>
                 
                 <div style="display: flex; gap: 5px; margin-top: 5px;">

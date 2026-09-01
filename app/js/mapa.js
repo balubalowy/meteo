@@ -731,14 +731,14 @@ window.initMapa = function() {
         // MENEDŻER WARSTW (Domyślna kolejność, widoczność i krycie wg preferencji)
         // ----------------------------------------------------
         window.MAP_LAYERS = {
-            'drawings':   { id: 'drawings',   name: 'Kreator Ostrzeżeń (Rysunki)',     icon: '✏️', visible: true,  opacity: 100, pane: 'drawingsPane' },
-            'stations':   { id: 'stations',   name: 'Stacje i Pomiary IMGW',           icon: '📍', visible: true,  opacity: 100, pane: 'stationsPane' },
-            'boundaries': { id: 'boundaries', name: 'Granice Państw i Województw',    icon: '🗺️', visible: true,  opacity: 85,  pane: 'boundariesPane' },
-            'lightning':  { id: 'lightning',  name: 'Wyładowania (Blitzortung Live)',  icon: '⚡', visible: true,  opacity: 95,  pane: 'lightningPane' },
-            'radar':      { id: 'radar',      name: 'Radar Opadów (RainViewer)',       icon: '🌧️', visible: true,  opacity: 87,  pane: 'radarPane' },
-            'sat_day':    { id: 'sat_day',    name: 'Satelita Dzienny (HRV HD)',       icon: '☀️', visible: true,  opacity: 65,  pane: 'satellitePane' },
-            'sat_night':  { id: 'sat_night',  name: 'Satelita Nocny / IR (Podczerwień)', icon: '🌙', visible: false, opacity: 60,  pane: 'satelliteNightPane' },
-            'inter':      { id: 'inter',      name: 'Interpolacja IMGW',               icon: '🌡️', visible: true,  opacity: 100, pane: 'weatherPane' }
+            'drawings':   { id: 'drawings',   name: 'Kreator Ostrzeżeń',     visible: true,  opacity: 100, pane: 'drawingsPane' },
+            'stations':   { id: 'stations',   name: 'Stacje i Pomiary IMGW', visible: true,  opacity: 100, pane: 'stationsPane' },
+            'boundaries': { id: 'boundaries', name: 'Granice',               visible: true,  opacity: 85,  pane: 'boundariesPane' },
+            'lightning':  { id: 'lightning',  name: 'Wyładowania (Live)',    visible: true,  opacity: 95,  pane: 'lightningPane' },
+            'radar':      { id: 'radar',      name: 'Radar Opadów',          visible: true,  opacity: 87,  pane: 'radarPane' },
+            'sat_day':    { id: 'sat_day',    name: 'Satelita Dzienny (HRV)', visible: true,  opacity: 65,  pane: 'satellitePane' },
+            'sat_night':  { id: 'sat_night',  name: 'Satelita Nocny (IR)',   visible: false, opacity: 60,  pane: 'satelliteNightPane' },
+            'inter':      { id: 'inter',      name: 'Interpolacja IMGW',     visible: true,  opacity: 100, pane: 'weatherPane' }
         };
 
         // Domyślna kolejność od góry (wierzch) do dołu
@@ -866,11 +866,11 @@ window.initMapa = function() {
                         <div style="display: flex; align-items: center; justify-content: space-between;">
                             <label style="display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; margin: 0; color: var(--text-primary);">
                                 <input type="checkbox" ${item.visible ? 'checked' : ''} onchange="window.toggleLayer('${key}', this.checked)">
-                                <span>${item.icon} ${item.name}${extraInfo}</span>
+                                <span>${item.name}${extraInfo}</span>
                             </label>
                             <div style="display: flex; gap: 3px;">
-                                <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń wyżej (nad inne)" onclick="window.moveLayer('${key}', 'up')" ${isTop ? 'disabled style="opacity:0.25; cursor:default;"' : ''}>▲</button>
-                                <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń niżej (pod inne)" onclick="window.moveLayer('${key}', 'down')" ${isBottom ? 'disabled style="opacity:0.25; cursor:default;"' : ''}>▼</button>
+                                <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń wyżej" onclick="window.moveLayer('${key}', 'up')" ${isTop ? 'disabled style="opacity:0.25; cursor:default;"' : ''}>▲</button>
+                                <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń niżej" onclick="window.moveLayer('${key}', 'down')" ${isBottom ? 'disabled style="opacity:0.25; cursor:default;"' : ''}>▼</button>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-muted);">
