@@ -6,6 +6,39 @@ let satNightLayer = null;
 let lightningGroup = null;
 let boundariesGroup = null;
 
+window.MAP_LAYERS = {
+    'drawings':   { id: 'drawings',   name: 'Kreator Ostrzeżeń',     visible: false, opacity: 100, pane: 'drawingsPane' },
+    'stations':   { id: 'stations',   name: 'Stacje i Pomiary IMGW', visible: true,  opacity: 100, pane: 'stationsPane' },
+    'boundaries': { id: 'boundaries', name: 'Granice',               visible: true,  opacity: 100, pane: 'boundariesPane' },
+    'lightning':  { id: 'lightning',  name: 'Wyładowania (Live)',    visible: false, opacity: 95,  pane: 'lightningPane' },
+    'radar':      { id: 'radar',      name: 'Radar Opadów',          visible: false, opacity: 87,  pane: 'radarPane' },
+    'sat_day':    { id: 'sat_day',    name: 'Satelita Dzienny (HRV)', visible: false, opacity: 100, pane: 'satellitePane' },
+    'inter':      { id: 'inter',      name: 'Interpolacja IMGW',     visible: true,  opacity: 70,  pane: 'weatherPane' },
+    'sat_night':  { id: 'sat_night',  name: 'Satelita Nocny (IR)',   visible: false, opacity: 60,  pane: 'satelliteNightPane' }
+};
+
+window.layerOrder = ['drawings', 'stations', 'boundaries', 'lightning', 'radar', 'sat_day', 'inter', 'sat_night'];
+
+try {
+    const savedLayers = localStorage.getItem('meteo_map_layers');
+    const savedOrder = localStorage.getItem('meteo_map_order');
+    if (savedLayers) {
+        const parsed = JSON.parse(savedLayers);
+        Object.keys(parsed).forEach(k => {
+            if (window.MAP_LAYERS[k]) {
+                window.MAP_LAYERS[k].visible = parsed[k].visible;
+                window.MAP_LAYERS[k].opacity = parsed[k].opacity;
+            }
+        });
+    }
+    if (savedOrder) {
+        const parsedOrder = JSON.parse(savedOrder);
+        if (Array.isArray(parsedOrder) && parsedOrder.length === window.layerOrder.length) {
+            window.layerOrder = parsedOrder;
+        }
+    }
+} catch(e) {}
+
 function saveLayerState() {
     try {
         localStorage.setItem('meteo_map_layers', JSON.stringify(window.MAP_LAYERS));
@@ -163,6 +196,10 @@ window.initLayers = function(map, satDay, satNight, lightning, boundaries) {
     satNightLayer = satNight;
     lightningGroup = lightning;
     boundariesGroup = boundaries;
+
+    if (window.MAP_LAYERS['boundaries']?.visible) {
+        boundariesGroup.addTo(mapInstance);
+    }
 
     window.applyLayerOrder();
     window.renderLayerManagerUI();

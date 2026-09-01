@@ -22,9 +22,9 @@ window.initMapa = function() {
         map.createPane('labelsPane');        map.getPane('labelsPane').style.zIndex = 650;
         map.getPane('labelsPane').style.pointerEvents = 'none';
 
-        // 2. Podkłady bazowe
-        const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© CartoDB', pane: 'basePane', maxZoom: 19
+        // 2. Podkład bazowy ciemny (CartoDB Dark Raster bez znaku wodnego)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png', {
+            subdomains: 'abcd', attribution: '© CartoDB / OSM', pane: 'basePane', maxZoom: 19
         }).addTo(map);
 
         // 3. Satelita EUMETSAT (WMS)
@@ -61,6 +61,10 @@ window.initMapa = function() {
         map.invalidateSize();
     }, 100);
 };
+
+// Aliases for global inline handlers
+window.renderIMGW = window.renderIMGW;
+window.setRadarSource = window.setRadarSource;
 
 window.addEventListener('bmeteo-authenticated', () => {
     if (document.getElementById('tab-mapa')?.classList.contains('active')) {
