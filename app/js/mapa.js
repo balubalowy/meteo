@@ -452,49 +452,126 @@ window.initMapa = function() {
             }
         });
 
+        let activeRadarSource = 'imgw'; // Domyślnie oficjalny polski radar IMGW CMAX!
         let radarTileLayer = null, radarHost = '', radarFrames = [], currentFrame = 0, animationTimer = null;
-        
+        let imgwRadarOverlay = null, imgwFrames = [];
+        const IMGW_RADAR_BOUNDS = [[48.0, 13.5], [56.0, 24.5]];
+
+        function generateImgwRadarFrames() {
+            const now = new Date();
+            const frames = [];
+            // Ostatnie 12 skanów (co 5 minut z ostatniej godziny)
+            // IMGW publikuje skany z opóźnieniem ok. 2-3 minut
+            for (let i = 11; i >= 0; i--) {
+                const d = new Date(now.getTime() - (i * 5 + 3) * 60000);
+                const utcYear = d.getUTCFullYear();
+                const utcMonth = String(d.getUTCMonth() + 1).padStart(2, '0');
+                const utcDay = String(d.getUTCDate()).padStart(2, '0');
+                const utcHours = String(d.getUTCHours()).padStart(2, '0');
+                const min5 = String(Math.floor(d.getUTCMinutes() / 5) * 5).padStart(2, '0');
+                
+                const ts = `${utcYear}${utcMonth}${utcDay}${utcHours}${min5}`;
+                const localLabel = d.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+                const url = `https://danepubliczne.imgw.pl/pl/datastore/getfiledown/Oper/Polrad/Produkty/POLCOMP/COMPO_CMAX_250.comp.cmax/${ts}0000dBZ.cmax_echoOnly.png`;
+                
+                if (!frames.some(f => f.ts === ts)) {
+                    frames.push({ ts, url, time: Math.floor(d.getTime() / 1000), label: localLabel });
+                }
+            }
+            return frames;
+        }
+
+        // Inicjalizacja klatek IMGW
+        imgwFrames = generateImgwRadarFrames();
+
+        // Źródło RainViewer
         fetch('https://api.rainviewer.com/public/weather-maps.json')
             .then(res => res.json())
             .then(data => {
                 radarHost = data.host;
                 radarFrames = data.radar.past.concat(data.radar.nowcast);
-                if (!radarFrames.length) return;
-
-                const slider = document.getElementById('rv-slider');
-                if (slider) {
-                    slider.max = radarFrames.length - 1;
-                    slider.value = radarFrames.length - 1;
+                if (activeRadarSource === 'rv') {
+                    initRadarSlider();
+                    showFrame(currentFrame);
                 }
-                currentFrame = radarFrames.length - 1;
-
-                radarTileLayer = new ImgwRadarTileLayer(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`, {
-                    opacity: 0.75, 
-                    pane: 'radarPane',
-                    maxZoom: 18,
-                    maxNativeZoom: 8
-                });
-
-                if (window.MAP_LAYERS && window.MAP_LAYERS['radar'].visible) {
-                    radarTileLayer.addTo(map);
-                }
-
-                updateTimeDisplay(currentFrame);
             })
             .catch(err => console.error("Błąd pobierania danych RainViewer:", err));
 
-        function updateTimeDisplay(index) {
-            if(!radarFrames[index]) return;
-            const timeEl = document.getElementById('rv-time');
-            if (timeEl) timeEl.textContent = new Date(radarFrames[index].time * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+        function initRadarSlider() {
+            const count = activeRadarSource === 'imgw' ? imgwFrames.length : radarFrames.length;
+            const slider = document.getElementById('rv-slider');
+            if (slider && count > 0) {
+                slider.max = count - 1;
+                slider.value = count - 1;
+                currentFrame = count - 1;
+            }
         }
 
+        window.setRadarSource = function(src) {
+            activeRadarSource = src;
+            const btnImgw = document.getElementById('radar-src-imgw');
+            const btnRv = document.getElementById('radar-src-rv');
+            
+            if (src === 'imgw') {
+                if (btnImgw) { btnImgw.className = 'btn btn-primary'; }
+                if (btnRv) { btnRv.className = 'btn btn-ghost'; btnRv.style.border = '1px solid var(--border-subtle)'; }
+                if (radarTileLayer && map.hasLayer(radarTileLayer)) map.removeLayer(radarTileLayer);
+                imgwFrames = generateImgwRadarFrames();
+            } else {
+                if (btnRv) { btnRv.className = 'btn btn-primary'; }
+                if (btnImgw) { btnImgw.className = 'btn btn-ghost'; btnImgw.style.border = '1px solid var(--border-subtle)'; }
+                if (imgwRadarOverlay && map.hasLayer(imgwRadarOverlay)) map.removeLayer(imgwRadarOverlay);
+            }
+            
+            initRadarSlider();
+            showFrame(currentFrame);
+        };
+
         function showFrame(index) {
-            if(!radarFrames[index] || !radarTileLayer) return;
             currentFrame = parseInt(index);
-            radarTileLayer.setUrl(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`);
-            updateTimeDisplay(currentFrame);
+            const timeEl = document.getElementById('rv-time');
+
+            if (activeRadarSource === 'imgw') {
+                if (!imgwFrames[currentFrame]) return;
+                const frame = imgwFrames[currentFrame];
+                
+                if (!imgwRadarOverlay) {
+                    imgwRadarOverlay = L.imageOverlay(frame.url, IMGW_RADAR_BOUNDS, {
+                        opacity: 0.85,
+                        pane: 'radarPane'
+                    });
+                } else {
+                    imgwRadarOverlay.setUrl(frame.url);
+                }
+
+                if (window.MAP_LAYERS && window.MAP_LAYERS['radar'].visible) {
+                    if (!map.hasLayer(imgwRadarOverlay)) imgwRadarOverlay.addTo(map);
+                }
+                if (timeEl) timeEl.textContent = frame.label;
+            } else {
+                if (!radarFrames[currentFrame]) return;
+                
+                if (!radarTileLayer) {
+                    radarTileLayer = new ImgwRadarTileLayer(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`, {
+                        opacity: 0.75, 
+                        pane: 'radarPane',
+                        maxZoom: 18,
+                        maxNativeZoom: 8
+                    });
+                } else {
+                    radarTileLayer.setUrl(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`);
+                }
+
+                if (window.MAP_LAYERS && window.MAP_LAYERS['radar'].visible) {
+                    if (!map.hasLayer(radarTileLayer)) radarTileLayer.addTo(map);
+                }
+                if (timeEl) timeEl.textContent = new Date(radarFrames[currentFrame].time * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+            }
         }
+
+        // Start domyślnego radaru IMGW
+        initRadarSlider();
+        showFrame(currentFrame);
 
         const rvSlider = document.getElementById('rv-slider');
         if (rvSlider) rvSlider.addEventListener('input', e => showFrame(parseInt(e.target.value)));
@@ -508,12 +585,14 @@ window.initMapa = function() {
                     btn.innerHTML = '<i data-lucide="play"></i>';
                 } else {
                     btn.innerHTML = '<i data-lucide="pause"></i>';
-                    if(currentFrame >= radarFrames.length - 1) currentFrame = 0;
+                    const maxFrames = activeRadarSource === 'imgw' ? imgwFrames.length : radarFrames.length;
+                    if(currentFrame >= maxFrames - 1) currentFrame = 0;
                     animationTimer = setInterval(() => {
-                        currentFrame = currentFrame >= radarFrames.length - 1 ? 0 : currentFrame + 1;
+                        const count = activeRadarSource === 'imgw' ? imgwFrames.length : radarFrames.length;
+                        currentFrame = currentFrame >= count - 1 ? 0 : currentFrame + 1;
                         if (document.getElementById('rv-slider')) document.getElementById('rv-slider').value = currentFrame;
                         showFrame(currentFrame);
-                    }, 600);
+                    }, 500);
                 }
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             });

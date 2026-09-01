@@ -16,6 +16,12 @@
                     <i data-lucide="zap" style="width: 12px; height: 12px;"></i> Pioruny (Live)
                 </button>
             </div>
+            <!-- Przełącznik Źródła Radaru -->
+            <div style="display: flex; gap: 6px; margin-bottom: 8px;">
+                <button id="radar-src-imgw" class="btn btn-primary" onclick="setRadarSource('imgw')" style="flex: 1; padding: 4px 6px; font-size: 0.72rem; font-weight: 600; text-align: center;">🛰️ IMGW CMAX (5 min)</button>
+                <button id="radar-src-rv" class="btn btn-ghost" onclick="setRadarSource('rv')" style="flex: 1; padding: 4px 6px; font-size: 0.72rem; border: 1px solid var(--border-subtle); text-align: center;">🌍 RainViewer (Live)</button>
+            </div>
+
             <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-secondary); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
                 <button id="rv-play-btn" class="btn btn-ghost" style="padding: 5px; border-radius: 50%; color: var(--accent-primary);">
                     <i data-lucide="play"></i>
