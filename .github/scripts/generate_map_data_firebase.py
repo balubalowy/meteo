@@ -10,15 +10,8 @@ import json
 import math
 import os
 import sys
-import numpy as np
 import requests
 from datetime import datetime, timedelta
-from scipy.interpolate import griddata
-from shapely.geometry import shape, Point
-from shapely.ops import unary_union
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 

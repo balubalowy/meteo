@@ -2,7 +2,7 @@ name: Pobieranie Danych IMGW do Firebase
 
 on:
   schedule:
-    - cron: '15 * * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -26,9 +26,6 @@ jobs:
         env:
           FIREBASE_SECRET: ${{ secrets.FIREBASE_SECRET }}
         run: python .github/scripts/fetch_imgw_firebase.py
-
-      - name: Install map dependencies
-        run: pip install numpy scipy shapely matplotlib
 
       - name: Generate and upload Map Data
         env:
