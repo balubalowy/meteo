@@ -302,6 +302,18 @@ def generate_dashboard():
               {plot_html}
           </div>
       </div>
+      
+      <div class="card" style="margin-top: 1.5rem; padding: 1.25rem; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md);">
+          <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="shield-check" style="color: var(--accent-primary);"></i> Źródła danych i prawa autorskie
+          </div>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; line-height: 1.5;">
+              Mapy wygenerowano na podstawie przetworzonych danych meteorologicznych pochodzących z otwartych źródeł: <b>IMGW-PIB</b>, <b>ECMWF</b> (IFS/AIFS), <b>NOAA</b> (GEFS) oraz <b>DWD</b> (ICON-EU EPS).
+          </p>
+          <div style="font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-subtle); padding-top: 8px;">
+              Właścicielem opracowania i autorem wizualizacji map jest <b>Bartosz Drobisz</b>. Wszelkie prawa zastrzeżone.
+          </div>
+      </div>
   </div>
   <script>lucide.createIcons();</script>
 </body>
