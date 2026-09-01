@@ -1,33 +1,33 @@
 window.meteoStats = {
-  "total_storms": "281",
+  "total_storms": "288",
   "max_wind": "100 km/h",
   "max_cape": 3870,
-  "total_km": "5423",
+  "total_km": "6033",
   "summary": {
     "burze_lowy": {
-      "val": "86",
+      "val": "92",
       "info": "*od 23.02.2020",
-      "stan": "Stan na 04.08.2026"
+      "stan": "Stan na 21.08.2026"
     },
     "dni_burzowe_lowy": {
-      "val": "60",
+      "val": "62",
       "info": "*od 23.02.2020",
-      "stan": "Stan na 04.08.2026"
+      "stan": "Stan na 21.08.2026"
     },
     "burze_ogolem": {
-      "val": "281",
+      "val": "288",
       "info": "*od 2019 r.",
-      "stan": "Stan na 05.08.2026"
+      "stan": "Stan na 31.08.2026"
     },
     "dni_burzowe_ogolem": {
-      "val": "173",
+      "val": "177",
       "info": "*od 2019 r.",
-      "stan": "Stan na 05.08.2026"
+      "stan": "Stan na 31.08.2026"
     },
     "km_suma": {
-      "val": "5423",
+      "val": "6033",
       "info": "*od 2024 r. 99%",
-      "stan": "Stan na 04.08.2026"
+      "stan": "Stan na 21.08.2026"
     },
     "grad_max": {
       "val": "4 cm",
@@ -58,23 +58,23 @@ window.meteoStats = {
   "ratings": [
     {
       "name": "Brak",
-      "zagrozenia": 8,
-      "wyglad": 5
+      "zagrozenia": 10,
+      "wyglad": 7
     },
     {
       "name": "Słaba",
       "zagrozenia": 42,
-      "wyglad": 33
+      "wyglad": 36
     },
     {
       "name": "Umiarkowana",
-      "zagrozenia": 16,
-      "wyglad": 26
+      "zagrozenia": 21,
+      "wyglad": 27
     },
     {
       "name": "Silna",
       "zagrozenia": 3,
-      "wyglad": 5
+      "wyglad": 6
     },
     {
       "name": "Bardzo silna",
@@ -90,5 +90,5 @@ window.meteoStats = {
   "pythonFiles": 51,
   "htmlFiles": 20,
   "excelFiles": 2,
-  "lastSync": "2026-08-18 17:28:20"
+  "lastSync": "2026-09-01 10:10:24"
 };

@@ -1,0 +1,37 @@
+; IMGW POLRAD CMAX Radar Palette (Z przezroczystoscia / Alpha)
+Product: BR
+Units: DBZ
+Step: 1
+
+Color: -32    0   0   0   0
+Color:   0    0   0   0   0
+Color:   3    4   5 147   0
+Color:   4    4   5 147  40
+Color:   8    4   5 147 100
+Color:  10   31  72 216 180
+Color:  12   58 126 231 230
+Color:  14   86 181 247 255
+Color:  16  109 201 252 255
+Color:  17  121 211 248 255
+Color:  20  174 233 251 255
+Color:  23  231 248 255 255
+Color:  25  253 252 224 255
+Color:  27  253 246 158 255
+Color:  28  254 241 136 255
+Color:  30  249 232  90 255
+Color:  32  245 206  77 255
+Color:  34  239 151  54 255
+Color:  36  233  98  43 255
+Color:  37  236  73  38 255
+Color:  40  184  37  29 255
+Color:  43  159  30  34 255
+Color:  44  149  29  39 255
+Color:  46  142  28  51 255
+Color:  47  159  31  79 255
+Color:  50  187  42 135 255
+Color:  53  210  55 172 255
+Color:  55  219  72 189 255
+Color:  56  221  79 197 255
+Color:  59  203 144 198 255
+Color:  65  180 100 180 255
+Color:  75  255 255 255 255

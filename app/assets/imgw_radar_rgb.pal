@@ -1,0 +1,34 @@
+; IMGW POLRAD CMAX Radar Palette (RGB bez czerni)
+Product: BR
+Units: DBZ
+Step: 1
+
+Color:   4    4   5 147
+Color:   8    4   5 147
+Color:  10   31  72 216
+Color:  12   58 126 231
+Color:  14   86 181 247
+Color:  16  109 201 252
+Color:  17  121 211 248
+Color:  20  174 233 251
+Color:  23  231 248 255
+Color:  25  253 252 224
+Color:  27  253 246 158
+Color:  28  254 241 136
+Color:  30  249 232  90
+Color:  32  245 206  77
+Color:  34  239 151  54
+Color:  36  233  98  43
+Color:  37  236  73  38
+Color:  40  184  37  29
+Color:  43  159  30  34
+Color:  44  149  29  39
+Color:  46  142  28  51
+Color:  47  159  31  79
+Color:  50  187  42 135
+Color:  53  210  55 172
+Color:  55  219  72 189
+Color:  56  221  79 197
+Color:  59  203 144 198
+Color:  65  180 100 180
+Color:  75  255 255 255
