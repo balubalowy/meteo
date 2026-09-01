@@ -470,6 +470,7 @@ window.initMapa = function() {
         function showFrame(index) {
             currentFrame = parseInt(index);
             const timeEl = document.getElementById('rv-time');
+            const currentRadarOpacity = (window.MAP_LAYERS && window.MAP_LAYERS['radar'] && window.MAP_LAYERS['radar'].opacity !== undefined) ? (window.MAP_LAYERS['radar'].opacity / 100.0) : 0.87;
 
             if (activeRadarSource === 'imgw') {
                 if (!imgwFrames[currentFrame]) return;
@@ -477,11 +478,12 @@ window.initMapa = function() {
                 
                 if (!imgwRadarOverlay) {
                     imgwRadarOverlay = L.imageOverlay(frame.url, IMGW_RADAR_BOUNDS, {
-                        opacity: 0.85,
+                        opacity: currentRadarOpacity,
                         pane: 'radarPane'
                     });
                 } else {
                     imgwRadarOverlay.setUrl(frame.url);
+                    imgwRadarOverlay.setOpacity(currentRadarOpacity);
                 }
 
                 if (window.MAP_LAYERS && window.MAP_LAYERS['radar'].visible) {
@@ -493,13 +495,14 @@ window.initMapa = function() {
                 
                 if (!radarTileLayer) {
                     radarTileLayer = L.tileLayer(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`, {
-                        opacity: 0.7, 
+                        opacity: currentRadarOpacity, 
                         pane: 'radarPane',
                         maxZoom: 18,
                         maxNativeZoom: 8
                     });
                 } else {
                     radarTileLayer.setUrl(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`);
+                    radarTileLayer.setOpacity(currentRadarOpacity);
                 }
 
                 if (window.MAP_LAYERS && window.MAP_LAYERS['radar'].visible) {
@@ -864,9 +867,23 @@ window.initMapa = function() {
                     if (map.hasLayer(lightningLayerGroup)) map.removeLayer(lightningLayerGroup);
                 }
             } else if (key === 'radar') {
-                if (radarTileLayer) {
-                    if (isChecked) { if (!map.hasLayer(radarTileLayer)) map.addLayer(radarTileLayer); }
-                    else { if (map.hasLayer(radarTileLayer)) map.removeLayer(radarTileLayer); }
+                if (isChecked) {
+                    if (activeRadarSource === 'imgw') {
+                        if (imgwRadarOverlay) {
+                            if (!map.hasLayer(imgwRadarOverlay)) map.addLayer(imgwRadarOverlay);
+                        } else {
+                            showFrame(currentFrame);
+                        }
+                    } else {
+                        if (radarTileLayer) {
+                            if (!map.hasLayer(radarTileLayer)) map.addLayer(radarTileLayer);
+                        } else {
+                            showFrame(currentFrame);
+                        }
+                    }
+                } else {
+                    if (imgwRadarOverlay && map.hasLayer(imgwRadarOverlay)) map.removeLayer(imgwRadarOverlay);
+                    if (radarTileLayer && map.hasLayer(radarTileLayer)) map.removeLayer(radarTileLayer);
                 }
             } else if (key === 'inter' || key === 'stations') {
                 window.renderIMGW();
@@ -890,7 +907,10 @@ window.initMapa = function() {
                     if (s.marker) s.marker.setStyle({ fillOpacity: op, opacity: op });
                 });
             }
-            else if (key === 'radar' && radarTileLayer) radarTileLayer.setOpacity(op);
+            else if (key === 'radar') {
+                if (radarTileLayer) radarTileLayer.setOpacity(op);
+                if (imgwRadarOverlay) imgwRadarOverlay.setOpacity(op);
+            }
             else if (key === 'inter' && idwOverlay) idwOverlay.setOpacity(op);
         };
 
