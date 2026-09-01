@@ -57,7 +57,10 @@ async function ensureMapDependencies() {
 
 async function ensureCloudsDependencies() {
     if (window._cloudsDepsLoaded) return;
-    await loadScript('js/clouds-data.js');
+    await Promise.all([
+        loadScript('js/cloud-identifier.js'),
+        loadScript('js/clouds-data.js')
+    ]);
     window._cloudsDepsLoaded = true;
 }
 

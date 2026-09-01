@@ -988,7 +988,7 @@ window.KNOWLEDGE_BASE = [
         "name": "Lightning Wizard",
         "danger": "Dobre",
         "desc": "Wyspecjalizowane mapy termodynamiczne generowane na żywo pod prognozowanie burz. Niesamowicie przydatne przy ocenie CAPE, LCL i uskoków wiatru.",
-        "url": "http://www.lightningwizard.com/maps/",
+        "url": "https://www.lightningwizard.com/maps/",
         "image": "http://www.lightningwizard.com/favicon.ico"
       },
       {

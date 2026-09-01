@@ -409,17 +409,45 @@ document.addEventListener('alpine:init', () => {
             this.forma = "Brak";
         },
 
+        get fullCloudName() {
+            if (this.rodzaj === "Brak") return "";
+            let name = this.rodzaj;
+            if (this.gatunek !== "Brak") name += " " + this.gatunek;
+            if (this.odmiana !== "Brak") name += " " + this.odmiana;
+            if (this.forma !== "Brak") name += " " + this.forma;
+            return name;
+        },
+
+        get forecastInfo() {
+            if (this.rodzaj === "Brak" || !window.CLOUD_FORECAST_DATA) return null;
+            const data = window.CLOUD_FORECAST_DATA[this.rodzaj];
+            if (!data) return null;
+
+            let specificForecast = data.base_forecast;
+            if (this.gatunek !== "Brak" && data.species_info?.[this.gatunek]) {
+                specificForecast += " " + data.species_info[this.gatunek];
+            }
+            if (this.forma !== "Brak" && data.features_info?.[this.forma]) {
+                specificForecast += " " + data.features_info[this.forma];
+            }
+
+            return {
+                genus: this.rodzaj,
+                level: data.level,
+                composition: data.composition,
+                forecast: specificForecast,
+                threat: data.threat,
+                threat_color: data.threat_color,
+                wmo_url: data.wmo_url
+            };
+        },
+
         szukajWGoogle() {
             if (this.rodzaj === "Brak") {
                 alert("Wybierz przynajmniej Rodzaj chmury!");
                 return;
             }
-            let query = this.rodzaj;
-            if (this.gatunek !== "Brak") query += " " + this.gatunek;
-            if (this.odmiana !== "Brak") query += " " + this.odmiana;
-            if (this.forma !== "Brak") query += " " + this.forma;
-            
-            query += " cloud"; // dodajemy "cloud" dla lepszych wynikow
+            let query = this.fullCloudName + " cloud";
             const url = "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(query);
             window.open(url, "_blank");
         }
