@@ -62,7 +62,7 @@
         <div style="font-size: 0.75rem; color: var(--text-muted, #94a3b8); margin-top: 6px;">Weryfikacja sesji...</div>
       </div>
 
-      <button id="lockscreen-login-btn" class="btn" style="width: 100%; background: #ffffff; color: #1f2937; border: 1px solid #e5e7eb; font-weight: 600; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+      <button id="lockscreen-login-btn" class="btn" aria-label="Zaloguj się przez konto Google" style="width: 100%; background: #ffffff; color: #1f2937; border: 1px solid #e5e7eb; font-weight: 600; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
         <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -81,8 +81,8 @@
 
   <!-- Lightbox Modal -->
   <div id="lightbox" class="lightbox">
-    <span class="lightbox-close">&times;</span>
-    <img class="lightbox-content" id="lightbox-img">
+    <span class="lightbox-close" role="button" aria-label="Zamknij podgląd" tabindex="0">&times;</span>
+    <img class="lightbox-content" id="lightbox-img" alt="Powiększony widok mapy">
   </div>
 
   <!-- Top Navigation (B-Core Style) -->
@@ -96,13 +96,13 @@
                       <a href="admin.html" class="btn btn-ghost" style="padding: 2px 8px; font-size: 0.75rem; border: 1px solid var(--border-subtle); color: #9ca3af; border-radius: 4px; text-decoration: none; display: flex; align-items: center; gap: 4px;">
                           <i data-lucide="settings" style="width: 12px; height: 12px;"></i> Admin
                       </a>
-                      <button id="login-google-btn" class="btn btn-ghost" style="padding: 2px 8px; font-size: 0.75rem; border: 1px solid var(--border-subtle); color: var(--accent-primary); border-radius: 4px; cursor: pointer;">
+                      <button id="login-google-btn" class="btn btn-ghost" aria-label="Zaloguj się przez konto Google" style="padding: 2px 8px; font-size: 0.75rem; border: 1px solid var(--border-subtle); color: var(--accent-primary); border-radius: 4px; cursor: pointer;">
                           <i data-lucide="log-in" style="width: 12px; height: 12px;"></i> Zaloguj
                       </button>
                   </span>
                   <span id="user-info" style="display: none;">
                       <span style="color: var(--accent-success); font-weight: 500; font-size: 0.7rem; white-space: nowrap;">✓ <span id="user-email" style="font-weight: 600; color: var(--text-primary); max-width: 130px; display: inline-block; vertical-align: bottom; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span></span>
-                      <button id="logout-btn" class="btn btn-ghost" style="padding: 1px 5px; font-size: 0.68rem; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer; margin-left: 4px;">Wyloguj</button>
+                      <button id="logout-btn" class="btn btn-ghost" aria-label="Wyloguj z systemu" style="padding: 1px 5px; font-size: 0.68rem; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer; margin-left: 4px;">Wyloguj</button>
                       <span id="firebase-bandwidth-display" style="display: inline-block; margin-left: 8px; font-size: 0.68rem; color: var(--text-secondary);"></span>
                   </span>
               </div>
@@ -110,7 +110,7 @@
       </div>
       
       <div class="top-stats">
-          <nav class="nav-links">
+          <nav class="nav-links" aria-label="Główna nawigacja portalu">
           <a href="#" class="nav-link btn btn-ghost tab-btn active" data-tab="tab-overview"><i data-lucide="layout-dashboard"></i> Pulpit</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-mapa" style="color: var(--accent-primary);"><i data-lucide="map"></i> Mapy</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-skale"><i data-lucide="scale"></i> Skale</a>
@@ -127,7 +127,7 @@
       <div id="tab-overview" class="tab-view active">
          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 1.5rem;">
             <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Pulpit synoptyczny</h2>
-            <button id="toggle-edit-layout" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-subtle); border-radius: 4px; display: flex; align-items: center; gap: 6px;">
+            <button id="toggle-edit-layout" class="btn btn-ghost" aria-label="Włącz lub wyłącz tryb edycji układu kafelków" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-subtle); border-radius: 4px; display: flex; align-items: center; gap: 6px;">
                 <i data-lucide="move"></i> <span id="edit-layout-text">Edytuj układ</span>
             </button>
          </div>
@@ -154,7 +154,7 @@
           <div class="card tile-item" data-id="tile-imgw-synop" style="padding: 1rem; cursor: grab;" x-data="imgwSynopTile">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
                   <h3 style="font-size: 1.1rem; color: var(--text-secondary); margin: 0;"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Synoptyka IMGW</h3>
-                  <select class="form-select" x-model="term" style="width: auto; padding: 2px 6px; font-size: 0.75rem;">
+                  <select class="form-select" x-model="term" aria-label="Wybór terminu mapy synoptycznej" style="width: auto; padding: 2px 6px; font-size: 0.75rem;">
                       <option value="00">00 UTC</option>
                       <option value="12">12 UTC</option>
                   </select>

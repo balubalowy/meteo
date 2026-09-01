@@ -23,11 +23,11 @@
             </div>
 
             <div style="display: flex; gap: 10px; align-items: center; background: var(--bg-secondary); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle);">
-                <button id="rv-play-btn" class="btn btn-ghost" style="padding: 5px; border-radius: 50%; color: var(--accent-primary);">
+                <button id="rv-play-btn" class="btn btn-ghost" aria-label="Odtwórz lub zatrzymaj animację radaru" style="padding: 5px; border-radius: 50%; color: var(--accent-primary);">
                     <i data-lucide="play"></i>
                 </button>
                 <span id="rv-time" style="font-family: monospace; font-size: 0.9rem; font-weight: bold; width: 50px; text-align: center;">--:--</span>
-                <input type="range" id="rv-slider" min="0" max="10" value="10" style="flex: 1; accent-color: var(--accent-primary);">
+                <input type="range" id="rv-slider" aria-label="Oś czasu klatek radarowych" min="0" max="10" value="10" style="flex: 1; accent-color: var(--accent-primary);">
             </div>
         </div>
 
@@ -39,7 +39,7 @@
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div>
                     <label style="font-size: 0.75rem; color: var(--text-secondary);">Parametr:</label>
-                    <select id="imgw-zmienna" class="form-select" onchange="renderIMGW()" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
+                    <select id="imgw-zmienna" class="form-select" aria-label="Wybór parametru meteorologicznego IMGW" onchange="renderIMGW()" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
                         <option value="temp">Temperatura (°C)</option>
                         <option value="cisnienie">Ciśnienie (hPa - SYNOP)</option>
                         <option value="wiatr">Wiatr Porywy (km/h)</option>
@@ -53,7 +53,7 @@
                 </div>
                 <div>
                     <label style="font-size: 0.75rem; color: var(--text-secondary);">Horyzont:</label>
-                    <select id="imgw-okres" class="form-select" onchange="renderIMGW()" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
+                    <select id="imgw-okres" class="form-select" aria-label="Horyzont czasowy obserwacji IMGW" onchange="renderIMGW()" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
                         <option value="now">Aktualne (Teraz)</option>
                         <option value="max5">Maksimum (ost. 5h)</option>
                         <option value="min5">Minimum (ost. 5h)</option>
@@ -70,7 +70,7 @@
                     </div>
                     <div style="margin-top: 8px; border-top: 1px solid var(--border-subtle); padding-top: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                         <label style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; white-space: nowrap;">Krok izolinii:</label>
-                        <select id="iso-step" class="form-select" onchange="window.renderIMGW()" style="font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); color: var(--text-primary); width: auto;">
+                        <select id="iso-step" class="form-select" aria-label="Krok izolinii interpolacji IDW" onchange="window.renderIMGW()" style="font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); color: var(--text-primary); width: auto;">
                             <option value="auto">Auto</option>
                             <option value="1">1 jedn.</option>
                             <option value="2">2 jedn.</option>
@@ -80,7 +80,7 @@
                     </div>
                     <div style="margin-top: 6px; border-top: 1px solid var(--border-subtle); padding-top: 6px;">
                         <label style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 4px;">Kolor Punktów:</label>
-                        <select id="pt-color-mode" class="form-select" onchange="window.renderIMGW()" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); color: var(--text-primary); width: 100%;">
+                        <select id="pt-color-mode" class="form-select" aria-label="Kolorowanie punktów stacji" onchange="window.renderIMGW()" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); color: var(--text-primary); width: 100%;">
                             <option value="scale">Zależny od Skali</option>
                             <option value="white">Białe</option>
                             <option value="black">Czarne</option>
