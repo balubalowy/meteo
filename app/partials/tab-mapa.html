@@ -31,10 +31,10 @@
             </div>
         </div>
 
-        <!-- SEKCJA: Baza Danych IMGW -->
+        <!-- SEKCJA: IMGW -->
         <div style="padding: 15px; border-bottom: 1px solid var(--border-subtle);">
             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 6px;">
-                <i data-lucide="thermometer" style="width: 16px; height: 16px;"></i> Baza Danych IMGW
+                <i data-lucide="thermometer" style="width: 16px; height: 16px;"></i> IMGW
             </div>
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div>
@@ -51,7 +51,7 @@
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 0.75rem; color: var(--text-secondary);">Horyzont Czasowy:</label>
+                    <label style="font-size: 0.75rem; color: var(--text-secondary);">Horyzont:</label>
                     <select id="imgw-okres" class="form-select" onchange="renderIMGW()" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
                         <option value="now">Aktualne (Teraz)</option>
                         <option value="max5">Maksimum (ost. 5h)</option>
@@ -61,7 +61,7 @@
                 
                 <!-- Szczegóły Wyświetlania IMGW -->
                 <div style="background: var(--bg-secondary); padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-top: 5px;">
-                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px; display: block;">Elementy Pomiary IMGW:</label>
+                    <label style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px; display: block;">Warstwy:</label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8rem;">
                         <label><input type="checkbox" id="chk-iso" onchange="renderIMGW()"> Izolinie</label>
                         <label><input type="checkbox" id="chk-pt" onchange="renderIMGW()" checked> Punkty</label>
@@ -79,22 +79,22 @@
             </div>
         </div>
 
-        <!-- SEKCJA: Menedżer Warstw i Kolejność (Z-Index) -->
+        <!-- SEKCJA: Warstwy -->
         <div style="padding: 15px; border-bottom: 1px solid var(--border-subtle);">
             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
-                <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="layers" style="width: 16px; height: 16px; color: var(--accent-primary);"></i> Menedżer Warstw</span>
+                <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="layers" style="width: 16px; height: 16px; color: var(--accent-primary);"></i> Warstwy</span>
             </div>
-            <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">Kolejność warstw od góry (użyj ▲/▼ do zmiany):</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 8px;">Kolejność (▲/▼):</div>
             
             <div id="layer-manager-list" style="display: flex; flex-direction: column; gap: 6px;">
                 <!-- Generowane dynamicznie przez JS -->
             </div>
         </div>
 
-        <!-- SEKCJA: Kreator Map Ostrzeżeń -->
+        <!-- SEKCJA: Kreator Ostrzeżeń -->
         <div style="padding: 15px; border-bottom: 1px solid var(--border-subtle);">
             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 6px;">
-                <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i> Kreator Map Ostrzeżeń
+                <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i> Kreator ostrzeżeń
             </div>
             
             <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -103,7 +103,7 @@
                      <button class="btn btn-ghost" style="font-size: 0.75rem; padding: 4px;" onclick="if(window.premiumMap) window.premiumMap.setView([49.5, 17.5], 5);">Europa Śr.</button>
                 </div>
                 <hr style="border-color: var(--border-subtle); margin: 5px 0;">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Rysuj strefy zagrożeń:</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Strefy:</div>
                 <button class="btn btn-ghost" style="border: 1px solid #22c55e; color: #22c55e; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#22c55e')">MRG (1)</button>
                 <button class="btn btn-ghost" style="border: 1px solid #eab308; color: #eab308; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#eab308')">NWL (2)</button>
                 <button class="btn btn-ghost" style="border: 1px solid #f97316; color: #f97316; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#f97316')">SRD (3)</button>
@@ -111,7 +111,7 @@
                 <button class="btn btn-ghost" style="border: 1px solid #d946ef; color: #d946ef; text-align: left; padding: 6px; font-size: 0.8rem;" onclick="setDrawingColor('#d946ef')">EXT (5)</button>
                 
                 <hr style="border-color: var(--border-subtle); margin: 5px 0;">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Narzędzia Synoptyczne:</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Fronty i linie:</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
                     <button class="btn btn-ghost" style="border: 1px solid #f97316; color: #f97316; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('zbieznosc')">Zbieżność</button>
                     <button class="btn btn-ghost" style="border: 1px solid #3b82f6; color: #3b82f6; padding: 4px; font-size: 0.75rem;" onclick="setDrawingMode('front_chlodny')">Fr. Chłodny</button>

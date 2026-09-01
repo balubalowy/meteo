@@ -51,10 +51,10 @@
       </div>
 
       <h2 style="margin: 0 0 6px 0; font-size: 1.4rem; font-weight: 700; color: var(--text-primary, #f8fafc);">B-<span>Meteo</span></h2>
-      <div style="font-size: 0.8rem; color: var(--text-secondary, #94a3b8); margin-bottom: 24px;">Centrum Analiz Meteorologicznych & Live Radar</div>
+      <div style="font-size: 0.8rem; color: var(--text-secondary, #94a3b8); margin-bottom: 24px;">Centrum meteorologiczne</div>
 
       <div style="font-size: 0.85rem; color: var(--text-muted, #94a3b8); line-height: 1.5; margin-bottom: 24px; background: var(--bg-secondary, #0f172a); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-subtle, #1e293b);">
-        <b>Dostęp autoryzowany</b><br>Zaloguj się swoim kontem Google, aby odblokować wszystkie narzędzia synoptyczne, mapy i radary.
+        <b>Dostęp autoryzowany</b><br>Zaloguj się kontem Google, aby odblokować narzędzia, mapy i radary.
       </div>
 
       <div id="lockscreen-spinner" style="display: none; margin-bottom: 16px;">
@@ -94,14 +94,14 @@
               <div id="header-auth-status" style="font-size: 0.75rem; margin-top: 4px; color: var(--text-secondary);">
                   <span id="auth-section" style="display: flex; gap: 8px;">
                       <a href="admin.html" class="btn btn-ghost" style="padding: 2px 8px; font-size: 0.75rem; border: 1px solid var(--border-subtle); color: #9ca3af; border-radius: 4px; text-decoration: none; display: flex; align-items: center; gap: 4px;">
-                          <i data-lucide="settings" style="width: 12px; height: 12px;"></i> Panel Admina
+                          <i data-lucide="settings" style="width: 12px; height: 12px;"></i> Admin
                       </a>
                       <button id="login-google-btn" class="btn btn-ghost" style="padding: 2px 8px; font-size: 0.75rem; border: 1px solid var(--border-subtle); color: var(--accent-primary); border-radius: 4px; cursor: pointer;">
-                          <i data-lucide="log-in" style="width: 12px; height: 12px;"></i> Zaloguj Google
+                          <i data-lucide="log-in" style="width: 12px; height: 12px;"></i> Zaloguj
                       </button>
                   </span>
                   <span id="user-info" style="display: none;">
-                      <span style="color: var(--accent-success); font-weight: 500; font-size: 0.7rem; white-space: nowrap;">✓ Zalogowano: <span id="user-email" style="font-weight: 600; color: var(--text-primary); max-width: 130px; display: inline-block; vertical-align: bottom; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span></span>
+                      <span style="color: var(--accent-success); font-weight: 500; font-size: 0.7rem; white-space: nowrap;">✓ <span id="user-email" style="font-weight: 600; color: var(--text-primary); max-width: 130px; display: inline-block; vertical-align: bottom; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span></span>
                       <button id="logout-btn" class="btn btn-ghost" style="padding: 1px 5px; font-size: 0.68rem; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer; margin-left: 4px;">Wyloguj</button>
                       <span id="firebase-bandwidth-display" style="display: inline-block; margin-left: 8px; font-size: 0.68rem; color: var(--text-secondary);"></span>
                   </span>
@@ -115,7 +115,7 @@
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-mapa" style="color: var(--accent-primary);"><i data-lucide="map"></i> Mapy</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-if-evaluator"><i data-lucide="tornado"></i> Skala IF</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-calculators"><i data-lucide="calculator"></i> Kalkulatory</a>
-          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-knowledge"><i data-lucide="book-open"></i> Baza Wiedzy</a>
+          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-knowledge"><i data-lucide="book-open"></i> Wiedza</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-alert-rules"><i data-lucide="alert-triangle"></i> Ostrzeżenia</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-stats"><i data-lucide="bar-chart-2"></i> Statystyki</a>
           <a href="https://balubalowy.github.io/system/" target="_blank" class="nav-link btn btn-ghost" style="opacity: 0.75; font-size: 0.85rem;" title="Otwórz System B-Core"><i data-lucide="command" style="width: 14px; height: 14px; color: var(--accent-primary);"></i> B-Core</a>
@@ -127,7 +127,7 @@
   <div class="container main-content">
       <div id="tab-overview" class="tab-view active">
          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 1.5rem;">
-            <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Widoki Synoptyczne, Radary i Zjawiska (Live)</h2>
+            <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;"><i data-lucide="globe"></i> Pulpit synoptyczny</h2>
             <button id="toggle-edit-layout" class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-subtle); border-radius: 4px; display: flex; align-items: center; gap: 6px;">
                 <i data-lucide="move"></i> <span id="edit-layout-text">Edytuj układ</span>
             </button>
@@ -135,17 +135,17 @@
         
         <div id="dashboard-tiles" class="dashboard-grid">
           
-          <!-- SOB Prognoza (Live Obserwatorzy.info) -->
+          <!-- SOB Prognoza -->
           <div class="card tile-item" data-id="tile-sob" style="padding: 1rem; cursor: grab;" x-data="sobTile" x-init="fetchSOB()">
-              <h3 style="margin-bottom: 0.4rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Prognoza SOB (Live)</h3>
+              <h3 style="margin-bottom: 0.4rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> SOB</h3>
               <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="sobTitle"></div>
               <div x-show="loading" class="skeleton-loader" style="height: 220px;"></div>
               <img x-show="!loading" :src="sobImg" alt="Prognoza SOB" class="zoomable" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary);" x-transition>
           </div>
 
-          <!-- Polscy Łowcy Burz Prognoza (Live Skywarn Polska) -->
+          <!-- Polscy Łowcy Burz Prognoza -->
           <div class="card tile-item" data-id="tile-lowcy" style="padding: 1rem; cursor: grab;" x-data="lowcyTile" x-init="fetchLowcy()">
-              <h3 style="margin-bottom: 0.4rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Polscy Łowcy Burz (Live)</h3>
+              <h3 style="margin-bottom: 0.4rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> PŁB</h3>
               <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="lowcyTitle"></div>
               <div x-show="loading" class="skeleton-loader" style="height: 220px;"></div>
               <img x-show="!loading" :src="lowcyImg" alt="Prognoza PŁB" class="zoomable" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary);" x-transition>
@@ -154,7 +154,7 @@
           <!-- IMGW Mapa Synoptyczna 00z/12z -->
           <div class="card tile-item" data-id="tile-imgw-synop" style="padding: 1rem; cursor: grab;" x-data="imgwSynopTile">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                  <h3 style="font-size: 1.1rem; color: var(--text-secondary); margin: 0;"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Mapa Synoptyczna IMGW</h3>
+                  <h3 style="font-size: 1.1rem; color: var(--text-secondary); margin: 0;"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Synoptyka IMGW</h3>
                   <select class="form-select" x-model="term" style="width: auto; padding: 2px 6px; font-size: 0.75rem;">
                       <option value="00">00 UTC</option>
                       <option value="12">12 UTC</option>
@@ -165,31 +165,31 @@
 
           <!-- DWD Europa - Analiza Frontów -->
           <div class="card tile-item" data-id="tile-dwd" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Europa — Analiza Frontów (DWD)</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Fronty (DWD)</h3>
             <img id="dash-dwd" class="zoomable" src="https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png" alt="DWD Europa" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
           </div>
           
-          <!-- SIGWX IMGW PL - Mapa Synoptyczna Live -->
+          <!-- SIGWX IMGW PL -->
           <div class="card tile-item" data-id="tile-sigwx-pl" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Polska — Mapa Synoptyczna (SIGWX IMGW Live)</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> SIGWX PL</h3>
             <img id="dash-sigwx-pl" class="zoomable" src="https://aviation-api.imgw.pl/image/significant/pl" alt="SIGWX Polska" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
 
           <!-- SIGWX CHMI CZ -->
           <div class="card tile-item" data-id="tile-sigwx-cz" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Czechy — Mapa Synoptyczna (SIGWX CHMI)</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> SIGWX CZ</h3>
             <img id="dash-sigwx-cz" class="zoomable" src="https://aviation-api.imgw.pl/image/significant/cz" alt="SIGWX Czechy" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
 
-          <!-- Estofex - Prognoza Konwekcyjna -->
+          <!-- Estofex -->
           <div class="card tile-item" data-id="tile-estofex" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> ESTOFEX — Prognoza Burzowa (Live)</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> ESTOFEX</h3>
             <img id="dash-estofex" class="zoomable" src="https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest" alt="Estofex" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
           
-          <!-- Blitzortung - Wyładowania Live -->
+          <!-- Wyładowania -->
           <div class="card tile-item" data-id="tile-blitzortung" style="padding: 1rem; cursor: grab; ">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wyładowania Live (Blitzortung)</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wyładowania</h3>
             <iframe src="https://map.blitzortung.org/#4/52.000/19.000" style="width: 100%; height: 400px; border: none; border-radius: var(--radius-sm);"></iframe>
           </div>
         </div>
@@ -199,15 +199,15 @@
       <div id="tab-if-evaluator" class="tab-view" x-data="ifEvaluator">
         <div class="card mb-2">
           <div class="card-header-bar">
-            <div class="card-title">Kalkulator Oceny Zniszczeń ESSL IF-Scale (v1.0e 2025)</div>
+            <div class="card-title">Kalkulator szkód (Skala IF)</div>
           </div>
           <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
-            Wybierz wskaźnik zniszczeń (Damage Indicator) oraz stopień uszkodzenia (DoD), aby wyliczyć natychmiastową trójwymiarową prędkość wiatru w porywie według wytycznych ESSL 2025.
+            Wybierz obiekt (DI) i stopień uszkodzenia (DoD), aby oszacować prędkość wiatru w porywie (ESSL).
           </p>
 
           <div class="grid-3">
             <div class="form-group">
-              <label class="form-label">1. Wskaźnik Zniszczeń (Damage Indicator):</label>
+              <label class="form-label">1. Obiekt (DI):</label>
               <select class="form-select" x-model="diId">
                 <template x-for="di in meteo.damageIndicators" :key="di.id">
                   <option :value="di.id" x-text="di.name"></option>
@@ -215,7 +215,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">2. Klasa Obiektu / Podkategoria:</label>
+              <label class="form-label">2. Podtyp:</label>
               <select class="form-select" x-model="subCode">
                 <template x-if="currentDi">
                   <template x-for="sub in currentDi.subclasses" :key="sub.code">
@@ -225,18 +225,18 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">3. Stopień Uszkodzenia (Degree of Damage):</label>
+              <label class="form-label">3. Stopień szkód (DoD):</label>
               <select class="form-select" x-model.number="dodVal">
-                <option value="1">DoD 1: Uszkodzenia częściowe / zrywanie elementów</option>
-                <option value="2">DoD 2: Poważne uszkodzenie / zawalenie &gt; 50%</option>
-                <option value="3">DoD 3: Całkowita destrukcja / unoszenie w powietrze</option>
+                <option value="1">DoD 1: Częściowe / poszycie</option>
+                <option value="2">DoD 2: Poważne / konstrukcja</option>
+                <option value="3">DoD 3: Całkowite zniszczenie</option>
               </select>
             </div>
           </div>
 
           <div class="result-box mt-1" x-show="resultObj" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start;">
             <div style="flex: 1; min-width: 250px;">
-              <div style="font-size:0.85rem; color:var(--text-muted)">Wyznaczony stopień uszkodzenia ESSL:</div>
+              <div style="font-size:0.85rem; color:var(--text-muted)">Wyznaczony stopień IF:</div>
               <div style="display:flex; align-items:center; gap:0.75rem; margin:0.4rem 0">
                 <span class="if-badge" :style="'background:' + getBadgeColor(resultObj.code) + '; font-size:1.4rem; padding:0.4rem 0.8rem; border-radius: 8px; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.15);'" x-text="resultObj.code"></span>
                 <div>
@@ -245,11 +245,11 @@
                 </div>
               </div>
               <div style="font-size:0.8rem; color:var(--text-muted); border-top:1px solid var(--border-color); padding-top:0.4rem; margin-top:0.4rem">
-                <strong>Interpretacja ESSL:</strong> <span x-text="resultObj.desc"></span>
+                <strong>Opis:</strong> <span x-text="resultObj.desc"></span>
               </div>
             </div>
             <div style="width: 180px; flex-shrink: 0;" class="if-example-photo">
-                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px;">Przykładowe zniszczenia:</div>
+                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px;">Zdjęcie:</div>
                 <img :src="getExampleImage(resultObj.code)" alt="Przykład zniszczeń" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); object-fit: cover; height: 110px; cursor: pointer;" onclick="window.open(this.src, '_blank')">
             </div>
           </div>
@@ -257,16 +257,16 @@
 
         <div class="card">
           <div class="card-header-bar">
-            <div class="card-title">Tabela Klas International Fujita (ESSL 2025)</div>
+            <div class="card-title">Tabela klas IF (ESSL)</div>
           </div>
           <table class="data-table mt-2">
             <thead>
               <tr>
-                <th>Klasa ESSL IF (od 2025)</th>
-                <th>Prędkość (km/h)</th>
-                <th>Prędkość (m/s)</th>
+                <th>Klasa IF</th>
+                <th>km/h</th>
+                <th>m/s</th>
                 <th>Węzły (kt)</th>
-                <th>Charakterystyka Zniszczeń</th>
+                <th>Opis szkód</th>
               </tr>
             </thead>
             <tbody id="if-classes-table-body">
@@ -287,42 +287,42 @@
       <!-- TAB 3: KALKULATORY -->
       <div id="tab-calculators" class="tab-view dynamic-tab" data-src="partials/tab-calculators.html">
   <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
-    <i data-lucide="loader" class="spin"></i> Ładowanie widoku...
+    <i data-lucide="loader" class="spin"></i> Ładowanie...
   </div>
 </div>
 
-      <!-- TAB 4: BAZA WIEDZY (Złączona Aerologia i Sygnatury) -->
+      <!-- TAB 4: WIEDZA -->
       <div id="tab-knowledge" class="tab-view dynamic-tab" data-src="partials/tab-knowledge.html">
   <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
-    <i data-lucide="loader" class="spin"></i> Ładowanie widoku...
+    <i data-lucide="loader" class="spin"></i> Ładowanie...
   </div>
 </div>
 
       <div id="tab-alert-rules" class="tab-view dynamic-tab" data-src="partials/tab-alert-rules.html">
   <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
-    <i data-lucide="loader" class="spin"></i> Ładowanie widoku...
+    <i data-lucide="loader" class="spin"></i> Ładowanie...
   </div>
 </div>
 
-      <!-- TAB 6: MAPY (Złączony Radar, IMGW, Kreator i Ensemble) -->
+      <!-- TAB 6: MAPY -->
       <div id="tab-mapa" class="tab-view dynamic-tab" data-src="partials/tab-mapa.html" style="height: calc(100vh - 70px); padding: 0;">
         <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
-          <i data-lucide="loader" class="spin"></i> Ładowanie Mapy Premium...
+          <i data-lucide="loader" class="spin"></i> Ładowanie mapy...
         </div>
       </div>
 
       <!-- TAB CLOUD IDENTIFIER -->
       <div id="tab-cloud-identifier" class="tab-view dynamic-tab" data-src="partials/tab-cloud-identifier.html">
   <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
-    <i data-lucide="loader" class="spin"></i> Ładowanie kreatora chmur...
+    <i data-lucide="loader" class="spin"></i> Ładowanie...
   </div>
 </div>
 
       <div id="tab-stats" class="tab-view">
         <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
-          <i data-lucide="bar-chart-2"></i> Pamiętnik Burz - Statystyki
+          <i data-lucide="bar-chart-2"></i> Pamiętnik burz
         </h2>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Wczytywanie z pliku Excel. Zaktualizuj statystyki używając skryptu parse_storm_stats.py</p>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Statystyki z arkusza obserwacji burzowych.</p>
         
         <div id="storm-stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;"></div>
         <div id="storm-ratings-container"></div>

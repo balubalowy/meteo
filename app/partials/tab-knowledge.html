@@ -1,5 +1,5 @@
 <div x-data="knowledgeBase" x-init="init()" style="width: 100%;">
-        <h2 class="section-title"><i data-lucide="book-open" style="margin-right: 10px;"></i> Baza Wiedzy (Katalog Zjawisk)</h2>
+        <h2 class="section-title"><i data-lucide="book-open" style="margin-right: 10px;"></i> Baza wiedzy</h2>
         
         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
           
@@ -10,9 +10,9 @@
             <button class="btn" 
                     :class="activeCategory?.id === 'classifier' ? 'btn-primary' : 'btn-ghost'" 
                     style="text-align: left; padding: 10px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-subtle); margin-bottom: 15px; border-color: var(--accent-primary);"
-                    @click="selectCategory({id: 'classifier', name: 'Klasyfikator Chmur (Interaktywny)'})">
+                    @click="selectCategory({id: 'classifier', name: 'Klasyfikator chmur'})">
               <i data-lucide="camera" style="width: 16px; height: 16px;"></i>
-              <span style="font-weight: bold; color: var(--accent-primary);">Klasyfikator Chmur</span>
+              <span style="font-weight: bold; color: var(--accent-primary);">Klasyfikator chmur</span>
             </button>
             
             <template x-for="cat in categories" :key="cat.id">

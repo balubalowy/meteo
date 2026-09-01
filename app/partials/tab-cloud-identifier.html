@@ -1,12 +1,12 @@
 <div x-data="cloudIdentifier()">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
-            <i data-lucide="cloud"></i> Kreator Identyfikacji Chmur (WMO)
+            <i data-lucide="cloud"></i> Identyfikacja chmur (WMO)
         </h2>
     </div>
     
     <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-        Wybieraj po kolei cechy chmury, zaczynając od jej rodzaju (Genus). System automatycznie podpowie Ci dozwolone gatunki (Species), odmiany (Varieties) oraz cechy szczególne (Features) zgodne z systematyką Światowej Organizacji Meteorologicznej (WMO).
+        Wybierz cechy chmury (rodzaj, gatunek, odmiana) według systematyki WMO.
     </p>
 
     <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
@@ -49,7 +49,7 @@
 
         <!-- Cecha dodatkowa -->
         <div class="card" style="padding: 1rem;" :style="!selectedGenus && 'opacity: 0.5; pointer-events: none;'">
-            <label class="label">4. Cechy dodatkowe (Features) <span class="text-xs" style="color: var(--text-secondary);">(Opcjonalnie)</span></label>
+            <label class="label">4. Cechy (Features) <span class="text-xs" style="color: var(--text-secondary);">(Opcjonalnie)</span></label>
             <select class="form-select" x-model="selectedFeature" style="width: 100%; margin-top: 5px;">
                 <option value="">-- Brak --</option>
                 <template x-for="feature in availableFeatures" :key="feature">

@@ -2,14 +2,14 @@
           <!-- Przelicznik Wiatru -->
           <div class="card" x-data="calcWind">
             <div class="card-header-bar">
-              <div class="card-title">1. Przelicznik Prędkości Wiatru</div>
+              <div class="card-title">1. Wiatr (jednostki)</div>
             </div>
             <div class="form-group">
-              <label class="form-label">Wartość wejściowa:</label>
+              <label class="form-label">Wartość:</label>
               <input type="number" class="form-input" x-model.number="val">
             </div>
             <div class="form-group">
-              <label class="form-label">Jednostka wejściowa:</label>
+              <label class="form-label">Jednostka:</label>
               <select class="form-select" x-model="unit">
                 <option value="kmh">km/h</option>
                 <option value="ms">m/s</option>
@@ -17,20 +17,20 @@
               </select>
             </div>
             <div class="result-box mt-1">
-              <div class="stat-label">Wyniki przeliczenia:</div>
+              <div class="stat-label">Wyniki:</div>
               <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-primary); margin-top: 0.2rem;"><span x-text="kmh.toFixed(1)"></span> km/h</div>
               <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-success); margin-top: 0.2rem;"><span x-text="(kmh / 3.6).toFixed(1)"></span> m/s</div>
               <div style="font-size: 1.05rem; font-weight: 700; color: var(--accent-warning); margin-top: 0.2rem;"><span x-text="(kmh / 1.852).toFixed(1)"></span> kt</div>
             </div>
             <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-              Źródło: 1 kt = 1.852 km/h; 1 m/s = 3.6 km/h (allmetsat)
+              1 kt = 1.852 km/h; 1 m/s = 3.6 km/h
             </div>
           </div>
 
           <!-- Kalkulator DCP -->
           <div class="card" x-data="calcDcp">
             <div class="card-header-bar">
-              <div class="card-title">2. Derecho Composite Parameter (DCP)</div>
+              <div class="card-title">2. Indeks DCP</div>
             </div>
             <div class="grid-2">
               <div class="form-group">
@@ -51,11 +51,11 @@
               </div>
             </div>
             <div class="result-box mt-1">
-              <div class="stat-label">Wyznaczony Indeks DCP:</div>
+              <div class="stat-label">Wskaźnik DCP:</div>
               <div style="font-size: 1.4rem; font-weight: 700; color: var(--accent-danger); margin-top: 0.1rem;" x-text="dcp"></div>
             </div>
             <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-              Źródło: DCP &gt; 2.0 → ryzyko Derecho (Evans &amp; Doswell / SPC).
+              DCP &gt; 2.0 → ryzyko Derecho (Evans &amp; Doswell).
             </div>
           </div>
         </div>
@@ -64,25 +64,25 @@
           <!-- Kalkulator Wmax -->
           <div class="card" x-data="calcWmax">
             <div class="card-header-bar">
-              <div class="card-title">3. Prąd Wstępujący (Wmax)</div>
+              <div class="card-title">3. Prąd wstępujący (Wmax)</div>
             </div>
             <div class="form-group">
-              <label class="form-label">Energia CAPE [J/kg]:</label>
+              <label class="form-label">CAPE [J/kg]:</label>
               <input type="number" class="form-input" x-model.number="cape" step="100">
             </div>
             <div class="result-box mt-1">
-              <div class="stat-label">Maksymalna prędkość prądu (Wmax):</div>
+              <div class="stat-label">Prędkość max (Wmax):</div>
               <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-danger); margin-top: 0.1rem;" x-text="`${wmax.toFixed(1)} m/s (${(wmax * 3.6).toFixed(0)} km/h)`"></div>
             </div>
             <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-              Źródło: Wzór Zięby — W<sub>max</sub> = √(2 × CAPE) [m/s]
+              W<sub>max</sub> = √(2 × CAPE) [m/s]
             </div>
           </div>
 
           <!-- Kalkulator LCL -->
           <div class="card" x-data="calcLcl">
             <div class="card-header-bar">
-              <div class="card-title">4. Podstawa Chmur (LCL)</div>
+              <div class="card-title">4. Podstawa chmur (LCL)</div>
             </div>
             <div class="form-group">
               <label class="form-label">Temperatura (T) [°C]:</label>
@@ -93,11 +93,11 @@
               <input type="number" class="form-input" x-model.number="td" step="0.5">
             </div>
             <div class="result-box mt-1">
-              <div class="stat-label">Wysokość podstawy LCL:</div>
+              <div class="stat-label">Wysokość podstawy:</div>
               <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-info); margin-top: 0.1rem;" x-text="`${lcl} m n.p.g.`"></div>
             </div>
             <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-              Źródło: Wzór Espy'ego — h<sub>LCL</sub> ≈ 125 × (T − T<sub>d</sub>) [m]
+              h<sub>LCL</sub> ≈ 125 × (T − T<sub>d</sub>) [m] (wzór Espy'ego)
             </div>
           </div>
         </div>
@@ -106,7 +106,7 @@
           <!-- Kalkulator Wilgotności / Punktu Rosy -->
           <div class="card" x-data="calcMagnus">
             <div class="card-header-bar">
-              <div class="card-title">5. Wilgotność / Punkt Rosy (Magnus)</div>
+              <div class="card-title">5. Punkt rosy / wilgotność</div>
             </div>
             <div class="form-group">
               <label class="form-label">Temperatura (T) [°C]:</label>
@@ -123,18 +123,18 @@
               </div>
             </div>
             <div class="result-box mt-1">
-              <div class="stat-label">Ostatnio wyliczono:</div>
+              <div class="stat-label">Wynik:</div>
               <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-success); margin-top: 0.1rem;" x-text="lastCalc"></div>
             </div>
             <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-              Wpisz RH aby otrzymać T<sub>d</sub>, lub wpisz T<sub>d</sub> aby otrzymać RH. (Wzór Magnusa-Tetensa).
+              Wpisz RH aby obliczyć T<sub>d</sub>, lub T<sub>d</sub> aby obliczyć RH (Magnus-Tetens).
             </div>
           </div>
 
           <!-- Kalkulator Temp. Odczuwalnej (Wind Chill) -->
           <div class="card" x-data="calcWindChill">
             <div class="card-header-bar" style="background: var(--bg-tertiary);">
-              <div class="card-title" style="color: var(--accent-info);">6. Temperatura Odczuwalna (Wind Chill)</div>
+              <div class="card-title" style="color: var(--accent-info);">6. Odczuwalna (Wind Chill)</div>
             </div>
             <div class="grid-2">
               <div class="form-group">
@@ -142,16 +142,16 @@
                 <input type="number" class="form-input" x-model.number="t" step="0.5">
               </div>
               <div class="form-group">
-                <label class="form-label">Prędkość wiatru (V) [km/h]:</label>
+                <label class="form-label">Wiatr (V) [km/h]:</label>
                 <input type="number" class="form-input" x-model.number="v" step="1">
               </div>
             </div>
             <div class="result-box mt-1">
-              <div class="stat-label">Odczuwalna na skórze:</div>
+              <div class="stat-label">Odczuwalna:</div>
               <div style="font-size: 1.3rem; font-weight: 700; color: var(--accent-info); margin-top: 0.1rem;" x-text="`${windChill} °C`"></div>
             </div>
             <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.5rem;">
-              Wzór JAG/TI: T<sub>wc</sub> = 13.12 + 0.6215T - 11.37V<sup>0.16</sup> + 0.3965TV<sup>0.16</sup> (dla T ≤ 10°C i V ≥ 4.8 km/h).
+              Wzór JAG/TI (dla T ≤ 10°C i V ≥ 4.8 km/h).
             </div>
           </div>
         </div>
@@ -159,7 +159,7 @@
         <!-- Kalkulator Kąta Elewacji / Wysokości nad Horyzontem -->
         <div class="card mt-2" x-data="calcElevation">
           <div class="card-header-bar">
-            <div class="card-title">7. Kąt Elewacji i Wysokość Kątowa Obiektu (Kąt Widzenia α)</div>
+            <div class="card-title">7. Kąt nad horyzontem</div>
           </div>
           
           <div class="grid-2">
