@@ -135,6 +135,34 @@
         
         <div id="dashboard-tiles" class="dashboard-grid">
           
+          <!-- SOB Prognoza (Live Obserwatorzy.info) -->
+          <div class="card tile-item" data-id="tile-sob" style="padding: 1rem; cursor: grab;" x-data="sobTile" x-init="fetchSOB()">
+              <h3 style="margin-bottom: 0.4rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Prognoza SOB (Live)</h3>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="sobTitle"></div>
+              <div x-show="loading" class="skeleton-loader" style="height: 220px;"></div>
+              <img x-show="!loading" :src="sobImg" alt="Prognoza SOB" class="zoomable" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary);" x-transition>
+          </div>
+
+          <!-- Polscy Łowcy Burz Prognoza (Live Skywarn Polska) -->
+          <div class="card tile-item" data-id="tile-lowcy" style="padding: 1rem; cursor: grab;" x-data="lowcyTile" x-init="fetchLowcy()">
+              <h3 style="margin-bottom: 0.4rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Polscy Łowcy Burz (Live)</h3>
+              <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="lowcyTitle"></div>
+              <div x-show="loading" class="skeleton-loader" style="height: 220px;"></div>
+              <img x-show="!loading" :src="lowcyImg" alt="Prognoza PŁB" class="zoomable" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary);" x-transition>
+          </div>
+
+          <!-- IMGW Mapa Synoptyczna 00z/12z -->
+          <div class="card tile-item" data-id="tile-imgw-synop" style="padding: 1rem; cursor: grab;" x-data="imgwSynopTile">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                  <h3 style="font-size: 1.1rem; color: var(--text-secondary); margin: 0;"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Mapa Synoptyczna IMGW</h3>
+                  <select class="form-select" x-model="term" style="width: auto; padding: 2px 6px; font-size: 0.75rem;">
+                      <option value="00">00 UTC</option>
+                      <option value="12">12 UTC</option>
+                  </select>
+              </div>
+              <img :src="synopUrl" alt="Mapa Synoptyczna IMGW" class="zoomable" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+          </div>
+
           <!-- DWD Europa - Analiza Frontów -->
           <div class="card tile-item" data-id="tile-dwd" style="padding: 1rem; cursor: grab;">
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Europa — Analiza Frontów (DWD)</h3>

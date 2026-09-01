@@ -3,29 +3,66 @@
 
 document.addEventListener('alpine:init', () => {
 
-    // 1. SOB Tile (Prognoza)
+    // 1. SOB Tile (Prognoza Obserwatorzy.info)
     Alpine.data('sobTile', () => ({
         sobImg: '',
+        sobTitle: 'Ładowanie prognozy...',
         loading: true,
         async fetchSOB() {
             try {
-                const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://obserwatorzy.info/prognoza-burz/'));
-                const htmlText = await res.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlText, 'text/html');
-                const imgs = Array.from(doc.querySelectorAll('img'));
-                const targetImg = imgs.find(img => img.src && (img.src.includes('forecast') || img.src.includes('sob') || img.src.includes('prognoza')));
-                if (targetImg) {
-                    this.sobImg = targetImg.src.replace('https://corsproxy.io/?', ''); 
-                    // Sometimes corsproxy might prepend its URL if relative paths are used incorrectly, just in case
-                } else {
-                    this.sobImg = 'https://obserwatorzy.info/wp-content/uploads/2026/08/forecast-20260807.png';
+                // Bezpośrednie REST API WordPress z CORS
+                const res = await fetch('https://obserwatorzy.info/wp-json/wp/v2/media?search=forecast&per_page=5');
+                const data = await res.json();
+                const target = data.find(item => item.source_url && item.source_url.includes('forecast-'));
+                if (target) {
+                    this.sobImg = target.source_url;
+                    this.sobTitle = (target.title && target.title.rendered) ? target.title.rendered : 'Prognoza Burzowa SOB';
                 }
             } catch(e) {
-                console.error("Błąd obserwatorzy:", e);
-                this.sobImg = 'https://obserwatorzy.info/wp-content/uploads/2026/08/forecast-20260807.png';
+                console.error("Błąd pobierania prognozy SOB:", e);
+            } finally {
+                this.loading = false;
             }
-            this.loading = false;
+        }
+    }));
+
+    // 1b. Polscy Łowcy Burz Tile (Skywarn Polska)
+    Alpine.data('lowcyTile', () => ({
+        lowcyImg: '',
+        lowcyTitle: 'Ładowanie prognozy...',
+        loading: true,
+        async fetchLowcy() {
+            try {
+                // Bezpośrednie REST API WordPress z CORS
+                const res = await fetch('https://lowcyburz.pl/wp-json/wp/v2/posts?search=Prognoza%20konwekcyjna&per_page=3');
+                const data = await res.json();
+                for (const post of data) {
+                    const html = (post.content && post.content.rendered) ? post.content.rendered : '';
+                    const match = html.match(/https:\/\/lowcyburz\.pl\/wp-content\/uploads\/[^\s"'<>]+\.png/);
+                    if (match) {
+                        this.lowcyImg = match[0];
+                        this.lowcyTitle = (post.title && post.title.rendered) ? post.title.rendered : 'Prognoza Konwekcyjna PŁB';
+                        break;
+                    }
+                }
+            } catch(e) {
+                console.error("Błąd pobierania prognozy Łowców Burz:", e);
+            } finally {
+                this.loading = false;
+            }
+        }
+    }));
+
+    // 1c. IMGW Mapa Synoptyczna Tile (00z / 12z)
+    Alpine.data('imgwSynopTile', () => ({
+        term: '00',
+        get synopUrl() {
+            return `https://meteo.imgw.pl/data/archiwum_map_synoptycznych/mapa_current_${this.term}.png?t=` + Math.floor(Date.now() / 600000);
+        },
+        init() {
+            const utcHour = new Date().getUTCHours();
+            // Analiza 12 UTC jest publikowana ok. 14:30 UTC
+            this.term = (utcHour >= 14 || utcHour < 2) ? '12' : '00';
         }
     }));
 
