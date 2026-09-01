@@ -272,16 +272,21 @@ window.initMapa = function() {
             container.innerHTML = `<iframe src="prognoza/dashboard.html?v=3&thresh=${thresh}&days=${days}" style="width: 100%; height: 100%; border: none;"></iframe>`;
         };
 
+        // ----------------------------------------------------
+        // PODKŁADY MAPOWE (CARTO z kluczem API)
+        // ----------------------------------------------------
+        const CARTO_KEY = 'cb1_2p7i_1_352cdbd16b8b51b87892ae14';
+
         // Warstwa bazowa (Tylko lądy/wody, bez napisów)
-        const darkBase = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { 
+        const darkBase = L.tileLayer(`https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`, { 
             maxZoom: 20, pane: 'basePane' 
         });
         
-        const lightBase = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', { 
+        const lightBase = L.tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`, { 
             maxZoom: 20, pane: 'basePane' 
         });
 
-        // Własna warstwa z głównymi miastami (zamiast brzydkich z CartoDB)
+        // Własna warstwa z głównymi miastami
         const majorCities = [
             { name: "Warszawa", lat: 52.2297, lon: 21.0122 },
             { name: "Kraków", lat: 50.0647, lon: 19.9450 },
@@ -304,21 +309,36 @@ window.initMapa = function() {
         ];
 
         const cityLabelsGroup = L.layerGroup();
-        majorCities.forEach(city => {
-            const icon = L.divIcon({
-                className: 'custom-city-label',
-                html: `<div style="font-weight: bold; font-size: 0.85rem; color: white; text-shadow: 0 0 3px black, 0 0 4px black, 0 0 5px black; white-space: nowrap; pointer-events: none;">${city.name}</div>`,
-                iconSize: [80, 20],
-                iconAnchor: [40, 10]
+
+        function updateCityLabels(isLight) {
+            cityLabelsGroup.clearLayers();
+            majorCities.forEach(city => {
+                const textCol = isLight ? '#0f172a' : '#ffffff';
+                const shadowCol = isLight ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.95)';
+                const icon = L.divIcon({
+                    className: 'custom-city-label',
+                    html: `<div style="font-weight: bold; font-size: 0.85rem; color: ${textCol}; text-shadow: 0 0 3px ${shadowCol}, 0 0 4px ${shadowCol}, 0 0 5px ${shadowCol}; white-space: nowrap; pointer-events: none;">${city.name}</div>`,
+                    iconSize: [80, 20],
+                    iconAnchor: [40, 10]
+                });
+                L.marker([city.lat, city.lon], {icon: icon, interactive: false}).addTo(cityLabelsGroup);
             });
-            L.marker([city.lat, city.lon], {icon: icon, interactive: false}).addTo(cityLabelsGroup);
-        });
+        }
+
+        updateCityLabels(false);
 
         const basemaps = {
-            "Ciemny (Dark)": L.layerGroup([darkBase, cityLabelsGroup]),
-            "Jasny (Voyager)": L.layerGroup([lightBase, cityLabelsGroup])
+            "Ciemny (Dark)": darkBase,
+            "Jasny (Voyager)": lightBase
         };
         basemaps["Ciemny (Dark)"].addTo(map);
+        cityLabelsGroup.addTo(map);
+
+        map.on('baselayerchange', function(e) {
+            const isLight = e.name && e.name.toLowerCase().includes('jasny');
+            if (typeof updateBoundariesStyle === 'function') updateBoundariesStyle(isLight);
+            updateCityLabels(isLight);
+        });
 
         // ----------------------------------------------------
         // OFICJALNA SKALA ODBICIOWOŚCI RADAROWEJ IMGW (dBZ)
@@ -556,15 +576,38 @@ window.initMapa = function() {
         map.getPane('boundariesPane').style.pointerEvents = 'none';
 
         const boundariesLayerGroup = L.layerGroup([], { pane: 'boundariesPane' });
+        let countriesGeoLayer = null;
+        let provincesGeoLayer = null;
+        let isCurrentThemeLight = false;
+
+        window.updateBoundariesStyle = function(isLight) {
+            isCurrentThemeLight = isLight;
+            if (countriesGeoLayer) {
+                countriesGeoLayer.setStyle({
+                    color: isLight ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.75)',
+                    weight: 1.5,
+                    dashArray: '4, 4',
+                    fill: false
+                });
+            }
+            if (provincesGeoLayer) {
+                provincesGeoLayer.setStyle({
+                    color: isLight ? 'rgba(51, 65, 85, 0.65)' : 'rgba(255, 255, 255, 0.45)',
+                    weight: 1.1,
+                    dashArray: '2, 3',
+                    fill: false
+                });
+            }
+        };
 
         // Granice państw Europy
         fetch('assets/geo/europe_countries.json')
             .then(res => res.json())
             .then(data => {
-                L.geoJSON(data, {
+                countriesGeoLayer = L.geoJSON(data, {
                     pane: 'boundariesPane',
                     style: {
-                        color: 'rgba(255, 255, 255, 0.75)',
+                        color: isCurrentThemeLight ? 'rgba(15, 23, 42, 0.85)' : 'rgba(255, 255, 255, 0.75)',
                         weight: 1.5,
                         dashArray: '4, 4',
                         fill: false,
@@ -578,10 +621,10 @@ window.initMapa = function() {
         fetch('assets/geo/wojewodztwa.geojson')
             .then(res => res.json())
             .then(data => {
-                L.geoJSON(data, {
+                provincesGeoLayer = L.geoJSON(data, {
                     pane: 'boundariesPane',
                     style: {
-                        color: 'rgba(255, 255, 255, 0.45)',
+                        color: isCurrentThemeLight ? 'rgba(51, 65, 85, 0.65)' : 'rgba(255, 255, 255, 0.45)',
                         weight: 1.1,
                         dashArray: '2, 3',
                         fill: false,
