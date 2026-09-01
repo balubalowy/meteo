@@ -1068,6 +1068,92 @@ window.initMapa = function() {
             [0.66, "#FFD700"], [0.79, "#FF4500"], [0.92, "#FF0000"], [1.0, "#8B0000"]
         ];
 
+                // Baza współrzędnych stacji synoptycznych IMGW-PIB (WGS84)
+        // Źródło: IMGW-PIB Dane Publiczne API Synop (https://danepubliczne.imgw.pl/api/data/synop)
+        const SYNOP_STATIONS_COORDS = {
+            '12001': { lat: 55.40, lon: 18.15, name: 'Platforma' },
+            '12100': { lat: 54.18, lon: 16.18, name: 'Kołobrzeg' },
+            '12105': { lat: 54.20, lon: 16.18, name: 'Koszalin' },
+            '12115': { lat: 54.58, lon: 16.85, name: 'Ustka' },
+            '12120': { lat: 54.75, lon: 17.53, name: 'Łeba' },
+            '12125': { lat: 54.60, lon: 18.80, name: 'Hel' },
+            '12135': { lat: 54.38, lon: 18.47, name: 'Gdańsk-Rębiechowo' },
+            '12145': { lat: 54.17, lon: 19.43, name: 'Elbląg-Milejewo' },
+            '12155': { lat: 53.78, lon: 20.48, name: 'Olsztyn' },
+            '12160': { lat: 53.78, lon: 21.57, name: 'Mikołajki' },
+            '12185': { lat: 54.10, lon: 22.93, name: 'Suwałki' },
+            '12195': { lat: 54.13, lon: 22.95, name: 'Suwałki' },
+            '12200': { lat: 53.92, lon: 14.23, name: 'Świnoujście' },
+            '12205': { lat: 53.40, lon: 14.62, name: 'Szczecin-Dąbie' },
+            '12210': { lat: 53.77, lon: 15.40, name: 'Resko' },
+            '12215': { lat: 53.18, lon: 15.53, name: 'Resko' },
+            '12230': { lat: 53.13, lon: 16.75, name: 'Piła' },
+            '12235': { lat: 53.10, lon: 18.00, name: 'Bydgoszcz-Szwederowo' },
+            '12250': { lat: 53.03, lon: 18.60, name: 'Toruń' },
+            '12270': { lat: 53.12, lon: 20.37, name: 'Mława' },
+            '12272': { lat: 52.63, lon: 20.38, name: 'Płońsk' },
+            '12280': { lat: 53.18, lon: 22.05, name: 'Łomża' },
+            '12285': { lat: 53.13, lon: 22.50, name: 'Białystok' },
+            '12295': { lat: 53.10, lon: 23.17, name: 'Białystok-Krywlany' },
+            '12300': { lat: 52.73, lon: 15.23, name: 'Gorzów Wielkopolski' },
+            '12310': { lat: 52.35, lon: 14.60, name: 'Słubice' },
+            '12330': { lat: 52.42, lon: 16.83, name: 'Poznań-Ławica' },
+            '12345': { lat: 52.20, lon: 18.67, name: 'Koło' },
+            '12358': { lat: 52.55, lon: 19.68, name: 'Płock' },
+            '12360': { lat: 52.55, lon: 19.68, name: 'Płock' },
+            '12375': { lat: 52.17, lon: 20.97, name: 'Warszawa-Okęcie' },
+            '12385': { lat: 52.17, lon: 22.25, name: 'Siedlce' },
+            '12399': { lat: 52.03, lon: 23.13, name: 'Biała Podlaska' },
+            '12400': { lat: 51.93, lon: 15.53, name: 'Zielona Góra' },
+            '12415': { lat: 51.20, lon: 16.17, name: 'Legnica' },
+            '12418': { lat: 51.83, lon: 16.53, name: 'Leszno' },
+            '12424': { lat: 51.10, lon: 16.88, name: 'Wrocław-Strachowice' },
+            '12425': { lat: 51.13, lon: 17.03, name: 'Wrocław' },
+            '12435': { lat: 51.78, lon: 18.08, name: 'Kalisz' },
+            '12455': { lat: 51.22, lon: 18.57, name: 'Wieluń' },
+            '12465': { lat: 51.73, lon: 19.40, name: 'Łódź-Lublinek' },
+            '12469': { lat: 51.97, lon: 20.15, name: 'Skierniewice' },
+            '12472': { lat: 51.55, lon: 21.57, name: 'Kozienice' },
+            '12485': { lat: 51.42, lon: 21.20, name: 'Radom-Sadków' },
+            '12488': { lat: 51.55, lon: 21.87, name: 'Dęblin' },
+            '12495': { lat: 51.22, lon: 22.40, name: 'Lublin-Radawiec' },
+            '12497': { lat: 51.55, lon: 23.53, name: 'Włodawa' },
+            '12500': { lat: 50.90, lon: 15.80, name: 'Jelenia Góra' },
+            '12510': { lat: 50.73, lon: 15.73, name: 'Śnieżka' },
+            '12520': { lat: 50.43, lon: 16.65, name: 'Kłodzko' },
+            '12530': { lat: 50.67, lon: 17.95, name: 'Opole' },
+            '12540': { lat: 50.08, lon: 18.20, name: 'Racibórz' },
+            '12550': { lat: 50.82, lon: 19.10, name: 'Częstochowa' },
+            '12560': { lat: 50.23, lon: 19.03, name: 'Katowice-Muchowiec' },
+            '12566': { lat: 50.08, lon: 19.80, name: 'Kraków-Balice' },
+            '12570': { lat: 50.80, lon: 20.70, name: 'Kielce-Suków' },
+            '12575': { lat: 50.03, lon: 20.98, name: 'Tarnów' },
+            '12580': { lat: 50.12, lon: 22.05, name: 'Rzeszów-Jasionka' },
+            '12585': { lat: 50.70, lon: 23.25, name: 'Zamość' },
+            '12595': { lat: 49.80, lon: 22.77, name: 'Przemyśl' },
+            '12600': { lat: 49.80, lon: 19.00, name: 'Bielsko-Biała' },
+            '12605': { lat: 49.68, lon: 19.20, name: 'Żywiec' },
+            '12625': { lat: 49.30, lon: 19.97, name: 'Zakopane' },
+            '12650': { lat: 49.23, lon: 19.98, name: 'Kasprowy Wierch' },
+            '12660': { lat: 49.62, lon: 20.70, name: 'Nowy Sącz' },
+            '12670': { lat: 49.68, lon: 21.77, name: 'Krosno' },
+            '12680': { lat: 49.47, lon: 22.33, name: 'Lesko' },
+            '12690': { lat: 49.43, lon: 22.58, name: 'Ustrzyki Dolne' },
+            '12695': { lat: 49.15, lon: 22.65, name: 'Ustrzyki Górne' }
+        };
+
+        const DEFAULT_PRESSURE_COLORSCALE = [
+            [0.0,  "#3b0764"], // 980 hPa - bardzo głęboki niż (ciemny fiolet)
+            [0.17, "#991b1b"], // 990 hPa - głęboki niż (czerwień)
+            [0.33, "#ea580c"], // 1000 hPa - niż (pomarańcz)
+            [0.47, "#eab308"], // 1008 hPa - umiarkowany niż (żółć)
+            [0.55, "#22c55e"], // 1013 hPa - normalne ciśnienie (zieleń)
+            [0.67, "#06b6d4"], // 1020 hPa - umiarkowany wyż (cyan)
+            [0.80, "#2563eb"], // 1028 hPa - wyż (błękit)
+            [0.92, "#1e1b4b"], // 1035 hPa - silny wyż (granat)
+            [1.0,  "#4338ca"]  // 1040 hPa - bardzo silny wyż (indygo)
+        ];
+
         const DEFAULT_LCL_COLORSCALE = [
             [0.0, "#312e81"], [0.15, "#2563eb"], [0.30, "#06b6d4"], [0.45, "#10b981"],
             [0.60, "#eab308"], [0.75, "#f97316"], [0.90, "#ef4444"], [1.0, "#831843"]
@@ -1089,7 +1175,8 @@ window.initMapa = function() {
             "wilg":     { "nazwa": "Wilgotność", "cscale": DEFAULT_HUMIDITY_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "%", "step": 10.0 },
             "rosy":     { "nazwa": "Punkt Rosy", "cscale": DEFAULT_DEWPOINT_COLORSCALE, "cmin": -10, "cmax": 28, "unit": "°C", "step": 2.0 },
             "lcl":      { "nazwa": "Podstawa Chmur (LCL)", "cscale": DEFAULT_LCL_COLORSCALE, "cmin": 0, "cmax": 3000, "unit": "m", "step": 250.0 },
-            "synop":    { "nazwa": "Model Synoptyczny", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 }
+            "synop":    { "nazwa": "Model Synoptyczny", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
+            "cisnienie": { "nazwa": "Ciśnienie", "cscale": DEFAULT_PRESSURE_COLORSCALE, "cmin": 980, "cmax": 1040, "unit": "hPa", "step": 2.0 }
         };
         
         function hexToRgb(hex) {
@@ -1159,8 +1246,8 @@ window.initMapa = function() {
             return Math.log(Math.tan(Math.PI / 4.0 + rad / 2.0));
         }
 
-        function generateIDWImage(lats, lons, vals, scale, cmin, cmax, drawIso) {
-            const w = 320, h = 240;
+        function generateIDWImage(lats, lons, vals, scale, cmin, cmax, drawIso, stepVal = null, unit = '') {
+            const w = 360, h = 270;
             const offCanvas = document.createElement('canvas');
             offCanvas.width = w; 
             offCanvas.height = h;
@@ -1205,8 +1292,9 @@ window.initMapa = function() {
                 }
             }
             
+            const isoLabels = [];
             if (drawIso) {
-                const step = (cmax - cmin) / 15;
+                const step = (stepVal && !isNaN(stepVal) && stepVal > 0) ? stepVal : ((cmax - cmin) / 15);
                 for (let y = 0; y < h - 1; y++) {
                     for (let x = 0; x < w - 1; x++) {
                         const idx = y * w + x;
@@ -1214,18 +1302,41 @@ window.initMapa = function() {
                         const v2 = valGrid[idx + 1];
                         const v3 = valGrid[idx + w];
                         
-                        if (Math.floor(v1 / step) !== Math.floor(v2 / step) || Math.floor(v1 / step) !== Math.floor(v3 / step)) {
+                        const q1 = Math.floor(v1 / step);
+                        const q2 = Math.floor(v2 / step);
+                        const q3 = Math.floor(v3 / step);
+
+                        if (q1 !== q2 || q1 !== q3) {
                             const pIdx = idx * 4;
-                            imgData.data[pIdx] = 0;
-                            imgData.data[pIdx+1] = 0;
-                            imgData.data[pIdx+2] = 0;
-                            imgData.data[pIdx+3] = 120;
+                            imgData.data[pIdx] = 15;
+                            imgData.data[pIdx+1] = 23;
+                            imgData.data[pIdx+2] = 42;
+                            imgData.data[pIdx+3] = 220; // Elegancka, wyraźna linia izobary/izolinii
+                            
+                            // Próbkowanie etykiet (co ok. 60 px)
+                            if (x > 20 && x < w - 20 && y > 20 && y < h - 20 && x % 55 === 0 && y % 45 === 0) {
+                                const roundedVal = (Math.round(v1 / step) * step).toFixed(step < 1 ? 1 : 0);
+                                isoLabels.push({ x, y, text: roundedVal });
+                            }
                         }
                     }
                 }
             }
             
             offCtx.putImageData(imgData, 0, 0);
+
+            // Nanoszenie etykiet liczbowych na linie izobar/izolinii
+            if (drawIso && isoLabels.length > 0) {
+                offCtx.font = 'bold 9px monospace';
+                offCtx.textAlign = 'center';
+                offCtx.textBaseline = 'middle';
+                for (let lbl of isoLabels) {
+                    offCtx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                    offCtx.fillRect(lbl.x - 14, lbl.y - 6, 28, 12);
+                    offCtx.fillStyle = '#ffffff';
+                    offCtx.fillText(lbl.text, lbl.x, lbl.y);
+                }
+            }
 
             // Główny canvas z precyzyjnym przycięciem (clip) ściśle do konturów Polski w projekcji Mercator
             const mainCanvas = document.createElement('canvas');
@@ -1242,7 +1353,7 @@ window.initMapa = function() {
                 else mainCtx.lineTo(px, py);
             }
             mainCtx.closePath();
-            mainCtx.clip(); // Maskowanie: poza Polską piksele pozostają w 100% przezroczyste
+            mainCtx.clip();
 
             mainCtx.drawImage(offCanvas, 0, 0);
             return mainCanvas.toDataURL();
@@ -1280,11 +1391,18 @@ window.initMapa = function() {
             document.getElementById('imgw-loading').innerHTML = '<i data-lucide="loader" class="spin"></i> Pobieranie danych z IMGW (Live)...';
             
             try {
-                const res = await fetch('https://danepubliczne.imgw.pl/api/data/meteo/');
-                const rawData = await res.json();
+                // Pobieranie danych automatycznych (meteo) oraz synoptycznych (synop) równolegle
+                // IMGW API Docs: https://danepubliczne.imgw.pl/api/data/meteo/ | https://danepubliczne.imgw.pl/api/data/synop
+                const [resMeteo, resSynop] = await Promise.all([
+                    fetch('https://danepubliczne.imgw.pl/api/data/meteo/'),
+                    fetch('https://danepubliczne.imgw.pl/api/data/synop')
+                ]);
+                const rawData = await resMeteo.json();
+                const synopData = await resSynop.json();
                 
                 const dataObj = {
                     'temp': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
+                    'cisnienie': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
                     'wiatr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
                     'wiatr_sr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
                     'rosy': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
@@ -1293,6 +1411,36 @@ window.initMapa = function() {
                     'grunt': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
                     'synop': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] }
                 };
+
+                // Przetwarzanie stacji SYNOP dla ciśnienia atmosferycznego (zredukowane do poziomu morza w hPa)
+                for (let st of synopData) {
+                    const sid = st.id_stacji;
+                    const pVal = parseFloat(st.cisnienie);
+                    if (isNaN(pVal) || !pVal) continue;
+                    
+                    const coord = SYNOP_STATIONS_COORDS[sid];
+                    if (!coord) continue;
+                    
+                    const sName = coord.name || st.stacja;
+                    const sDate = st.data_pomiaru;
+                    const sHour = st.godzina_pomiaru;
+                    const sTemp = st.temperatura;
+                    const sWind = st.predkosc_wiatru;
+                    const sRh = st.wilgotnosc_wzgledna;
+                    const timeLabel = sHour ? ` (${sHour}:00 UTC)` : '';
+                    
+                    dataObj['cisnienie'].pt_lats.push(coord.lat);
+                    dataObj['cisnienie'].pt_lons.push(coord.lon);
+                    dataObj['cisnienie'].pt_vals.push(pVal);
+                    dataObj['cisnienie'].pt_dirs.push(null);
+                    dataObj['cisnienie'].pt_txts.push(pVal.toFixed(1));
+                    dataObj['cisnienie'].pt_hov.push(
+                        `<b>${sName}</b> (Stacja SYNOP)<br>` +
+                        `Ciśnienie (QNH): <b>${pVal.toFixed(1)} hPa</b>${timeLabel}<br>` +
+                        `Temperatura: ${sTemp || '-'}°C, Wilgotność: ${sRh || '-'}%<br>` +
+                        `Wiatr: ${sWind || '-'} m/s (${st.kierunek_wiatru || '-'}°)`
+                    );
+                }
 
                 for(let st of rawData) {
                     const lat = parseFloat(st.lat);
@@ -1542,7 +1690,9 @@ window.initMapa = function() {
             }
             
             if(data.pt_lats && data.pt_lats.length > 5 && showInter) {
-                const dataUrl = generateIDWImage(data.pt_lats, data.pt_lons, data.pt_vals, scale, cmin, cmax, showIso);
+                const isoStepInput = document.getElementById('iso-step') ? document.getElementById('iso-step').value : 'auto';
+                const stepVal = (isoStepInput !== 'auto') ? parseFloat(isoStepInput) : (zInfo.step || 2.0);
+                const dataUrl = generateIDWImage(data.pt_lats, data.pt_lons, data.pt_vals, scale, cmin, cmax, showIso, stepVal, zInfo.unit);
                 const bounds = [[48.5, 13.5], [55.5, 24.5]];
                 idwOverlay = L.imageOverlay(dataUrl, bounds, { opacity: opacityBg, pane: 'weatherPane' }).addTo(map);
             }

@@ -41,6 +41,7 @@
                     <label style="font-size: 0.75rem; color: var(--text-secondary);">Parametr:</label>
                     <select id="imgw-zmienna" class="form-select" onchange="renderIMGW()" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
                         <option value="temp">Temperatura (°C)</option>
+                        <option value="cisnienie">Ciśnienie (hPa - SYNOP)</option>
                         <option value="wiatr">Wiatr Porywy (km/h)</option>
                         <option value="rosy">Punkt Rosy (°C)</option>
                         <option value="lcl">Podstawa Chmur (LCL) [m]</option>
@@ -67,7 +68,17 @@
                         <label><input type="checkbox" id="chk-pt" onchange="renderIMGW()" checked> Punkty</label>
                         <label><input type="checkbox" id="chk-txt" onchange="renderIMGW()" checked> Wartości</label>
                     </div>
-                    <div style="margin-top: 8px; border-top: 1px solid var(--border-subtle); padding-top: 6px;">
+                    <div style="margin-top: 8px; border-top: 1px solid var(--border-subtle); padding-top: 6px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                        <label style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; white-space: nowrap;">Krok izolinii:</label>
+                        <select id="iso-step" class="form-select" onchange="window.renderIMGW()" style="font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); color: var(--text-primary); width: auto;">
+                            <option value="auto">Auto</option>
+                            <option value="1">1 jedn.</option>
+                            <option value="2">2 jedn.</option>
+                            <option value="5">5 jedn.</option>
+                            <option value="10">10 jedn.</option>
+                        </select>
+                    </div>
+                    <div style="margin-top: 6px; border-top: 1px solid var(--border-subtle); padding-top: 6px;">
                         <label style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-bottom: 4px;">Kolor Punktów:</label>
                         <select id="pt-color-mode" class="form-select" onchange="window.renderIMGW()" style="font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; background-color: var(--bg-tertiary); border: 1px solid var(--border-subtle); color: var(--text-primary); width: 100%;">
                             <option value="scale">Zależny od Skali</option>
