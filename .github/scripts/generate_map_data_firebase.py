@@ -51,11 +51,9 @@ ZMIENNE = {
     "synop": {"nazwa": "Model Synoptyczny", "cscale": "TEMP_COLORSCALE", "cmin": -40, "cmax": 50, "unit": "", "step": 2.0},
 }
 
-OKRESY = ["now", "max3", "min3", "max6", "min6", "max12", "min12", "max24", "min24"]
+OKRESY = ["now", "max5", "min5"]
 OKRESY_NAZWY = {
-    "now": "Aktualne", "max3": "Max 3h", "min3": "Min 3h", 
-    "max6": "Max 6h", "min6": "Min 6h", "max12": "Max 12h", 
-    "min12": "Min 12h", "max24": "Max 24h", "min24": "Min 24h"
+    "now": "Aktualne", "max5": "Maksimum (ost. 5h)", "min5": "Minimum (ost. 5h)"
 }
 
 def kier_na_strzalke(kier):
@@ -248,10 +246,7 @@ def generate_dashboard():
         except:
             continue
             
-        is_3h = diff_h <= 3.1
-        is_6h = diff_h <= 6.1
-        is_12h = diff_h <= 12.1
-        is_24h = diff_h <= 24.1
+        is_5h = diff_h <= 5.1
         is_now = diff_h <= 0.1 # w granicach tego samego snapshota
 
         for st in snap["stacje"]:
@@ -310,10 +305,7 @@ def generate_dashboard():
                         ms[okr_max] = val
                         master_stations[kod]["czas"][okr_max] = c_time
 
-                if is_3h: update_minmax("min3", "max3", v, cz)
-                if is_6h: update_minmax("min6", "max6", v, cz)
-                if is_12h: update_minmax("min12", "max12", v, cz)
-                if is_24h: update_minmax("min24", "max24", v, cz)
+                if is_5h: update_minmax("min5", "max5", v, cz)
 
     # Przygotowanie Polski i siatki (grid rozszerzony zeby zakryc cala Polske)
     print("  Pobieranie konturów Polski...")

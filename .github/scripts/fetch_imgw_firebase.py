@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 IMGW_URL = "https://danepubliczne.imgw.pl/api/data/meteo"
 FIREBASE_URL = "https://meteo-bbe28-default-rtdb.europe-west1.firebasedatabase.app"
-MAX_HISTORY_HOURS = 24
+MAX_HISTORY_HOURS = 5
 
 def oblicz_punkt_rosy(temp_c, wilgotnosc_pct):
     if temp_c is None or wilgotnosc_pct is None or wilgotnosc_pct <= 0:
