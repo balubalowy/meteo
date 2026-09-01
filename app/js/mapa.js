@@ -467,6 +467,56 @@ window.initMapa = function() {
             showFrame(currentFrame);
         };
 
+        // ----------------------------------------------------
+        // SATELITA (Dzienny HRV HD + Nocny IR Podczerwień)
+        // ----------------------------------------------------
+        map.createPane('satelliteNightPane');
+        map.getPane('satelliteNightPane').style.zIndex = 250;
+
+        // Dzienny: European High-Resolution Visible (RGB Eview)
+        const satelliteDayLayer = L.tileLayer.wms('https://view.eumetsat.int/geoserver/ows', {
+            layers: 'msg_fes:rgb_eview',
+            format: 'image/png',
+            transparent: true,
+            opacity: 0.65,
+            pane: 'satellitePane',
+            maxNativeZoom: 7,
+            maxZoom: 18,
+            attribution: '© EUMETSAT HRV'
+        });
+
+        // Nocny / IR: Meteosat Third Generation FCI High-Rate IR 10.5 µm
+        const satelliteNightLayer = L.tileLayer.wms('https://view.eumetsat.int/geoserver/ows', {
+            layers: 'mtg_fd:ir105_hrfi',
+            format: 'image/png',
+            transparent: true,
+            opacity: 0.60,
+            pane: 'satelliteNightPane',
+            maxNativeZoom: 7,
+            maxZoom: 18,
+            attribution: '© EUMETSAT MTG-IR'
+        });
+
+        // Synchronizacja czasu satelity (kwantyzacja do najbliższego skanu 15-minutowego)
+        let lastSatSyncTime = null;
+        function syncSatelliteTime(timeUnixSec) {
+            if (!timeUnixSec) return;
+            const isSatDay = window.MAP_LAYERS && window.MAP_LAYERS['sat_day'] && window.MAP_LAYERS['sat_day'].visible;
+            const isSatNight = window.MAP_LAYERS && window.MAP_LAYERS['sat_night'] && window.MAP_LAYERS['sat_night'].visible;
+            if (!isSatDay && !isSatNight) return;
+
+            const d = new Date(timeUnixSec * 1000);
+            const min15 = Math.floor(d.getUTCMinutes() / 15) * 15;
+            d.setUTCMinutes(min15, 0, 0);
+            const timeStr = d.toISOString().replace('.000Z', 'Z');
+
+            if (lastSatSyncTime === timeStr) return;
+            lastSatSyncTime = timeStr;
+
+            if (isSatDay && satelliteDayLayer) satelliteDayLayer.setParams({ time: timeStr });
+            if (isSatNight && satelliteNightLayer) satelliteNightLayer.setParams({ time: timeStr });
+        }
+
         function showFrame(index) {
             currentFrame = parseInt(index);
             const timeEl = document.getElementById('rv-time');
@@ -490,25 +540,28 @@ window.initMapa = function() {
                     if (!map.hasLayer(imgwRadarOverlay)) imgwRadarOverlay.addTo(map);
                 }
                 if (timeEl) timeEl.textContent = frame.label;
+                syncSatelliteTime(frame.time);
             } else {
                 if (!radarFrames[currentFrame]) return;
+                const frame = radarFrames[currentFrame];
                 
                 if (!radarTileLayer) {
-                    radarTileLayer = L.tileLayer(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`, {
+                    radarTileLayer = L.tileLayer(`${radarHost}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`, {
                         opacity: currentRadarOpacity, 
                         pane: 'radarPane',
                         maxZoom: 18,
                         maxNativeZoom: 8
                     });
                 } else {
-                    radarTileLayer.setUrl(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`);
+                    radarTileLayer.setUrl(`${radarHost}${frame.path}/256/{z}/{x}/{y}/2/1_1.png`);
                     radarTileLayer.setOpacity(currentRadarOpacity);
                 }
 
                 if (window.MAP_LAYERS && window.MAP_LAYERS['radar'].visible) {
                     if (!map.hasLayer(radarTileLayer)) radarTileLayer.addTo(map);
                 }
-                if (timeEl) timeEl.textContent = new Date(radarFrames[currentFrame].time * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+                if (timeEl) timeEl.textContent = new Date(frame.time * 1000).toLocaleTimeString('pl-PL', {hour: '2-digit', minute:'2-digit'});
+                syncSatelliteTime(frame.time);
             }
         }
 
@@ -540,36 +593,6 @@ window.initMapa = function() {
                 if (typeof lucide !== 'undefined') lucide.createIcons();
             });
         }
-
-        // ----------------------------------------------------
-        // SATELITA (Dzienny HRV HD + Nocny IR Podczerwień)
-        // ----------------------------------------------------
-        map.createPane('satelliteNightPane');
-        map.getPane('satelliteNightPane').style.zIndex = 250;
-
-        // Dzienny: European High-Resolution Visible (RGB Eview) - krystalicznie ostry obraz chmur w dzień
-        const satelliteDayLayer = L.tileLayer.wms('https://view.eumetsat.int/geoserver/ows', {
-            layers: 'msg_fes:rgb_eview',
-            format: 'image/png',
-            transparent: true,
-            opacity: 0.65,
-            pane: 'satellitePane',
-            maxNativeZoom: 7,
-            maxZoom: 18,
-            attribution: '© EUMETSAT HRV'
-        });
-
-        // Nocny / IR: Meteosat Third Generation FCI High-Rate IR 10.5 µm - wysoka rozdzielczość w nocy i dzień
-        const satelliteNightLayer = L.tileLayer.wms('https://view.eumetsat.int/geoserver/ows', {
-            layers: 'mtg_fd:ir105_hrfi',
-            format: 'image/png',
-            transparent: true,
-            opacity: 0.60,
-            pane: 'satelliteNightPane',
-            maxNativeZoom: 7,
-            maxZoom: 18,
-            attribution: '© EUMETSAT MTG-IR'
-        });
 
         // ----------------------------------------------------
         // GRANICE PAŃSTW I WOJEWÓDZTW (Subtelny obrys wektorowy nad chmurami/radarem)
@@ -851,11 +874,21 @@ window.initMapa = function() {
             saveLayerState();
             
             if (key === 'sat_day') {
-                if (isChecked) { if (!map.hasLayer(satelliteDayLayer)) map.addLayer(satelliteDayLayer); }
-                else { if (map.hasLayer(satelliteDayLayer)) map.removeLayer(satelliteDayLayer); }
+                if (isChecked) {
+                    if (!map.hasLayer(satelliteDayLayer)) map.addLayer(satelliteDayLayer);
+                    const activeTime = activeRadarSource === 'imgw' ? (imgwFrames[currentFrame]?.time) : (radarFrames[currentFrame]?.time);
+                    if (activeTime) syncSatelliteTime(activeTime);
+                } else {
+                    if (map.hasLayer(satelliteDayLayer)) map.removeLayer(satelliteDayLayer);
+                }
             } else if (key === 'sat_night') {
-                if (isChecked) { if (!map.hasLayer(satelliteNightLayer)) map.addLayer(satelliteNightLayer); }
-                else { if (map.hasLayer(satelliteNightLayer)) map.removeLayer(satelliteNightLayer); }
+                if (isChecked) {
+                    if (!map.hasLayer(satelliteNightLayer)) map.addLayer(satelliteNightLayer);
+                    const activeTime = activeRadarSource === 'imgw' ? (imgwFrames[currentFrame]?.time) : (radarFrames[currentFrame]?.time);
+                    if (activeTime) syncSatelliteTime(activeTime);
+                } else {
+                    if (map.hasLayer(satelliteNightLayer)) map.removeLayer(satelliteNightLayer);
+                }
             } else if (key === 'boundaries') {
                 if (isChecked) { if (!map.hasLayer(boundariesLayerGroup)) map.addLayer(boundariesLayerGroup); }
                 else { if (map.hasLayer(boundariesLayerGroup)) map.removeLayer(boundariesLayerGroup); }
