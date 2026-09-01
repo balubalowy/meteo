@@ -96,30 +96,24 @@ document.addEventListener('alpine:init', () => {
                 'BSB': {1: 'IF1',   2: 'IF1.5', 3: 'IF2.5'},
                 'BSC': {1: 'IF1.5', 2: 'IF2',   3: 'IF3'},
                 'BSD': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF4'},
-                'BSE': {1: 'IF2',   2: 'IF3',   3: 'IF5'}, // Zawalenie solidnych domów
-                'BSF': {1: 'IF2.5', 2: 'IF4',   3: 'IF5'}, // Zawalenie budynków żelbetowych
-                
+                'BSE': {1: 'IF2',   2: 'IF3',   3: 'IF5'},
+                'BSF': {1: 'IF2.5', 2: 'IF4',   3: 'IF5'},
                 'BRA': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
                 'BRD': {1: 'IF1',   2: 'IF2',   3: 'IF2.5'},
                 'BRE': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF3'},
-                
                 'TRW': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
                 'TRA': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
                 'TRS': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
-                
                 'TSW': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
                 'TSA': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
                 'TSS': {1: 'IF2',   2: 'IF2.5', 3: 'IF3'},
-                
                 'VHT': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
                 'VHE': {1: 'IF1',   2: 'IF2',   3: 'IF2.5'},
                 'VHC': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF3'},
                 'VHL': {1: 'IF2',   2: 'IF3',   3: 'IF4'},
-                
                 'PTW': {1: 'IF0.5', 2: 'IF1',   3: 'IF1.5'},
                 'PTS': {1: 'IF1.5', 2: 'IF2.5', 3: 'IF3'},
                 'PTT': {1: 'IF2',   2: 'IF3',   3: 'IF4'},
-                
                 'SCA': {1: 'IF1',   2: 'IF1.5', 3: 'IF2'},
                 'SCD': {1: 'IF1.5', 2: 'IF2',   3: 'IF2.5'},
                 'SCF': {1: 'IF2',   2: 'IF3',   3: 'IF4'},
@@ -140,7 +134,7 @@ document.addEventListener('alpine:init', () => {
                 'IF1': 'linear-gradient(135deg, #FCD34D, #F59E0B)',
                 'IF1.5': 'linear-gradient(135deg, #F59E0B, #D97706)', 
                 'IF2': 'linear-gradient(135deg, #F87171, #EF4444)', 
-                'IF2.5': 'linear-gradient(135deg, #EF4444, #DC2626)',
+                'IF2.5': 'linear-gradient(135deg, #EF4444, #DC2626)', 
                 'IF3': 'linear-gradient(135deg, #DC2626, #991B1B)', 
                 'IF4': 'linear-gradient(135deg, #8B5CF6, #6D28D9)', 
                 'IF5': 'linear-gradient(135deg, #4C1D95, #312E81)'
@@ -221,6 +215,68 @@ document.addEventListener('alpine:init', () => {
             const vPow = Math.pow(this.v, 0.16);
             const twc = 13.12 + 0.6215 * this.t - 11.37 * vPow + 0.3965 * this.t * vPow;
             return twc.toFixed(1);
+        }
+    }));
+
+    // Kalkulator Kąta Elewacji / Wysokości nad Horyzontem
+    Alpine.data('calcElevation', () => ({
+        dist: 30,
+        distUnit: 'km',
+        height: 1525,
+        heightUnit: 'ft',
+        obsHeight: 1.8,
+        
+        get distMeters() {
+            if (this.distUnit === 'km') return (this.dist || 0) * 1000;
+            if (this.distUnit === 'mi') return (this.dist || 0) * 1609.344;
+            return this.dist || 0;
+        },
+        get heightMeters() {
+            if (this.heightUnit === 'ft') return (this.height || 0) * 0.3048;
+            if (this.heightUnit === 'km') return (this.height || 0) * 1000;
+            return this.height || 0;
+        },
+        get deltaH() {
+            return Math.max(0, this.heightMeters - (this.obsHeight || 0));
+        },
+        get alphaDeg() {
+            if (this.distMeters <= 0) return 90;
+            const rad = Math.atan2(this.deltaH, this.distMeters);
+            return (rad * 180 / Math.PI);
+        },
+        get alphaFormatted() {
+            return this.alphaDeg.toFixed(2);
+        },
+        get alphaArcMin() {
+            return (this.alphaDeg * 60).toFixed(1);
+        },
+        get slantRange() {
+            const d = Math.sqrt(this.distMeters * this.distMeters + this.deltaH * this.deltaH);
+            return d >= 1000 ? (d / 1000).toFixed(2) + ' km' : d.toFixed(0) + ' m';
+        },
+        get earthCurvDrop() {
+            const R = 6371000;
+            return (Math.pow(this.distMeters, 2) / (2 * R)).toFixed(1);
+        },
+        get alphaWithCurv() {
+            const effH = this.deltaH - (Math.pow(this.distMeters, 2) / (2 * 6371000));
+            const rad = Math.atan2(effH, this.distMeters);
+            return (rad * 180 / Math.PI).toFixed(2);
+        },
+        get svgPoints() {
+            const angleForVis = Math.min(38, Math.max(8, this.alphaDeg * 4));
+            const rad = angleForVis * Math.PI / 180;
+            const baseW = 240;
+            const targetX = 290;
+            const targetY = 145 - Math.tan(rad) * baseW;
+            return {
+                obsX: 50,
+                obsY: 145,
+                targetX: targetX,
+                targetY: Math.max(25, targetY),
+                baseX: targetX,
+                baseY: 145
+            };
         }
     }));
 
