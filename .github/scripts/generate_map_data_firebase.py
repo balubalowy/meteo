@@ -373,12 +373,12 @@ def generate_dashboard():
                         hovs_ok.append(f"<b>{nazwa}</b><br>{z_info['nazwa']}: {fmt} {z_info['unit']}<br>Czas: {czas}")
                 else: lats_nan.append(lat); lons_nan.append(lon); hovs_nan.append(f"<b>{nazwa}</b><br>Brak danych")
 
-            glats, glons, gvals, wlats, wlons, wtxts, grid_masked, grid_lon, grid_lat = create_grid(lats_ok, lons_ok, vals_ok, u_vals, v_vals)
-            c_lats, c_lons, c_txts = extract_contours(grid_masked, grid_lon, grid_lat, z_info["step"])
-
             js_data[z_key][okres] = {
-                "pt_lats": lats_ok, "pt_lons": lons_ok, "pt_vals": vals_ok, "pt_hov": hovs_ok, "pt_txts": txts_ok,
-                "gr_lats": glats, "gr_lons": glons, "gr_vals": gvals, "w_lats": wlats, "w_lons": wlons, "w_txts": wtxts
+                "pt_lats": [round(x, 4) for x in lats_ok],
+                "pt_lons": [round(x, 4) for x in lons_ok],
+                "pt_vals": [round(x, 1) if x is not None else None for x in vals_ok],
+                "pt_hov": hovs_ok,
+                "pt_txts": txts_ok
             }
 
     js_colors = {"TEMP_COLORSCALE": TEMP_COLORSCALE, "WIND_COLORSCALE": WIND_COLORSCALE, "HUMIDITY_COLORSCALE": HUMIDITY_COLORSCALE, "DEWPOINT_COLORSCALE": DEWPOINT_COLORSCALE}

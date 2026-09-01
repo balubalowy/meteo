@@ -1202,8 +1202,12 @@ window.initMapa = function() {
                         loadingEl.innerHTML = '<i data-lucide="loader" class="spin"></i> Wczytywanie danych historycznych (Firebase)...';
                     }
                     try {
-                        const res = await fetch('https://meteo-bbe28-default-rtdb.europe-west1.firebasedatabase.app/imgw_map_data.json');
-                        imgwData = await res.json();
+                        let token = window.getFirebaseToken ? await window.getFirebaseToken() : null;
+                        let authParam = token ? `?auth=${token}` : '';
+                        const res = await fetch(`https://meteo-bbe28-default-rtdb.europe-west1.firebasedatabase.app/imgw_map_data.json${authParam}`);
+                        const text = await res.text();
+                        if (window.trackFirebaseDownload) window.trackFirebaseDownload(text.length);
+                        imgwData = JSON.parse(text);
                     } catch (e) {
                         console.error("Błąd pobierania historii Firebase:", e);
                     } finally {

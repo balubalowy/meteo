@@ -70,6 +70,16 @@ if (isConfigured) {
                 
                 if (authorized) {
                     // Użytkownik poprawny i na białej liście
+                    window.firebaseUser = user;
+                    window.getFirebaseToken = async () => {
+                        try {
+                            return await user.getIdToken();
+                        } catch (err) {
+                            console.error("Błąd pobierania tokena Firebase:", err);
+                            return null;
+                        }
+                    };
+
                     if (lockscreen) lockscreen.style.display = 'none';
                     if (appRoot) appRoot.style.display = 'block';
                     
@@ -80,6 +90,8 @@ if (isConfigured) {
                         headerUserEmail.title = user.email;
                     }
                     
+                    if (window.updateBandwidthUI) window.updateBandwidthUI();
+
                     // Rozgłoś zdarzenie autoryzacji dla modułów (np. mapy i stacji)
                     window.dispatchEvent(new CustomEvent('bmeteo-authenticated', { detail: { user } }));
                     
@@ -88,6 +100,8 @@ if (isConfigured) {
                     }, 200);
                 } else {
                     // Zalogowano kontem spoza białej listy
+                    window.firebaseUser = null;
+                    window.getFirebaseToken = null;
                     if (appRoot) appRoot.style.display = 'none';
                     if (lockscreen) lockscreen.style.display = 'flex';
                     
@@ -114,6 +128,8 @@ if (isConfigured) {
                 }
             } else {
                 // Niezalogowany
+                window.firebaseUser = null;
+                window.getFirebaseToken = null;
                 if (appRoot) appRoot.style.display = 'none';
                 if (lockscreen) lockscreen.style.display = 'flex';
                 if (headerAuthSection) headerAuthSection.style.display = 'block';
@@ -121,6 +137,46 @@ if (isConfigured) {
             }
         });
     });
+
+    // ----------------------------------------------------
+    // ŚLEDZENIE ZUŻYCIA LIMITU POBIERANIA (BANDWIDTH TRACKER)
+    // ----------------------------------------------------
+    window.trackFirebaseDownload = function(bytes) {
+        if (!bytes || isNaN(bytes)) return;
+        const today = new Date().toISOString().slice(0, 10);
+        const month = new Date().toISOString().slice(0, 7);
+        
+        let totalBytes = parseInt(localStorage.getItem('bmeteo_fb_bytes_' + month) || '0', 10);
+        totalBytes += bytes;
+        localStorage.setItem('bmeteo_fb_bytes_' + month, totalBytes);
+        
+        let dayBytes = parseInt(localStorage.getItem('bmeteo_fb_bytes_' + today) || '0', 10);
+        dayBytes += bytes;
+        localStorage.setItem('bmeteo_fb_bytes_' + today, dayBytes);
+        
+        if (window.updateBandwidthUI) window.updateBandwidthUI();
+    };
+
+    window.updateBandwidthUI = function() {
+        const month = new Date().toISOString().slice(0, 7);
+        const today = new Date().toISOString().slice(0, 10);
+        const totalBytes = parseInt(localStorage.getItem('bmeteo_fb_bytes_' + month) || '0', 10);
+        const dayBytes = parseInt(localStorage.getItem('bmeteo_fb_bytes_' + today) || '0', 10);
+        
+        const mbToday = (dayBytes / (1024 * 1024)).toFixed(2);
+        const mbMonth = (totalBytes / (1024 * 1024)).toFixed(2);
+        const pctMonth = ((totalBytes / (10 * 1024 * 1024 * 1024)) * 100).toFixed(2);
+        
+        const el = document.getElementById('firebase-bandwidth-display');
+        if (el) {
+            el.innerHTML = `
+                <a href="https://console.firebase.google.com/project/meteo-bbe28/database/meteo-bbe28-default-rtdb/usage" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 4px;" title="Kliknij, aby otworzyć statystyki Firebase">
+                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
+                    <span>Transfer FB: <b>${mbToday} MB</b> dziś (${mbMonth} MB / 10 GB msc — ${pctMonth}%)</span>
+                </a>
+            `;
+        }
+    };
 } else {
     document.addEventListener('DOMContentLoaded', () => {
         const lockError = document.getElementById('lockscreen-error');
