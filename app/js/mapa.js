@@ -774,18 +774,18 @@ window.initMapa = function() {
         // MENEDŻER WARSTW (Domyślna kolejność, widoczność i krycie wg preferencji)
         // ----------------------------------------------------
         window.MAP_LAYERS = {
-            'drawings':   { id: 'drawings',   name: 'Kreator Ostrzeżeń',     visible: true,  opacity: 100, pane: 'drawingsPane' },
+            'drawings':   { id: 'drawings',   name: 'Kreator Ostrzeżeń',     visible: false, opacity: 100, pane: 'drawingsPane' },
             'stations':   { id: 'stations',   name: 'Stacje i Pomiary IMGW', visible: true,  opacity: 100, pane: 'stationsPane' },
-            'boundaries': { id: 'boundaries', name: 'Granice',               visible: true,  opacity: 85,  pane: 'boundariesPane' },
-            'lightning':  { id: 'lightning',  name: 'Wyładowania (Live)',    visible: true,  opacity: 95,  pane: 'lightningPane' },
-            'radar':      { id: 'radar',      name: 'Radar Opadów',          visible: true,  opacity: 87,  pane: 'radarPane' },
-            'sat_day':    { id: 'sat_day',    name: 'Satelita Dzienny (HRV)', visible: true,  opacity: 65,  pane: 'satellitePane' },
-            'sat_night':  { id: 'sat_night',  name: 'Satelita Nocny (IR)',   visible: false, opacity: 60,  pane: 'satelliteNightPane' },
-            'inter':      { id: 'inter',      name: 'Interpolacja IMGW',     visible: true,  opacity: 100, pane: 'weatherPane' }
+            'boundaries': { id: 'boundaries', name: 'Granice',               visible: true,  opacity: 100, pane: 'boundariesPane' },
+            'lightning':  { id: 'lightning',  name: 'Wyładowania (Live)',    visible: false, opacity: 95,  pane: 'lightningPane' },
+            'radar':      { id: 'radar',      name: 'Radar Opadów',          visible: false, opacity: 87,  pane: 'radarPane' },
+            'sat_day':    { id: 'sat_day',    name: 'Satelita Dzienny (HRV)', visible: false, opacity: 100, pane: 'satellitePane' },
+            'inter':      { id: 'inter',      name: 'Interpolacja IMGW',     visible: true,  opacity: 70,  pane: 'weatherPane' },
+            'sat_night':  { id: 'sat_night',  name: 'Satelita Nocny (IR)',   visible: false, opacity: 60,  pane: 'satelliteNightPane' }
         };
 
         // Domyślna kolejność od góry (wierzch) do dołu
-        window.layerOrder = ['drawings', 'stations', 'boundaries', 'lightning', 'radar', 'sat_day', 'sat_night', 'inter'];
+        window.layerOrder = ['drawings', 'stations', 'boundaries', 'lightning', 'radar', 'sat_day', 'inter', 'sat_night'];
 
         // Wczytaj zapisany stan z localStorage jeśli istnieje
         try {
