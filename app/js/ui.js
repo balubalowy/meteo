@@ -39,14 +39,6 @@ async function ensureMapDependencies() {
     ]);
     // 3. Moduły aplikacyjne mapy
     await Promise.all([
-        loadScript('js/map/config.js'),
-        loadScript('js/map/isobars.js'),
-        loadScript('js/map/drawing.js'),
-        loadScript('js/map/layers.js'),
-        loadScript('js/map/radar.js'),
-        loadScript('js/map/synop.js')
-    ]);
-    await Promise.all([
         loadScript('js/kreator.js'),
         loadScript('js/cmm-map.js'),
         loadScript('js/burze.js')
