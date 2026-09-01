@@ -1194,7 +1194,22 @@ window.initMapa = function() {
                     data = liveDataObj[zmienna];
                 }
             } else {
-                // Historia Firebase
+                // Historia Firebase (Lazy-load na żądanie - oszczędza 11.75 MB przy każdym załadowaniu strony)
+                if (!imgwData) {
+                    const loadingEl = document.getElementById('imgw-loading');
+                    if (loadingEl) {
+                        loadingEl.style.display = 'flex';
+                        loadingEl.innerHTML = '<i data-lucide="loader" class="spin"></i> Wczytywanie danych historycznych (Firebase)...';
+                    }
+                    try {
+                        const res = await fetch('https://meteo-bbe28-default-rtdb.europe-west1.firebasedatabase.app/imgw_map_data.json');
+                        imgwData = await res.json();
+                    } catch (e) {
+                        console.error("Błąd pobierania historii Firebase:", e);
+                    } finally {
+                        if (loadingEl) loadingEl.style.display = 'none';
+                    }
+                }
                 if(!imgwData || !imgwData.MAP_DATA) return;
                 const ds = imgwData.MAP_DATA[zmienna];
                 if(ds && ds[okres]) data = ds[okres];
@@ -1336,24 +1351,7 @@ window.initMapa = function() {
             }
         }
 
-        // Trigger fetches (handled by HTML onchange)
-        
-        // Fetch history data in the background just in case they select max/min
-        fetch('https://meteo-bbe28-default-rtdb.europe-west1.firebasedatabase.app/imgw_map_data.json')
-            .then(res => res.json())
-            .then(data => {
-                imgwData = data;
-                // Don't hide loading yet if 'now' is selected, getIMGWLiveData will handle it
-                if(document.getElementById('imgw-okres').value !== 'now') {
-                    document.getElementById('imgw-loading').style.display = 'none';
-                    window.renderIMGW();
-                } else {
-                    window.renderIMGW();
-                }
-            })
-            .catch(err => console.error("Błąd IMGW Firebase:", err));
-
-        // Initial render for 'now'
+        // Initial render dla aktualnych danych ('now' korzysta z lekkiego API 25 KB)
         window.renderIMGW();
 
         L.control.layers(
