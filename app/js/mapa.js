@@ -1015,27 +1015,91 @@ window.initMapa = function() {
         let imgwData = null;
         let idwOverlay = null;
         const imgwLayerGroup = L.layerGroup().addTo(map);
+
+        // ----------------------------------------------------
+        // OFICJALNE SKALE KOLORYSTYCZNE IMGW
+        // ----------------------------------------------------
+        const DEFAULT_TEMP_COLORSCALE = [
+            [0.0, "#f4c2f4"], [0.055, "#e020e0"], [0.111, "#8a2be2"], [0.166, "#4b0082"],
+            [0.222, "#000080"], [0.277, "#0000ff"], [0.333, "#1e90ff"], [0.388, "#00bfff"],
+            [0.444, "#00ffff"], [0.5, "#00fa9a"], [0.555, "#32cd32"], [0.611, "#adff2f"],
+            [0.666, "#ffd700"], [0.722, "#ffa500"], [0.777, "#ff4500"], [0.833, "#ff0000"],
+            [0.888, "#8b0000"], [0.944, "#5c4033"], [1.0, "#808080"]
+        ];
+
+        function _calcWndNorm(kmh, mx=259) { return +(kmh/mx).toFixed(4); }
+        const DEFAULT_WIND_COLORSCALE = [
+            [0.0, "#FFFFFF"], [_calcWndNorm(9), "#C8FFFF"], [_calcWndNorm(19), "#00FFFF"], [_calcWndNorm(28), "#0088FF"],
+            [_calcWndNorm(37), "#0000CD"], [_calcWndNorm(46), "#00C800"], [_calcWndNorm(56), "#80FF00"],
+            [_calcWndNorm(65), "#FFFF00"], [_calcWndNorm(74), "#FFD700"], [_calcWndNorm(83), "#FFA500"],
+            [_calcWndNorm(93), "#FF4500"], [_calcWndNorm(102), "#FF0000"], [_calcWndNorm(111), "#CC0000"],
+            [_calcWndNorm(120), "#800000"], [_calcWndNorm(130), "#800080"], [_calcWndNorm(139), "#4B0082"],
+            [_calcWndNorm(148), "#FF00FF"], [_calcWndNorm(157), "#FF69B4"], [_calcWndNorm(167), "#808080"],
+            [_calcWndNorm(176), "#606060"], [_calcWndNorm(185), "#404040"], [_calcWndNorm(194), "#303030"],
+            [_calcWndNorm(204), "#202020"], [1.0, "#000000"]
+        ];
+
+        const DEFAULT_HUMIDITY_COLORSCALE = [
+            [0.0, "#FFD700"], [0.25, "#FF8C00"], [0.5, "#32CD32"], [0.75, "#1E90FF"], [1.0, "#00008B"]
+        ];
+
+        const DEFAULT_DEWPOINT_COLORSCALE = [
+            [0.0, "#0000FF"], [0.26, "#00BFFF"], [0.39, "#00FF7F"], [0.53, "#ADFF2F"],
+            [0.66, "#FFD700"], [0.79, "#FF4500"], [0.92, "#FF0000"], [1.0, "#8B0000"]
+        ];
+
+        const DEFAULT_LCL_COLORSCALE = [
+            [0.0, "#312e81"], [0.15, "#2563eb"], [0.30, "#06b6d4"], [0.45, "#10b981"],
+            [0.60, "#eab308"], [0.75, "#f97316"], [0.90, "#ef4444"], [1.0, "#831843"]
+        ];
+
+        const DEFAULT_COLORS = {
+            "TEMP_COLORSCALE": DEFAULT_TEMP_COLORSCALE,
+            "WIND_COLORSCALE": DEFAULT_WIND_COLORSCALE,
+            "HUMIDITY_COLORSCALE": DEFAULT_HUMIDITY_COLORSCALE,
+            "DEWPOINT_COLORSCALE": DEFAULT_DEWPOINT_COLORSCALE,
+            "LCL_COLORSCALE": DEFAULT_LCL_COLORSCALE
+        };
+
+        const DEFAULT_ZMIENNE = {
+            "temp":     { "nazwa": "Temperatura", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
+            "grunt":    { "nazwa": "Temp. Gruntu", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
+            "wiatr":    { "nazwa": "Poryw Wiatru", "cscale": DEFAULT_WIND_COLORSCALE, "cmin": 0, "cmax": 259, "unit": "km/h", "step": 10.0 },
+            "wiatr_sr": { "nazwa": "Śr. Wiatr", "cscale": DEFAULT_WIND_COLORSCALE, "cmin": 0, "cmax": 259, "unit": "km/h", "step": 10.0 },
+            "wilg":     { "nazwa": "Wilgotność", "cscale": DEFAULT_HUMIDITY_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "%", "step": 10.0 },
+            "rosy":     { "nazwa": "Punkt Rosy", "cscale": DEFAULT_DEWPOINT_COLORSCALE, "cmin": -10, "cmax": 28, "unit": "°C", "step": 2.0 },
+            "lcl":      { "nazwa": "Podstawa Chmur (LCL)", "cscale": DEFAULT_LCL_COLORSCALE, "cmin": 0, "cmax": 3000, "unit": "m", "step": 250.0 },
+            "synop":    { "nazwa": "Model Synoptyczny", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 }
+        };
         
         function hexToRgb(hex) {
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : [0,0,0];
         }
 
-        function getColorRGBA(val, scale, cmin, cmax) {
+        function getColorRGBA(val, scale, cmin, cmax, alpha = 160) {
             if(val === null || isNaN(val)) return [0,0,0,0];
             let norm = (val - cmin) / (cmax - cmin);
             if (norm < 0) norm = 0;
             if (norm > 1) norm = 1;
             
-            let colorHex = scale[scale.length-1][1];
+            // Płynna interpolacja liniowa pomiędzy progami skali
             for(let i = 0; i < scale.length - 1; i++) {
-                if(norm >= scale[i][0] && norm <= scale[i+1][0]) {
-                    colorHex = scale[i][1];
-                    break;
+                const stop1 = scale[i];
+                const stop2 = scale[i+1];
+                if(norm >= stop1[0] && norm <= stop2[0]) {
+                    const span = stop2[0] - stop1[0];
+                    const t = span > 0 ? (norm - stop1[0]) / span : 0;
+                    const rgb1 = hexToRgb(stop1[1]);
+                    const rgb2 = hexToRgb(stop2[1]);
+                    const r = Math.round(rgb1[0] + t * (rgb2[0] - rgb1[0]));
+                    const g = Math.round(rgb1[1] + t * (rgb2[1] - rgb1[1]));
+                    const b = Math.round(rgb1[2] + t * (rgb2[2] - rgb1[2]));
+                    return [r, g, b, alpha];
                 }
             }
-            const rgb = hexToRgb(colorHex);
-            return [rgb[0], rgb[1], rgb[2], 160];
+            const rgb = hexToRgb(scale[scale.length-1][1]);
+            return [rgb[0], rgb[1], rgb[2], alpha];
         }
 
         // Precyzyjny obrys granic Polski (189 punktów z poland_hires.geojson)
@@ -1349,38 +1413,25 @@ window.initMapa = function() {
                 idwOverlay = null;
             }
             
-            // ZInfo setup
-            const zInfo = imgwData && imgwData.ZMIENNE ? imgwData.ZMIENNE[zmienna] : null;
+            // ZInfo setup - pełna zgodność z oficjalnymi skalami IMGW
+            const defaultZi = DEFAULT_ZMIENNE[zmienna] || DEFAULT_ZMIENNE['temp'];
+            const zInfo = (imgwData && imgwData.ZMIENNE && imgwData.ZMIENNE[zmienna]) ? imgwData.ZMIENNE[zmienna] : defaultZi;
             
-            let scale;
-            if (zInfo && zInfo.cscale && imgwData.COLORS[zInfo.cscale]) {
-                scale = imgwData.COLORS[zInfo.cscale];
-            } else {
-                // Hardcoded scales based on variable if ZMIENNE not loaded yet
-                if (zmienna.includes('temp') || zmienna === 'rosy' || zmienna === 'grunt' || zmienna === 'synop') {
-                    scale = [[0,"#0000ff"],[0.25,"#00ffff"],[0.5,"#00ff00"],[0.75,"#ffff00"],[1,"#ff0000"]];
-                } else if (zmienna === 'lcl') {
-                    scale = [
-                        [0, "#312e81"],    // < 300m - ciemny fiolet / indygo
-                        [0.15, "#2563eb"], // ~450m - niebieski
-                        [0.30, "#06b6d4"], // ~900m - błękit / cyan
-                        [0.45, "#10b981"], // ~1350m - zielony
-                        [0.60, "#eab308"], // ~1800m - żółty
-                        [0.75, "#f97316"], // ~2250m - pomarańczowy
-                        [0.90, "#ef4444"], // ~2700m - czerwony
-                        [1.00, "#831843"]  // 3000m+ - bordowy
-                    ];
-                } else if (zmienna.includes('wiatr')) {
-                    scale = [[0,"#ffffff"],[0.2,"#a1dab4"],[0.4,"#41b6c4"],[0.6,"#2c7fb8"],[1,"#253494"]];
-                } else if (zmienna === 'wilg') {
-                    scale = [[0,"#ffffcc"],[0.5,"#41b6c4"],[1,"#0c2c84"]];
-                } else {
-                    scale = [[0, '#000000'], [1, '#ffffff']];
+            let scale = defaultZi.cscale;
+            if (zInfo && zInfo.cscale) {
+                if (Array.isArray(zInfo.cscale)) {
+                    scale = zInfo.cscale;
+                } else if (typeof zInfo.cscale === 'string') {
+                    if (imgwData && imgwData.COLORS && imgwData.COLORS[zInfo.cscale]) {
+                        scale = imgwData.COLORS[zInfo.cscale];
+                    } else if (DEFAULT_COLORS[zInfo.cscale]) {
+                        scale = DEFAULT_COLORS[zInfo.cscale];
+                    }
                 }
             }
             
-            const cmin = zInfo && zInfo.cmin !== undefined ? zInfo.cmin : (zmienna === 'wilg' ? 0 : (zmienna === 'lcl' ? 0 : -20));
-            const cmax = zInfo && zInfo.cmax !== undefined ? zInfo.cmax : (zmienna === 'wilg' ? 100 : (zmienna === 'lcl' ? 3000 : 40));
+            const cmin = (zInfo && zInfo.cmin !== undefined) ? zInfo.cmin : defaultZi.cmin;
+            const cmax = (zInfo && zInfo.cmax !== undefined) ? zInfo.cmax : defaultZi.cmax;
             
             const showStations = window.MAP_LAYERS && window.MAP_LAYERS['stations'] ? window.MAP_LAYERS['stations'].visible : true;
             const showInter = window.MAP_LAYERS && window.MAP_LAYERS['inter'] ? window.MAP_LAYERS['inter'].visible : true;
