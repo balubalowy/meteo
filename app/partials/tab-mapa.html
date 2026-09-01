@@ -189,19 +189,15 @@
     <!-- GŁÓWNA MAPA -->
     <div id="premium-map" style="flex: 1; height: 100%; background: #111; position: relative;">
         
-        <!-- Przycisk Pełnego Ekranu -->
-        <div style="position: absolute; top: 12px; right: 12px; z-index: 1001; display: flex; gap: 8px;">
-            <button id="map-fs-btn" class="map-fullscreen-btn" onclick="window.toggleMapFullscreen()" title="Tryb pełnoekranowy (F11 / Esc)">
-                <i data-lucide="maximize" style="width: 15px; height: 15px;"></i>
-                <span id="map-fs-text">Pełny Ekran</span>
-            </button>
-        </div>
-
-        <!-- Przycisk Chowania Panelu Bocznego -->
-        <div style="position: absolute; top: 12px; left: 55px; z-index: 1001;">
+        <!-- Pasek Narzędziowy Mapy (Top-Left obok kontrolek zoomu) -->
+        <div style="position: absolute; top: 12px; left: 55px; z-index: 1001; display: flex; gap: 8px; align-items: center;">
             <button id="map-toggle-sidebar" class="btn btn-ghost" style="background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); border: 1px solid var(--border-subtle); color: var(--text-primary); padding: 7px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);" onclick="window.toggleMapSidebar()" title="Pokaż / Ukryj panel boczny">
                 <i data-lucide="panel-left-close" id="sidebar-toggle-icon" style="width: 15px; height: 15px;"></i>
                 <span id="sidebar-toggle-text">Panel</span>
+            </button>
+            <button id="map-fs-btn" class="map-fullscreen-btn" onclick="window.toggleMapFullscreen()" title="Tryb pełnoekranowy (F11 / Esc)">
+                <i data-lucide="maximize" style="width: 15px; height: 15px;"></i>
+                <span id="map-fs-text">Pełny Ekran</span>
             </button>
         </div>
 
