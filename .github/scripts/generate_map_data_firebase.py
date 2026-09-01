@@ -66,121 +66,7 @@ def kier_na_strzalke(kier):
     idx = round(val / 45.0) % 8
     return dirs[idx]
 
-# ================================================================
-# FUNKCJE POMOCNICZE MAPY
-# ================================================================
-_CACHED_POLAND_POLY = None
-_PREPARED_POLAND_POLY = None
-
-def pobierz_polske():
-    global _CACHED_POLAND_POLY, _PREPARED_POLAND_POLY
-    if _CACHED_POLAND_POLY is not None:
-        return _CACHED_POLAND_POLY
-    try:
-        url = 'https://raw.githubusercontent.com/ppatrzyk/polska-geojson/master/wojewodztwa/wojewodztwa-min.geojson'
-        geo_data = requests.get(url, timeout=10).json()
-        polygons = [shape(f['geometry']).buffer(0) for f in geo_data['features']]
-        _CACHED_POLAND_POLY = unary_union(polygons)
-    except:
-        url = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries/POL.geo.json'
-        geo_data = requests.get(url, timeout=10).json()
-        _CACHED_POLAND_POLY = shape(geo_data['features'][0]['geometry']).buffer(0)
-    from shapely.prepared import prep
-    _PREPARED_POLAND_POLY = prep(_CACHED_POLAND_POLY)
-    return _CACHED_POLAND_POLY
-
-def extract_contours(grid_z, grid_lon, grid_lat, interval):
-    if len(grid_z) == 0: return [], [], []
-    min_val = np.nanmin(grid_z)
-    max_val = np.nanmax(grid_z)
-    if np.isnan(min_val): return [], [], []
-    
-    levels = np.arange(np.floor(min_val/interval)*interval, np.ceil(max_val/interval)*interval + interval, interval)
-    fig_c = plt.figure()
-    ax = fig_c.add_subplot(111)
-    cs = ax.contour(grid_lon, grid_lat, grid_z, levels=levels)
-    
-    lons, lats, txts = [], [], []
-    for level, path in zip(levels, cs.get_paths()):
-        codes = path.codes if path.codes is not None else np.zeros(len(path.vertices))
-        for i, (coord, code) in enumerate(zip(path.vertices, codes)):
-            if code == 1 and i > 0: # MOVETO = break line
-                lons.append(None); lats.append(None); txts.append(None)
-            lons.append(coord[0])
-            lats.append(coord[1])
-            txts.append(f"{level}")
-        lons.append(None); lats.append(None); txts.append(None)
-    plt.close(fig_c)
-    return lats, lons, txts
-
-# ================================================================
-# GŁÓWNA FUNKCJA
-# ================================================================
-def create_grid(lats, lons, vals, u_vals=None, v_vals=None):
-    """Tworzy interpolowaną siatkę dla heatmapy oraz wektorów (ściśle ograniczoną do Polski)."""
-    if len(vals) < 3:
-        return [], [], [], [], [], [], [], [], []
-    
-    # 1. Tworzenie regularnej siatki 0.10° dla optymalnego rozmiaru JSON i płynnego renderowania
-    grid_lon, grid_lat = np.mgrid[13.5:24.5:0.10, 48.5:55.5:0.10]
-    
-    points = np.array([lons, lats]).T
-    
-    # Próba interpolacji linear, z fallbackiem do nearest (łatanie dziur na granicach)
-    grid_z_linear = griddata(points, vals, (grid_lon, grid_lat), method='linear')
-    grid_z_nearest = griddata(points, vals, (grid_lon, grid_lat), method='nearest')
-    grid_z = np.where(np.isnan(grid_z_linear), grid_z_nearest, grid_z_linear)
-    
-    # Interpolacja U i V
-    grid_u, grid_v = None, None
-    if u_vals and v_vals and len(u_vals) == len(vals):
-        grid_u_lin = griddata(points, u_vals, (grid_lon, grid_lat), method='linear')
-        grid_u_near = griddata(points, u_vals, (grid_lon, grid_lat), method='nearest')
-        grid_u = np.where(np.isnan(grid_u_lin), grid_u_near, grid_u_lin)
-        
-        grid_v_lin = griddata(points, v_vals, (grid_lon, grid_lat), method='linear')
-        grid_v_near = griddata(points, v_vals, (grid_lon, grid_lat), method='nearest')
-        grid_v = np.where(np.isnan(grid_v_lin), grid_v_near, grid_v_lin)
-    
-    pobierz_polske()
-    prep_poly = _PREPARED_POLAND_POLY
-    
-    glats, glons, gvals = [], [], []
-    gu, gv = [], []
-    
-    grid_masked = np.full(grid_lon.shape, np.nan)
-    
-    # Maskowanie - ściśle do granic Polski
-    for i in range(grid_lon.shape[0]):
-        for j in range(grid_lon.shape[1]):
-            lon, lat = grid_lon[i, j], grid_lat[i, j]
-            val = grid_z[i, j]
-            if not np.isnan(val) and (prep_poly is None or prep_poly.contains(Point(lon, lat))):
-                glats.append(round(lat, 2))
-                glons.append(round(lon, 2))
-                gvals.append(round(val, 1))
-                grid_masked[i, j] = val
-                if grid_u is not None and grid_v is not None:
-                    gu.append(grid_u[i, j])
-                    gv.append(grid_v[i, j])
-    
-    # Generowanie siatki wektorów strzałek wiatru
-    w_lats, w_lons, w_txts = [], [], []
-    if len(gu) > 0 and len(gv) > 0:
-        for i in range(0, len(glats), 25): # Co 25 punkt
-            u = gu[i]
-            v = gv[i]
-            spd = math.sqrt(u*u + v*v)
-            if spd > 2.0:
-                angle = math.degrees(math.atan2(u, v))
-                if angle < 0: angle += 360
-                idx = int(round(angle / 45.0)) % 8
-                arrows = ['⬆', '↗', '➡', '↘', '⬇', '↙', '⬅', '↖']
-                w_txts.append(arrows[idx])
-                w_lats.append(glats[i])
-                w_lons.append(glons[i])
-
-    return glats, glons, gvals, w_lats, w_lons, w_txts, grid_masked, grid_lon, grid_lat
+# =========================================== w_lats, w_lons, w_txts, grid_masked, grid_lon, grid_lat
 
 
 
@@ -307,9 +193,6 @@ def generate_dashboard():
 
                 if is_5h: update_minmax("min5", "max5", v, cz)
 
-    # Przygotowanie Polski i siatki (grid rozszerzony zeby zakryc cala Polske)
-    print("  Pobieranie konturów Polski...")
-    poland_polygon = pobierz_polske()
     js_data = {}
     total_iters = len(ZMIENNE) * len(OKRESY)
     curr_iter = 0
