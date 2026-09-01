@@ -55,7 +55,7 @@
         </div>
         <div style="width: 180px; flex-shrink: 0;" class="if-example-photo">
             <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 5px;">Zdjęcie:</div>
-            <img :src="getExampleImage(resultObj.code)" alt="Przykład zniszczeń" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); object-fit: cover; height: 110px; cursor: pointer;" onclick="window.open(this.src, '_blank')">
+            <img :src="getExampleImage(resultObj.code)" alt="Przykład zniszczeń" loading="lazy" decoding="async" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); object-fit: cover; height: 110px; cursor: pointer;" onclick="window.open(this.src, '_blank')">
         </div>
       </div>
     </div>
