@@ -370,8 +370,88 @@ window.initMapa = function() {
         };
 
         // ----------------------------------------------------
-        // RAINVIEWER RADAR (Optymalizacja: maxNativeZoom 8 zapobiega znikaniu przy zoomie)
+        // RAINVIEWER RADAR (Natywna skala odbiciowości IMGW CMAX w Canvas)
         // ----------------------------------------------------
+        const ImgwRadarTileLayer = L.TileLayer.extend({
+            createTile: function(coords, done) {
+                const tile = document.createElement('canvas');
+                tile.width = 256;
+                tile.height = 256;
+                const ctx = tile.getContext('2d');
+                
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0);
+                    try {
+                        const imgData = ctx.getImageData(0, 0, 256, 256);
+                        const d = imgData.data;
+                        for (let i = 0; i < d.length; i += 4) {
+                            const a = d[i + 3];
+                            if (a < 15) {
+                                d[i + 3] = 0;
+                                continue;
+                            }
+                            const r = d[i], g = d[i + 1], b = d[i + 2];
+                            
+                            // 1. Mżawka / niska odbiciowość (4-12 dBZ) -> IMGW Ciemnoniebieski kontur
+                            if (r > 70 && g > 70 && b > 60 && a < 210) {
+                                const norm = a / 210.0;
+                                d[i] = Math.round(4 + norm * 27);
+                                d[i + 1] = Math.round(5 + norm * 67);
+                                d[i + 2] = Math.round(147 + norm * 69);
+                                d[i + 3] = Math.round(140 + norm * 115);
+                            }
+                            // 2. Błękit / Cyan (deszcz 14-30 dBZ)
+                            else if (b > r && g > r) {
+                                const cyan = (g + b) / 2;
+                                if (cyan > 180) {
+                                    // 14-20 dBZ -> Jasny błękit IMGW
+                                    d[i] = 86; d[i + 1] = 181; d[i + 2] = 247; d[i + 3] = 255;
+                                } else if (cyan > 130) {
+                                    // 23-28 dBZ -> Błękitno-biały IMGW
+                                    d[i] = 174; d[i + 1] = 233; d[i + 2] = 251; d[i + 3] = 255;
+                                } else {
+                                    // 10-14 dBZ -> Granat / błękit IMGW
+                                    d[i] = 31; d[i + 1] = 72; d[i + 2] = 216; d[i + 3] = 255;
+                                }
+                            }
+                            // 3. Żółty / Pomarańczowy (ulewa 30-45 dBZ)
+                            else if (r > 190 && g > 90 && b < 70) {
+                                if (g > 180) {
+                                    // 30-34 dBZ -> Żółty IMGW
+                                    d[i] = 254; d[i + 1] = 241; d[i + 2] = 136; d[i + 3] = 255;
+                                } else {
+                                    // 34-40 dBZ -> Pomarańczowy IMGW
+                                    d[i] = 239; d[i + 1] = 151; d[i + 2] = 54; d[i + 3] = 255;
+                                }
+                            }
+                            // 4. Czerwony / Fiolet / Róż (nawałnica / grad 45-65+ dBZ)
+                            else if (r > 90 && g < 75 && b < 75) {
+                                if (r > 210) {
+                                    // 40-47 dBZ -> Czerwony IMGW
+                                    d[i] = 184; d[i + 1] = 37; d[i + 2] = 29; d[i + 3] = 255;
+                                } else if (r > 160) {
+                                    // 50-56 dBZ -> Fiolet / Magenta IMGW
+                                    d[i] = 219; d[i + 1] = 72; d[i + 2] = 189; d[i + 3] = 255;
+                                } else {
+                                    // 57-65+ dBZ -> Grad (Róż / Ciemny Fiolet IMGW)
+                                    d[i] = 180; d[i + 1] = 100; d[i + 2] = 180; d[i + 3] = 255;
+                                }
+                            }
+                        }
+                        ctx.putImageData(imgData, 0, 0);
+                    } catch(e) {}
+                    done(null, tile);
+                };
+                img.onerror = function() {
+                    done(null, tile);
+                };
+                img.src = this.getTileUrl(coords);
+                return tile;
+            }
+        });
+
         let radarTileLayer = null, radarHost = '', radarFrames = [], currentFrame = 0, animationTimer = null;
         
         fetch('https://api.rainviewer.com/public/weather-maps.json')
@@ -388,8 +468,8 @@ window.initMapa = function() {
                 }
                 currentFrame = radarFrames.length - 1;
 
-                radarTileLayer = L.tileLayer(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`, {
-                    opacity: 0.7, 
+                radarTileLayer = new ImgwRadarTileLayer(`${radarHost}${radarFrames[currentFrame].path}/256/{z}/{x}/{y}/2/1_1.png`, {
+                    opacity: 0.75, 
                     pane: 'radarPane',
                     maxZoom: 18,
                     maxNativeZoom: 8
