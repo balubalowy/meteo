@@ -258,7 +258,7 @@
             
             statusBox.style.display = 'block';
             statusBox.className = 'status-box status-info';
-            statusBox.innerHTML = `⚡ Wysyłanie zlecenia wyliczenia Ensemble dla <b>${thresh}°C</b> na <b>+${days} dni</b> do GitHub Actions...`;
+            statusBox.innerHTML = ` Wysyłanie zlecenia wyliczenia Ensemble dla <b>${thresh}°C</b> na <b>+${days} dni</b> do GitHub Actions...`;
 
             // Sprawdzamy czy mamy podany token lub wywołujemy API
             fetch('https://api.github.com/repos/balubalowy/meteo/actions/workflows/generate-ensemble.yml/dispatches', {
@@ -278,15 +278,15 @@
             .then(res => {
                 if (res.ok || res.status === 204) {
                     statusBox.className = 'status-box status-success';
-                    statusBox.innerHTML = `✅ Zlecenie przyjęte! GitHub Actions rozpoczął przeliczanie 169 wiązek modeli dla próg ${thresh}°C (+${days} dni). Za około 1-2 minuty nowa mapa pojawi się w systemie.`;
+                    statusBox.innerHTML = ` Zlecenie przyjęte! GitHub Actions rozpoczął przeliczanie 169 wiązek modeli dla próg ${thresh}°C (+${days} dni). Za około 1-2 minuty nowa mapa pojawi się w systemie.`;
                 } else {
                     statusBox.className = 'status-box status-info';
-                    statusBox.innerHTML = `ℹ️ Wyślij zlecenie bezpośrednio w panelu GitHub Actions lub uruchom lokalnie poleceniem:<br><code>python pobierz_ensemble.py ${thresh} ${days}</code>`;
+                    statusBox.innerHTML = `ℹ Wyślij zlecenie bezpośrednio w panelu GitHub Actions lub uruchom lokalnie poleceniem:<br><code>python pobierz_ensemble.py ${thresh} ${days}</code>`;
                 }
             })
             .catch(err => {
                 statusBox.className = 'status-box status-info';
-                statusBox.innerHTML = `ℹ️ Aby przeliczyć lokalnie, uruchom konsolę i wpisz:<br><code>python pobierz_ensemble.py ${thresh} ${days}</code>`;
+                statusBox.innerHTML = `ℹ Aby przeliczyć lokalnie, uruchom konsolę i wpisz:<br><code>python pobierz_ensemble.py ${thresh} ${days}</code>`;
             });
         }
     </script>

@@ -180,7 +180,7 @@ def create_grid(lats, lons, vals, u_vals=None, v_vals=None):
                 # Zmiana kąta na strzałkę Unicode
                 # 0=N, 90=E, 180=S, 270=W
                 idx = int(round(angle / 45.0)) % 8
-                arrows = ['⬆', '↗', '➡', '↘', '⬇', '↙', '⬅', '↖']
+                arrows = ['', '↗', '', '↘', '', '↙', '', '↖']
                 w_txts.append(arrows[idx])
                 w_lats.append(glats[i])
                 w_lons.append(glons[i])

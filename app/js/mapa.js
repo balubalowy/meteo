@@ -173,19 +173,19 @@ window.initMapa = function() {
                 } else if (window.currentDrawingMode === 'burza') {
                     layer.setIcon(L.divIcon({
                         className: 'meteo-icon-burza',
-                        html: '<div style="color: #ef4444; font-size: 32px; text-shadow: 0px 0px 4px white; transform: translate(-50%, -50%);">☈</div>',
+                        html: '<div style="color: #ef4444; font-size: 32px; text-shadow: 0px 0px 4px white; transform: translate(-50%, -50%);"></div>',
                         iconSize: [0, 0]
                     }));
                 } else if (window.currentDrawingMode === 'deszcz') {
                     layer.setIcon(L.divIcon({
                         className: 'meteo-icon-deszcz',
-                        html: '<div style="color: #22c55e; font-size: 32px; font-weight: bold; text-shadow: 0px 0px 4px white; transform: translate(-50%, -50%);">●</div>',
+                        html: '<div style="color: #22c55e; font-size: 32px; font-weight: bold; text-shadow: 0px 0px 4px white; transform: translate(-50%, -50%);"></div>',
                         iconSize: [0, 0]
                     }));
                 } else if (window.currentDrawingMode === 'snieg') {
                     layer.setIcon(L.divIcon({
                         className: 'meteo-icon-snieg',
-                        html: '<div style="color: #3b82f6; font-size: 32px; text-shadow: 0px 0px 4px white; transform: translate(-50%, -50%);">✱</div>',
+                        html: '<div style="color: #3b82f6; font-size: 32px; text-shadow: 0px 0px 4px white; transform: translate(-50%, -50%);"></div>',
                         iconSize: [0, 0]
                     }));
                 } else if (window.currentDrawingMode === 'mgla') {
@@ -782,7 +782,7 @@ window.initMapa = function() {
             });
 
             const timeStr = new Date(strikeTime).toLocaleTimeString('pl-PL');
-            marker.bindTooltip(`⚡ Wyładowanie: ${timeStr}<br>Pozycja: ${strike.lat.toFixed(3)}°N, ${strike.lon.toFixed(3)}°E`, { sticky: true });
+            marker.bindTooltip(` Wyładowanie: ${timeStr}<br>Pozycja: ${strike.lat.toFixed(3)}°N, ${strike.lon.toFixed(3)}°E`, { sticky: true });
             
             marker.addTo(lightningLayerGroup);
             activeStrikes.push({ lat: strike.lat, lon: strike.lon, time: strikeTime, marker });
@@ -965,8 +965,8 @@ window.initMapa = function() {
                                 <span>${item.name}${extraInfo}</span>
                             </label>
                             <div style="display: flex; gap: 3px;">
-                                <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń wyżej" onclick="window.moveLayer('${key}', 'up')" ${isTop ? 'disabled style="opacity:0.25; cursor:default;"' : ''}>▲</button>
-                                <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń niżej" onclick="window.moveLayer('${key}', 'down')" ${isBottom ? 'disabled style="opacity:0.25; cursor:default;"' : ''}>▼</button>
+                                <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń wyżej" onclick="window.moveLayer('${key}', 'up')" ${isTop ? 'disabled style="opacity:0.25; cursor:default;"' : ''}></button>
+                                <button class="btn btn-ghost" style="padding: 2px 6px; font-size: 0.75rem; border: 1px solid var(--border-subtle);" title="Przesuń niżej" onclick="window.moveLayer('${key}', 'down')" ${isBottom ? 'disabled style="opacity:0.25; cursor:default;"' : ''}></button>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-muted);">

@@ -129,7 +129,7 @@ function loadDashboardLinks() {
     });
 }
 
-// ─── 1. Nawigacja (top-nav + module cards) ───
+//  1. Nawigacja (top-nav + module cards) 
 function initNavigation() {
   const navLinks = document.querySelectorAll(".nav-link");
   const tabViews = document.querySelectorAll(".tab-view");
@@ -174,7 +174,7 @@ function getMeteoData() {
 
 
 
-// ─── 8. Kalkulatory Na Żywo ───
+//  8. Kalkulatory Na Żywo 
 
 function renderLocalStats() {
   if (window.meteoStats) {
@@ -275,7 +275,7 @@ function initLiveCalculators() {
   // (Logika kalkulatorów Wiatru, Wmax, LCL, DCP, Magnus usunięta - Alpine.js przejęło renderowanie)
 }
 
-// ─── 9. Interaktywna Mapa Leaflet ───
+//  9. Interaktywna Mapa Leaflet 
 function initLeafletMap() {
   const mapElement = document.getElementById("leaflet-map");
   if (!mapElement || typeof L === "undefined") return;
@@ -328,7 +328,7 @@ window.triggerEnsFromTab = function() {
      statusBox.style.background = 'var(--bg-tertiary)';
      statusBox.style.color = 'var(--accent-primary)';
      statusBox.style.border = '1px solid var(--border-subtle)';
-     statusBox.innerHTML = `⚡ Wysyłanie zlecenia przeliczenia wiązek dla progu <b>${thresh}°C</b> na <b>+${days} dni</b> do GitHub Actions...`;
+     statusBox.innerHTML = ` Wysyłanie zlecenia przeliczenia wiązek dla progu <b>${thresh}°C</b> na <b>+${days} dni</b> do GitHub Actions...`;
   }
 
   fetch('https://api.github.com/repos/balubalowy/meteo/actions/workflows/generate-ensemble.yml/dispatches', {
@@ -346,17 +346,17 @@ window.triggerEnsFromTab = function() {
       if (statusBox) {
           if (res.ok || res.status === 204) {
               statusBox.style.color = 'var(--accent-success)';
-              statusBox.innerHTML = `✅ Zlecenie przyjęte! GitHub Actions rozpoczął przeliczanie 169 wiązek (próg ${thresh}°C, +${days}d). Wyniki pojawią się na mapie poniżej za 1-2 minuty.`;
+              statusBox.innerHTML = ` Zlecenie przyjęte! GitHub Actions rozpoczął przeliczanie 169 wiązek (próg ${thresh}°C, +${days}d). Wyniki pojawią się na mapie poniżej za 1-2 minuty.`;
           } else {
               statusBox.style.color = 'var(--accent-primary)';
-              statusBox.innerHTML = `ℹ️ Zlecenie zapisane! Uruchom przeliczanie w konsoli poleceniem:<br><code>python prognoza/pobierz_ensemble.py ${thresh} ${days}</code>`;
+              statusBox.innerHTML = `ℹ Zlecenie zapisane! Uruchom przeliczanie w konsoli poleceniem:<br><code>python prognoza/pobierz_ensemble.py ${thresh} ${days}</code>`;
           }
       }
   })
   .catch(err => {
       if (statusBox) {
           statusBox.style.color = 'var(--accent-primary)';
-          statusBox.innerHTML = `ℹ️ Aby przeliczyć lokalnie, uruchom w konsoli:<br><code>python prognoza/pobierz_ensemble.py ${thresh} ${days}</code>`;
+          statusBox.innerHTML = `ℹ Aby przeliczyć lokalnie, uruchom w konsoli:<br><code>python prognoza/pobierz_ensemble.py ${thresh} ${days}</code>`;
       }
   });
 };

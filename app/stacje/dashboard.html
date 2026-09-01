@@ -109,7 +109,7 @@
         <div id="sliders-panel" class="sliders-container">
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--text-primary);" onclick="toggleSliders()">
                 <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="sliders" style="width: 14px; height: 14px;"></i> Wygląd i Przezroczystość</span>
-                <span id="sliders-toggle-icon" style="font-size: 0.75rem; color: var(--accent-primary);">▲</span>
+                <span id="sliders-toggle-icon" style="font-size: 0.75rem; color: var(--accent-primary);"></span>
             </div>
             <div class="slider-row">
                 <label><span>Przezrocz. Tła (Interpolacji):</span> <span id="val-op-gr">70%</span></label>
@@ -317,10 +317,10 @@
             const icon = document.getElementById("sliders-toggle-icon");
             if (panel.classList.contains("collapsed")) {
                 panel.classList.remove("collapsed");
-                icon.innerText = "▲";
+                icon.innerText = "";
             } else {
                 panel.classList.add("collapsed");
-                icon.innerText = "▼";
+                icon.innerText = "";
             }
         };
 

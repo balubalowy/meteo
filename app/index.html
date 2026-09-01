@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>B-Meteo</title>
   <meta name="description" content="Centrum analiz meteorologicznych: stacje IMGW, prognozy ensemble, narzędzia radarowe, baza wiedzy burzowej, kalkulatory IF/DCP/Wmax/LCL.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22></text></svg>">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#121212">
 
@@ -101,7 +101,7 @@
                       </button>
                   </span>
                   <span id="user-info" style="display: none;">
-                      <span style="color: var(--accent-success); font-weight: 500; font-size: 0.7rem; white-space: nowrap;">✓ <span id="user-email" style="font-weight: 600; color: var(--text-primary); max-width: 130px; display: inline-block; vertical-align: bottom; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span></span>
+                      <span style="color: var(--accent-success); font-weight: 500; font-size: 0.7rem; white-space: nowrap;"> <span id="user-email" style="font-weight: 600; color: var(--text-primary); max-width: 130px; display: inline-block; vertical-align: bottom; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span></span>
                       <button id="logout-btn" class="btn btn-ghost" aria-label="Wyloguj z systemu" style="padding: 1px 5px; font-size: 0.68rem; border: 1px solid var(--border-subtle); border-radius: 4px; cursor: pointer; margin-left: 4px;">Wyloguj</button>
                       <span id="firebase-bandwidth-display" style="display: inline-block; margin-left: 8px; font-size: 0.68rem; color: var(--text-secondary);"></span>
                   </span>
@@ -136,7 +136,7 @@
           
           <!-- SOB Prognoza -->
           <div class="card tile-item" data-id="tile-sob" style="padding: 1rem; cursor: grab;" x-data="sobTile" x-init="fetchSOB()">
-              <h3 style="margin-bottom: 0.4rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> SOB</h3>
+              <h3 style="margin-bottom: 0.4rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;"></span> SOB</h3>
               <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="sobTitle"></div>
               <div x-show="loading" class="skeleton-loader" style="height: 220px;"></div>
               <img x-show="!loading" :src="sobImg" alt="Prognoza SOB" class="zoomable" loading="lazy" decoding="async" width="600" height="380" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary);" x-transition>
@@ -144,7 +144,7 @@
 
           <!-- Polscy Łowcy Burz Prognoza -->
           <div class="card tile-item" data-id="tile-lowcy" style="padding: 1rem; cursor: grab;" x-data="lowcyTile" x-init="fetchLowcy()">
-              <h3 style="margin-bottom: 0.4rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> PŁB</h3>
+              <h3 style="margin-bottom: 0.4rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;"></span> PŁB</h3>
               <div style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" x-text="lowcyTitle"></div>
               <div x-show="loading" class="skeleton-loader" style="height: 220px;"></div>
               <img x-show="!loading" :src="lowcyImg" alt="Prognoza PŁB" class="zoomable" loading="lazy" decoding="async" width="600" height="380" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary);" x-transition>
@@ -153,7 +153,7 @@
           <!-- IMGW Mapa Synoptyczna 00z/12z -->
           <div class="card tile-item" data-id="tile-imgw-synop" style="padding: 1rem; cursor: grab;" x-data="imgwSynopTile">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-                  <h3 style="font-size: 1.1rem; color: var(--text-secondary); margin: 0;"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Synoptyka IMGW</h3>
+                  <h3 style="font-size: 1.1rem; color: var(--text-secondary); margin: 0;"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;"></span> Synoptyka IMGW</h3>
                   <select class="form-select" x-model="term" aria-label="Wybór terminu mapy synoptycznej" style="width: auto; padding: 2px 6px; font-size: 0.75rem;">
                       <option value="00">00 UTC</option>
                       <option value="12">12 UTC</option>
@@ -164,31 +164,31 @@
 
           <!-- DWD Europa - Analiza Frontów -->
           <div class="card tile-item" data-id="tile-dwd" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Fronty (DWD)</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;"></span> Fronty (DWD)</h3>
             <img id="dash-dwd" class="zoomable" loading="lazy" decoding="async" width="600" height="420" src="https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png" alt="DWD Europa" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
           </div>
           
           <!-- SIGWX IMGW PL -->
           <div class="card tile-item" data-id="tile-sigwx-pl" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> SIGWX PL</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;"></span> SIGWX PL</h3>
             <img id="dash-sigwx-pl" class="zoomable" loading="lazy" decoding="async" width="600" height="420" src="https://aviation-api.imgw.pl/image/significant/pl" alt="SIGWX Polska" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
 
           <!-- SIGWX CHMI CZ -->
           <div class="card tile-item" data-id="tile-sigwx-cz" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> SIGWX CZ</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;"></span> SIGWX CZ</h3>
             <img id="dash-sigwx-cz" class="zoomable" loading="lazy" decoding="async" width="600" height="420" src="https://aviation-api.imgw.pl/image/significant/cz" alt="SIGWX Czechy" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
 
           <!-- Estofex -->
           <div class="card tile-item" data-id="tile-estofex" style="padding: 1rem; cursor: grab;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> ESTOFEX</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;"></span> ESTOFEX</h3>
             <img id="dash-estofex" class="zoomable" loading="lazy" decoding="async" width="600" height="420" src="https://www.estofex.org/cgi-bin/polygon/showforecast.cgi?map=yes&fcst=latest" alt="Estofex" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
           </div>
           
           <!-- Wyładowania -->
           <div class="card tile-item" data-id="tile-blitzortung" style="padding: 1rem; cursor: grab; ">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;">✥</span> Wyładowania</h3>
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;"></span> Wyładowania</h3>
             <iframe loading="lazy" title="Mapa wyładowań atmosferycznych Blitzortung Live" src="https://map.blitzortung.org/#4/52.000/19.000" style="width: 100%; height: 400px; border: none; border-radius: var(--radius-sm);"></iframe>
           </div>
         </div>

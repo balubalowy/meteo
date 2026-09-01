@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/Markdown-%23000000.svg?style=flat&logo=markdown&logoColor=white" alt="Markdown">
 </p>
 
-> 🌐 **Live App:** [**balubalowy.github.io/meteo**](https://balubalowy.github.io/meteo/)
+>  **Live App:** [**balubalowy.github.io/meteo**](https://balubalowy.github.io/meteo/)
 
 Tutaj znajduje się centralne repozytorium **Centrum Meteo** – baza wiedzy, kalkulatory, mapy pogodowe oraz statyczne podsumowania analiz konwekcyjnych. Całość jest hostowana za darmo przez architekturę Serverless w postaci GitHub Pages, wspieraną przez Firebase do przechowywania logów oraz akcje automatyczne GitHub Actions, pobierające na bieżąco świeże dane pogodowe z IMGW.
 
@@ -65,11 +65,11 @@ Repozytorium może działać globalnie jako statyczna baza wiedzy (kalkulatory, 
 
 ---
 
-## 📁 Struktura Katalogów i Plików
+##  Struktura Katalogów i Plików
 
 System, po potężnym refaktorze z sierpnia 2026, został całkowicie posprzątany z gigantycznych plików spaghetti i działa w ultraczystej architekturze modułowej. Wszystko zostało podzielone na warstwę jawną (`app/`) i niejawną (`.private/`).
 
-### 📂 /app (Frontend)
+###  /app (Frontend)
 Katalog zawierający całą publiczną stronę aplikacji webowej (statyczny SPA - Single Page Application).
 * `index.html` - Lekki, odchudzony plik główny, opierający się o dynamiczne pobieranie danych.
 * `/css/` - Główne źródło prawdy dla designu. Styl Dark Mode Glassmorphism (B-Core).
@@ -77,25 +77,25 @@ Katalog zawierający całą publiczną stronę aplikacji webowej (statyczny SPA 
 * `/assets/` - Obrazy statyczne używane w aplikacji i pobrane cache danych z IMGW.
 * `/partials/` - Rozbite, modułowe pliki HTML, które ładują się na żądanie w ułamku sekundy, drastycznie zmniejszając wagę pliku `index.html`.
 
-### 📂 /.private (Backend i Archiwum)
+###  /.private (Backend i Archiwum)
 Pliki i skrypty niewidoczne dla systemu GitHub Pages (dzięki prefiksowi kropki i plikowi .gitignore).
 * `AGENTS.md` - Notatki administracyjne.
 * `/archiwum/` - Wszystkie historyczne foldery (`klimatologia`, `mapy`, `radar`, `wiedza`, `stacje`), które służyły jako zaszłe repozytorium wiedzy.
 * `*.py` - Skrypty backendowe (np. `fetch_imgw_firebase.py`, `generate_map_data_firebase.py`), odpalane cyklicznie przez serwery Microsoftu.
 
-### 📂 /.github
+###  /.github
 Katalog skryptów automatyzacji i Github Actions. Odpala skrypty z folderu `.private` i karmi nimi folder `app/`.
 * `workflows/fetch-imgw.yml` - zautomatyzowane pobieranie stacji IMGW do bazy chmurowej i aktualizacja linków.
 * `workflows/pages.yml` - oficjalny skrypt deploymentu dla GitHub Pages (ustawia folder `app/` jako publiczny korzeń).
 
 ---
 
-## 🔒 Zabezpieczenia i Prawa Autorskie
+##  Zabezpieczenia i Prawa Autorskie
 Reguły Firebase odrzucają jakikolwiek bezpośredni zapis z zewnątrz, jeżeli żądanie nie jest opatrzone unikalnym i tajnym sekretnym kluczem. Kod automatyzacji ładuje ten klucz bezpiecznie do nagłówków w trakcie uruchamiania skryptów `fetch_imgw_firebase.py` z maszyn Microsoftu/GitHuba. Logowanie kontem Google na froncie pozwala wejść na przyszłe sekcje administracyjne (zaplanowane moduły).
 
 ---
 
-## 🔮 Roadmap & Historia Projektu
+##  Roadmap & Historia Projektu
 
 ### Faza 0 & 1: Baza Wiedzy (MVP)
 * Stworzenie encyklopedii parametrów burzowych.

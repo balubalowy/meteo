@@ -108,7 +108,7 @@ if (isConfigured) {
                     if (lockError) {
                         lockError.innerHTML = `
                             <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 8px; padding: 12px; margin-top: 10px; color: #fca5a5;">
-                                <div style="font-weight: bold; margin-bottom: 4px;">⛔ Brak uprawnień do portalu</div>
+                                <div style="font-weight: bold; margin-bottom: 4px;"> Brak uprawnień do portalu</div>
                                 <div style="font-size: 0.8rem; line-height: 1.4;">Konto <b>${user.email}</b> nie znajduje się na liście uprawnionych użytkowników.</div>
                                 <button id="lockscreen-switch-btn" class="btn btn-ghost" style="margin-top: 10px; border: 1px solid #f87171; color: #f87171; width: 100%; font-size: 0.8rem; padding: 6px;">Zmień konto / Wyloguj</button>
                             </div>

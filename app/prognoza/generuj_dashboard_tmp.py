@@ -11,14 +11,14 @@ import traceback
 
 def generate_dashboard():
     print()
-    print("═" * 65)
+    print("" * 65)
     print("  KROK 2: GENEROWANIE MAPY Z DANYCH EXCEL")
     
     excel_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Dane_Mapy_Polska.xlsx")
     config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
     
     if not os.path.exists(excel_file):
-        print(f"  ⚠ Brak pliku {os.path.basename(excel_file)}. Najpierw uruchom skrypt pobierający (KROK 1).")
+        print(f"   Brak pliku {os.path.basename(excel_file)}. Najpierw uruchom skrypt pobierający (KROK 1).")
         return
         
     print(f"  Wczytywanie danych z {os.path.basename(excel_file)}...")
@@ -193,7 +193,7 @@ def generate_dashboard():
         trace_max_temp_text = go.Scattermapbox(
             lat=[max_temp_row['Lat']], lon=[max_temp_row['Lon']], mode='markers+text',
             marker=dict(size=22, color='rgba(0,0,0,0)', opacity=1.0),
-            text=[f"🔥 MAX TEMP: {max_temp_row['Temperatura']}°C"],
+            text=[f" MAX TEMP: {max_temp_row['Temperatura']}°C"],
             textposition="top right", textfont=dict(color="black", size=14),
             hoverinfo="skip"
         )
@@ -208,7 +208,7 @@ def generate_dashboard():
         trace_max_prob_text = go.Scattermapbox(
             lat=[max_prob_row['Lat']], lon=[max_prob_row['Lon']], mode='markers+text',
             marker=dict(size=22, color='rgba(0,0,0,0)', opacity=1.0),
-            text=[f"⚠️ MAX SZANSA: {max_prob_row['Szansa']}%"],
+            text=[f" MAX SZANSA: {max_prob_row['Szansa']}%"],
             textposition="bottom right", textfont=dict(color="black", size=14),
             hoverinfo="skip", visible=False
         )
@@ -328,16 +328,16 @@ def generate_dashboard():
         with open(html_file, "w", encoding="utf-8") as f:
             f.write(dashboard_html)
             
-        print(f"  ✓ Gotowe! Interaktywny Dashboard zapisany jako: {os.path.basename(html_file)}")
+        print(f"   Gotowe! Interaktywny Dashboard zapisany jako: {os.path.basename(html_file)}")
         
         import webbrowser
         webbrowser.open('file://' + html_file.replace('\\', '/'))
         
     except Exception as e:
         traceback.print_exc()
-        print(f"  ⚠ Błąd przy tworzeniu mapy HTML: {e}")
+        print(f"   Błąd przy tworzeniu mapy HTML: {e}")
 
-    print("═" * 65)
+    print("" * 65)
     print()
 
 if __name__ == "__main__":

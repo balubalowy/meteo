@@ -15,7 +15,7 @@ MODELS = [
 
 def download_data():
     print()
-    print("═" * 65)
+    print("" * 65)
     print("  KROK 1: POBIERANIE DANYCH Z MODELI (API)")
     
     import sys
@@ -130,8 +130,8 @@ def download_data():
     with open(config_file, "w") as f:
         json.dump({"threshold": threshold, "days_ahead": days_ahead}, f)
         
-    print(f"  ✓ Gotowe! Plik {os.path.basename(target_file)} zaktualizowany.")
-    print("═" * 65)
+    print(f"   Gotowe! Plik {os.path.basename(target_file)} zaktualizowany.")
+    print("" * 65)
 
 if __name__ == "__main__":
     download_data()
