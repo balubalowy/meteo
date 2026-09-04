@@ -167,6 +167,12 @@
             <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;"></span> Fronty (DWD)</h3>
             <img id="dash-dwd" class="zoomable" loading="lazy" decoding="async" width="600" height="420" src="https://www.dwd.de/DWD/wetter/wv_spez/hobbymet/wetterkarten/bwk_bodendruck_na_ana.png" alt="DWD Europa" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
           </div>
+
+          <!-- UK Met Office - Analiza Frontów (Bracknell) -->
+          <div class="card tile-item" data-id="tile-ukmo" style="padding: 1rem; cursor: grab;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-secondary);"><span style="font-size: 1.2rem; cursor: grab; margin-right: 5px;"></span> Fronty (UK Met Office)</h3>
+            <img id="dash-ukmo" class="zoomable" loading="lazy" decoding="async" width="600" height="420" src="" alt="UK Met Office Fronty i Ciśnienie" style="width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); background: var(--bg-tertiary); min-height: 200px;">
+          </div>
           
           <!-- SIGWX IMGW PL -->
           <div class="card tile-item" data-id="tile-sigwx-pl" style="padding: 1rem; cursor: grab;">
@@ -302,6 +308,25 @@
             items.forEach(item => dashboard.appendChild(item));
           }
         }
+
+        // Inicjalizacja mapy UK Met Office z dynamicznym czasem publikacji
+        function initUKMOChart() {
+          const img = document.getElementById('dash-ukmo');
+          if (!img) return;
+          const now = new Date();
+          if (now.getUTCHours() < 4) {
+            now.setUTCDate(now.getUTCDate() - 1);
+          }
+          const dateStr = now.toISOString().split('T')[0];
+          img.src = `https://data.consumer-digital.api.metoffice.gov.uk/v1/surface-pressure/colour/${dateStr}T0000/FSXX00T_00.gif`;
+          img.onerror = () => {
+            const prev = new Date();
+            prev.setUTCDate(prev.getUTCDate() - 1);
+            img.src = `https://data.consumer-digital.api.metoffice.gov.uk/v1/surface-pressure/colour/${prev.toISOString().split('T')[0]}T0000/FSXX00T_00.gif`;
+            img.onerror = null;
+          };
+        }
+        initUKMOChart();
         
         loadDashboardOrder();
         
