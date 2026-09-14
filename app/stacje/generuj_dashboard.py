@@ -295,15 +295,15 @@ def generate_dashboard():
                 # Zapisujemy czas pomiaru dla najnowszego (now)
                 if is_now: 
                     ms["now"] = v
-                    master_stations[kod]["czas"]["now"] = cz
+                    ms["czas_now"] = cz
                 
                 def update_minmax(okr_min, okr_max, val, c_time):
                     if okr_min not in ms or val < ms[okr_min]: 
                         ms[okr_min] = val
-                        master_stations[kod]["czas"][okr_min] = c_time
+                        ms[f"czas_{okr_min}"] = c_time
                     if okr_max not in ms or val > ms[okr_max]: 
                         ms[okr_max] = val
-                        master_stations[kod]["czas"][okr_max] = c_time
+                        ms[f"czas_{okr_max}"] = c_time
 
                 if is_3h: update_minmax("min3", "max3", v, cz)
                 if is_6h: update_minmax("min6", "max6", v, cz)
@@ -328,8 +328,10 @@ def generate_dashboard():
             lats_nan, lons_nan, hovs_nan = [], [], []
             
             for kod, st in master_stations.items():
-                val = st["temp"].get(okres) if z_key == "synop" else st[z_key].get(okres)
-                lat, lon, nazwa, czas = st["lat"], st["lon"], st["nazwa"], st.get("czas", {}).get(okres, "--:--")
+                ms = st["temp"] if z_key == "synop" else st[z_key]
+                val = ms.get(okres)
+                lat, lon, nazwa = st["lat"], st["lon"], st["nazwa"]
+                czas = ms.get(f"czas_{okres}", ms.get("czas_now", "--:--"))
                 
                 if val is not None:
                     lats_ok.append(lat); lons_ok.append(lon); vals_ok.append(val)

@@ -41,6 +41,18 @@ WIND_COLORSCALE = [
 HUMIDITY_COLORSCALE = [[0.0, "#FFD700"], [0.25, "#FF8C00"], [0.5, "#32CD32"], [0.75, "#1E90FF"], [1.0, "#00008B"]]
 DEWPOINT_COLORSCALE = [[0.0, "#0000FF"], [0.26, "#00BFFF"], [0.39, "#00FF7F"], [0.53, "#ADFF2F"], [0.66, "#FFD700"], [0.79, "#FF4500"], [0.92, "#FF0000"], [1.0, "#8B0000"]]
 
+# Skale dywergentne dla trendów (tempo zmian na godzinę)
+TREND_TEMP_COLORSCALE = [
+    [0.0, "#1e3a8a"], [0.2, "#3b82f6"], [0.4, "#93c5fd"],
+    [0.5, "#f3f4f6"],
+    [0.6, "#fca5a5"], [0.8, "#ef4444"], [1.0, "#991b1b"]
+]
+TREND_HUMIDITY_COLORSCALE = [
+    [0.0, "#854d0e"], [0.25, "#d97706"],
+    [0.5, "#f3f4f6"],
+    [0.75, "#0284c7"], [1.0, "#1e3a8a"]
+]
+
 ZMIENNE = {
     "temp":  {"nazwa": "Temperatura", "cscale": "TEMP_COLORSCALE", "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0},
     "grunt": {"nazwa": "Temp. Gruntu", "cscale": "TEMP_COLORSCALE", "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0},
@@ -51,9 +63,15 @@ ZMIENNE = {
     "synop": {"nazwa": "Model Synoptyczny", "cscale": "TEMP_COLORSCALE", "cmin": -40, "cmax": 50, "unit": "", "step": 2.0},
 }
 
-OKRESY = ["now", "max5", "min5"]
+OKRESY = ["now", "max5", "min5", "trend1h", "trend2h", "trend3h", "trend5h"]
 OKRESY_NAZWY = {
-    "now": "Aktualne", "max5": "Maksimum (ost. 5h)", "min5": "Minimum (ost. 5h)"
+    "now": "Aktualne",
+    "max5": "Maksimum (ost. 5h)",
+    "min5": "Minimum (ost. 5h)",
+    "trend1h": "Trend 1h (Δ/h)",
+    "trend2h": "Trend 2h (Δ/h)",
+    "trend3h": "Trend 3h (Δ/h)",
+    "trend5h": "Trend 5h (Δ/h)"
 }
 
 def kier_na_strzalke(kier):
@@ -65,10 +83,6 @@ def kier_na_strzalke(kier):
     dirs = ["↓", "↙", "←", "↖", "↑", "↗", "→", "↘"]
     idx = round(val / 45.0) % 8
     return dirs[idx]
-
-# =========================================== w_lats, w_lons, w_txts, grid_masked, grid_lon, grid_lat
-
-
 
 def generate_dashboard():
     print("=" * 65)
@@ -104,20 +118,16 @@ def generate_dashboard():
     except:
         latest_time = datetime.now()
 
-    # Grupowanie danych wg stacji i wyliczanie ekstremow
-    # station_id -> { "nazwa", "lat", "lon", "temp": {"now": X, "max3": Y, ...} }
+    # Grupowanie danych wg stacji i wyliczanie ekstremów
     master_stations = {}
-    
-    # Dodajemy puste struktury z najnowszego snapshota, zeby miec baze stacji
     for st in latest_snap["stacje"]:
         kod = st["kod"]
         master_stations[kod] = {
             "nazwa": st["nazwa"], "lat": st["lat"], "lon": st["lon"],
             "temp": {}, "grunt": {}, "wiatr": {}, "wilg": {}, "rosy": {}, "wiatr_sr": {}, "kierunek": {},
-            "czas": {} # przechowuje stringi np. "14:20" dla hove'a
+            "czas_now": "--:--"
         }
         
-    # Funkcja pomocnicza do mapowania zmiennych API na nasze krotkie klucze
     api_map = {
         "temp": "temp", "grunt": "temp_grunt", 
         "wiatr": "maks_poryw_kmh", "wilg": "wilgotnosc", "rosy": "punkt_rosy",
@@ -133,27 +143,22 @@ def generate_dashboard():
             continue
             
         is_5h = diff_h <= 5.1
-        is_now = diff_h <= 0.1 # w granicach tego samego snapshota
+        is_now = diff_h <= 0.1
 
         for st in snap["stacje"]:
             kod = st["kod"]
             if kod not in master_stations: continue
             
-            # Czas pomiaru ze stacji (IMGW API podaje w UTC)
             t_data = st.get("temp_data")
             is_valid_data = True
             if t_data:
                 try:
-                    # Parsujemy jako UTC i dodajemy 2h (CEST)
                     cz_dt = datetime.strptime(t_data, "%Y-%m-%d %H:%M:%S") + timedelta(hours=2)
-                    
-                    # Filtrowanie
                     age_hours = (snap_time - cz_dt).total_seconds() / 3600.0
                     if age_hours > 6:
                         is_valid_data = False
                     if is_now and age_hours > 1.5:
                         is_valid_data = False
-                        
                     cz = cz_dt.strftime("%H:%M")
                 except:
                     cz = str(t_data)
@@ -161,43 +166,98 @@ def generate_dashboard():
                 cz = snap_time.strftime("%H:%M")
 
             if not is_valid_data:
-                continue # Ignorujemy całkowicie przestarzałe dane z martwych stacji (np. sprzed miesiąca)
+                continue
+
+            if is_now:
+                master_stations[kod]["czas_now"] = cz
 
             for k, api_k in api_map.items():
                 v = st.get(api_k)
                 if v is None: continue
                 
-                # Zabezpieczenie przed zepsutymi czujnikami wiatru
+                # Zabezpieczenie przed uszkodzonymi czujnikami wiatru
                 if k in ["wiatr", "wiatr_sr"]:
                     nazwa_st = st.get("nazwa", "").upper()
                     if nazwa_st in ["DĄBRÓWKA STARA", "CHRZĄSTOWO", "ŚWIERKLANIEC", "ŚWIERKLANY"]:
                         continue
-                    # Wiatr > 120 km/h poza wysokimi górami to na 99% błąd sprzętu IMGW
                     if v > 120 and nazwa_st not in ["ŚNIEŻKA", "KASPROWY WIERCH"]:
                         continue
                 
                 ms = master_stations[kod][k]
                 
-                # Zapisujemy czas pomiaru dla najnowszego (now)
                 if is_now: 
                     ms["now"] = v
-                    master_stations[kod]["czas"]["now"] = cz
+                    ms["czas_now"] = cz
                 
-                def update_minmax(okr_min, okr_max, val, c_time):
-                    if okr_min not in ms or val < ms[okr_min]: 
-                        ms[okr_min] = val
-                        master_stations[kod]["czas"][okr_min] = c_time
-                    if okr_max not in ms or val > ms[okr_max]: 
-                        ms[okr_max] = val
-                        master_stations[kod]["czas"][okr_max] = c_time
+                if is_5h:
+                    # Minimum: rejestracja wartości i czasu wystąpienia
+                    if "min5" not in ms or v < ms["min5"]:
+                        ms["min5"] = v
+                        ms["czas_min5"] = cz
+                    # Maksimum: rejestracja wartości i czasu wystąpienia
+                    if "max5" not in ms or v > ms["max5"]:
+                        ms["max5"] = v
+                        ms["czas_max5"] = cz
 
-                if is_5h: update_minmax("min5", "max5", v, cz)
+    # Obliczanie trendów czasowych (1h, 2h, 3h, 5h)
+    print("  Wyliczanie trendów czasowych (1h, 2h, 3h, 5h)...")
+    for hours_back in [1, 2, 3, 5]:
+        target_dt = latest_time - timedelta(hours=hours_back)
+        best_snap = None
+        min_sec_diff = float("inf")
+        for s in historia:
+            try:
+                st_dt = datetime.strptime(s["czas_pobrania"], "%Y-%m-%d %H:%M:%S")
+                sec_diff = abs((st_dt - target_dt).total_seconds())
+                if sec_diff < min_sec_diff and sec_diff <= 45 * 60:
+                    min_sec_diff = sec_diff
+                    best_snap = (s, st_dt)
+            except:
+                continue
+        
+        if not best_snap:
+            continue
+            
+        past_snap, past_dt = best_snap
+        dt_actual_hours = (latest_time - past_dt).total_seconds() / 3600.0
+        if dt_actual_hours < 0.4:
+            continue
+            
+        past_map = {s["kod"]: s for s in past_snap.get("stacje", [])}
+        trend_key = f"trend{hours_back}h"
+        
+        for kod, ms_st in master_stations.items():
+            st_past = past_map.get(kod)
+            if not st_past: continue
+            for k, api_k in api_map.items():
+                v_now = ms_st[k].get("now")
+                v_past = st_past.get(api_k)
+                if v_now is None or v_past is None: continue
+                if k in ["wiatr", "wiatr_sr"]:
+                    nazwa_st = ms_st.get("nazwa", "").upper()
+                    if nazwa_st in ["DĄBRÓWKA STARA", "CHRZĄSTOWO", "ŚWIERKLANIEC", "ŚWIERKLANY"]:
+                        continue
+                    if (v_now > 120 or v_past > 120) and nazwa_st not in ["ŚNIEŻKA", "KASPROWY WIERCH"]:
+                        continue
+                        
+                delta_total = round(v_now - v_past, 1)
+                rate_per_hour = round(delta_total / dt_actual_hours, 1)
+                ms = ms_st[k]
+                ms[trend_key] = rate_per_hour
+                ms[f"meta_{trend_key}"] = {
+                    "v_now": v_now,
+                    "v_past": v_past,
+                    "cz_past": past_dt.strftime("%H:%M"),
+                    "cz_now": ms.get("czas_now", latest_time.strftime("%H:%M")),
+                    "dt_h": round(dt_actual_hours, 1),
+                    "delta_total": delta_total
+                }
 
     js_data = {}
     total_iters = len(ZMIENNE) * len(OKRESY)
     curr_iter = 0
 
-    print("  Budowanie bazy danych przestrzennych (to zajmie chwilę)...")
+    print("  Budowanie bazy danych przestrzennych...")
     for z_key, z_info in ZMIENNE.items():
         js_data[z_key] = {}
         for okres in OKRESY:
@@ -208,8 +268,10 @@ def generate_dashboard():
             lats_nan, lons_nan, hovs_nan = [], [], []
             
             for kod, st in master_stations.items():
-                val = st["temp"].get(okres) if z_key == "synop" else st[z_key].get(okres)
-                lat, lon, nazwa, czas = st["lat"], st["lon"], st["nazwa"], st.get("czas", {}).get(okres, "--:--")
+                is_trend = okres.startswith("trend")
+                ms = st["temp"] if z_key == "synop" else st[z_key]
+                val = ms.get(okres)
+                lat, lon, nazwa = st["lat"], st["lon"], st["nazwa"]
                 
                 if val is not None:
                     lats_ok.append(lat); lons_ok.append(lon); vals_ok.append(val)
@@ -220,8 +282,34 @@ def generate_dashboard():
                             u_vals.append(-val * math.sin(rad)); v_vals.append(-val * math.cos(rad))
                         else: u_vals.append(0); v_vals.append(0)
                     
-                    if z_key == "synop":
-                        v_t, v_r, v_ws, v_wp, kier = st["temp"].get(okres), st["rosy"].get(okres), st["wiatr_sr"].get(okres), st["wiatr"].get(okres), st["kierunek"].get(okres)
+                    if is_trend:
+                        meta = ms.get(f"meta_{okres}", {})
+                        znak = "+" if val > 0 else ""
+                        unit_h = f"{z_info['unit']}/h" if z_info['unit'] else "/h"
+                        fmt_val = f"{znak}{val:.1f}"
+                        txts_ok.append(fmt_val)
+                        
+                        v_past = meta.get("v_past", "?")
+                        v_now = meta.get("v_now", "?")
+                        cz_past = meta.get("cz_past", "--:--")
+                        cz_now = meta.get("cz_now", "--:--")
+                        dt_h = meta.get("dt_h", "")
+                        d_tot = meta.get("delta_total", val)
+                        d_tot_znak = "+" if (d_tot is not None and d_tot > 0) else ""
+                        
+                        hov = (
+                            f"<b>{nazwa}</b><br>"
+                            f"Trend {z_info['nazwa']}: <b>{fmt_val} {unit_h}</b><br>"
+                            f"Zmiana w {dt_h}h: {d_tot_znak}{d_tot} {z_info['unit']} "
+                            f"(z {v_past} o {cz_past} do {v_now} o {cz_now})"
+                        )
+                        hovs_ok.append(hov)
+                    elif z_key == "synop":
+                        v_t = st["temp"].get(okres)
+                        v_r = st["rosy"].get(okres)
+                        v_ws = st["wiatr_sr"].get(okres)
+                        v_wp = st["wiatr"].get(okres)
+                        kier = st["kierunek"].get(okres)
                         strz = kier_na_strzalke(kier)
                         
                         txt_t = f"{v_t:.1f}" if v_t is not None else ""
@@ -229,16 +317,25 @@ def generate_dashboard():
                         txt_r = f"{v_r:.1f}" if v_r is not None else ""
                         txt_wp = f"{v_wp:.0f}" if v_wp is not None else ""
                         
+                        cz_t = st["temp"].get(f"czas_{okres}", st.get("czas_now", "--:--"))
                         txts_ok.append(f"{txt_t}|{txt_ws}|{txt_r}|{txt_wp}")
-                        hovs_ok.append(f"<b>{nazwa}</b><br>Temp: {txt_t}°C | Rosy: {txt_r}°C<br>Wiatr Śr: {txt_ws} (Poryw: {txt_wp})<br>Czas: {czas}")
+                        hovs_ok.append(f"<b>{nazwa}</b><br>Temp: {txt_t}°C | Rosy: {txt_r}°C<br>Wiatr Śr: {txt_ws} (Poryw: {txt_wp})<br>Czas: {cz_t}")
+                    elif okres in ["max5", "min5"]:
+                        cz_extr = ms.get(f"czas_{okres}", "--:--")
+                        lbl = "Maksimum" if okres == "max5" else "Minimum"
+                        fmt = f"{val:.1f}" if (z_key not in ["wiatr", "wiatr_sr"] or val < 10) else f"{val:.0f}"
+                        txts_ok.append(fmt)
+                        hovs_ok.append(f"<b>{nazwa}</b><br>{lbl} (ost. 5h): <b>{fmt} {z_info['unit']}</b><br>Czas wystąpienia: {cz_extr}")
                     elif z_key in ["wiatr", "wiatr_sr"]:
                         fmt = f"{val:.1f}" if val < 10 else f"{val:.0f}"
+                        cz_now = ms.get("czas_now", st.get("czas_now", "--:--"))
                         txts_ok.append(fmt); angs_ok.append(0)
-                        hovs_ok.append(f"<b>{nazwa}</b><br>{z_info['nazwa']}: {fmt} {z_info['unit']} {kier_na_strzalke(st['kierunek'].get(okres))}<br>Czas: {czas}")
+                        hovs_ok.append(f"<b>{nazwa}</b><br>{z_info['nazwa']}: {fmt} {z_info['unit']} {kier_na_strzalke(st['kierunek'].get(okres))}<br>Czas: {cz_now}")
                     else:
                         fmt = f"{val:.1f}"
+                        cz_now = ms.get("czas_now", st.get("czas_now", "--:--"))
                         txts_ok.append(fmt); angs_ok.append(0)
-                        hovs_ok.append(f"<b>{nazwa}</b><br>{z_info['nazwa']}: {fmt} {z_info['unit']}<br>Czas: {czas}")
+                        hovs_ok.append(f"<b>{nazwa}</b><br>{z_info['nazwa']}: {fmt} {z_info['unit']}<br>Czas: {cz_now}")
                 else: lats_nan.append(lat); lons_nan.append(lon); hovs_nan.append(f"<b>{nazwa}</b><br>Brak danych")
 
             js_data[z_key][okres] = {
@@ -249,7 +346,14 @@ def generate_dashboard():
                 "pt_txts": txts_ok
             }
 
-    js_colors = {"TEMP_COLORSCALE": TEMP_COLORSCALE, "WIND_COLORSCALE": WIND_COLORSCALE, "HUMIDITY_COLORSCALE": HUMIDITY_COLORSCALE, "DEWPOINT_COLORSCALE": DEWPOINT_COLORSCALE}
+    js_colors = {
+        "TEMP_COLORSCALE": TEMP_COLORSCALE,
+        "WIND_COLORSCALE": WIND_COLORSCALE,
+        "HUMIDITY_COLORSCALE": HUMIDITY_COLORSCALE,
+        "DEWPOINT_COLORSCALE": DEWPOINT_COLORSCALE,
+        "TREND_TEMP_COLORSCALE": TREND_TEMP_COLORSCALE,
+        "TREND_HUMIDITY_COLORSCALE": TREND_HUMIDITY_COLORSCALE
+    }
 
     # Zapis i wysyłka do Firebase
     final_payload_base = {

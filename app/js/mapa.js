@@ -273,17 +273,32 @@ window.initMapa = function() {
         };
 
         // ----------------------------------------------------
-        // PODKŁADY MAPOWE (CARTO z kluczem API)
+        // PODKŁADY MAPOWE (CARTO, ESRI HILLSHADE, OPENTOPO)
         // ----------------------------------------------------
         const CARTO_KEY = 'cb1_2p7i_1_352cdbd16b8b51b87892ae14';
 
         // Warstwa bazowa (Tylko lądy/wody, bez napisów)
         const darkBase = L.tileLayer(`https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`, { 
-            maxZoom: 20, pane: 'basePane' 
+            maxZoom: 20, pane: 'basePane', attribution: 'CartoDB'
         });
         
         const lightBase = L.tileLayer(`https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`, { 
-            maxZoom: 20, pane: 'basePane' 
+            maxZoom: 20, pane: 'basePane', attribution: 'CartoDB'
+        });
+
+        // Plastyczne cieniowanie rzeźby terenu (DEM / Hillshade)
+        const hillshadeBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 18, pane: 'basePane', attribution: 'Esri, USGS, Copernicus DEM'
+        });
+
+        // Klasyczna mapa topograficzna z poziomicami i rzeźbą terenu
+        const openTopoBase = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17, pane: 'basePane', attribution: 'OpenTopoMap (CC-BY-SA)'
+        });
+
+        // Fizyczna mapa ze zrównoważoną hipsometrią
+        const esriTopoBase = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 19, pane: 'basePane', attribution: 'Esri World Topo'
         });
 
         // Własna warstwa z głównymi miastami
@@ -329,13 +344,17 @@ window.initMapa = function() {
 
         const basemaps = {
             "Ciemny (Dark)": darkBase,
-            "Jasny (Voyager)": lightBase
+            "Jasny (Voyager)": lightBase,
+            "Rzeźba terenu (Hillshade)": hillshadeBase,
+            "Topograficzna (OpenTopo)": openTopoBase,
+            "Fizyczna (World Topo)": esriTopoBase
         };
         basemaps["Ciemny (Dark)"].addTo(map);
         cityLabelsGroup.addTo(map);
 
         map.on('baselayerchange', function(e) {
-            const isLight = e.name && e.name.toLowerCase().includes('jasny');
+            const nameLower = (e.name || '').toLowerCase();
+            const isLight = nameLower.includes('jasny') || nameLower.includes('topo') || nameLower.includes('rzeźba');
             if (typeof updateBoundariesStyle === 'function') updateBoundariesStyle(isLight);
             updateCityLabels(isLight);
         });
@@ -1193,12 +1212,26 @@ window.initMapa = function() {
             [0.60, "#eab308"], [0.75, "#f97316"], [0.90, "#ef4444"], [1.0, "#831843"]
         ];
 
+        const DEFAULT_TREND_TEMP_COLORSCALE = [
+            [0.0, "#1e3a8a"], [0.2, "#3b82f6"], [0.4, "#93c5fd"],
+            [0.5, "#f3f4f6"],
+            [0.6, "#fca5a5"], [0.8, "#ef4444"], [1.0, "#991b1b"]
+        ];
+
+        const DEFAULT_TREND_HUMIDITY_COLORSCALE = [
+            [0.0, "#854d0e"], [0.25, "#d97706"],
+            [0.5, "#f3f4f6"],
+            [0.75, "#0284c7"], [1.0, "#1e3a8a"]
+        ];
+
         const DEFAULT_COLORS = {
             "TEMP_COLORSCALE": DEFAULT_TEMP_COLORSCALE,
             "WIND_COLORSCALE": DEFAULT_WIND_COLORSCALE,
             "HUMIDITY_COLORSCALE": DEFAULT_HUMIDITY_COLORSCALE,
             "DEWPOINT_COLORSCALE": DEFAULT_DEWPOINT_COLORSCALE,
-            "LCL_COLORSCALE": DEFAULT_LCL_COLORSCALE
+            "LCL_COLORSCALE": DEFAULT_LCL_COLORSCALE,
+            "TREND_TEMP_COLORSCALE": DEFAULT_TREND_TEMP_COLORSCALE,
+            "TREND_HUMIDITY_COLORSCALE": DEFAULT_TREND_HUMIDITY_COLORSCALE
         };
 
         const DEFAULT_ZMIENNE = {
@@ -1632,8 +1665,25 @@ window.initMapa = function() {
                 }
             }
             
-            const cmin = (zInfo && zInfo.cmin !== undefined) ? zInfo.cmin : defaultZi.cmin;
-            const cmax = (zInfo && zInfo.cmax !== undefined) ? zInfo.cmax : defaultZi.cmax;
+            let cmin = (zInfo && zInfo.cmin !== undefined) ? zInfo.cmin : defaultZi.cmin;
+            let cmax = (zInfo && zInfo.cmax !== undefined) ? zInfo.cmax : defaultZi.cmax;
+            
+            // Konfiguracja skali i zakresu dla trendów czasowych
+            if (okres && okres.startsWith('trend')) {
+                if (zmienna === 'wilg') {
+                    cmin = -20;
+                    cmax = 20;
+                    scale = (imgwData && imgwData.COLORS && imgwData.COLORS['TREND_HUMIDITY_COLORSCALE']) || DEFAULT_TREND_HUMIDITY_COLORSCALE;
+                } else if (zmienna === 'wiatr' || zmienna === 'wiatr_sr') {
+                    cmin = -30;
+                    cmax = 30;
+                    scale = (imgwData && imgwData.COLORS && imgwData.COLORS['TREND_TEMP_COLORSCALE']) || DEFAULT_TREND_TEMP_COLORSCALE;
+                } else {
+                    cmin = -5;
+                    cmax = 5;
+                    scale = (imgwData && imgwData.COLORS && imgwData.COLORS['TREND_TEMP_COLORSCALE']) || DEFAULT_TREND_TEMP_COLORSCALE;
+                }
+            }
             
             const showStations = window.MAP_LAYERS && window.MAP_LAYERS['stations'] ? window.MAP_LAYERS['stations'].visible : true;
             const showInter = window.MAP_LAYERS && window.MAP_LAYERS['inter'] ? window.MAP_LAYERS['inter'].visible : true;
@@ -1652,7 +1702,7 @@ window.initMapa = function() {
                     if (ptColorMode === 'scale') ptColor = "rgb(" + getColorRGBA(val, scale, cmin, cmax).slice(0,3).join(',') + ")";
                     else if (ptColorMode === 'black') ptColor = "black";
                     
-                    if(zmienna === 'synop' && data.pt_extras && data.pt_extras[i]) {
+                    if(zmienna === 'synop' && !okres.startsWith('trend') && data.pt_extras && data.pt_extras[i]) {
                         // Render full synoptic station model
                         const ex = data.pt_extras[i];
                         htmlContent = `<div style="position: relative; width: 40px; height: 40px; margin: -10px -10px;">`;
@@ -1697,7 +1747,7 @@ window.initMapa = function() {
                         
                         const isWind = (zmienna === 'wiatr' || zmienna === 'wiatr_sr');
                         
-                        if (isWind && data.pt_dirs && !isNaN(data.pt_dirs[i]) && data.pt_dirs[i] !== null) {
+                        if (isWind && !okres.startsWith('trend') && data.pt_dirs && !isNaN(data.pt_dirs[i]) && data.pt_dirs[i] !== null) {
                             const dir = data.pt_dirs[i] + 180;
                             htmlContent += `<div style="width:18px; height:18px; margin:2px auto; transform: rotate(${dir}deg); color: ${ptColor}; text-shadow: 0 0 2px black;">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 1px black);">
@@ -1725,8 +1775,12 @@ window.initMapa = function() {
             
             if(data.pt_lats && data.pt_lats.length > 5 && showInter) {
                 const isoStepInput = document.getElementById('iso-step') ? document.getElementById('iso-step').value : 'auto';
-                const stepVal = (isoStepInput !== 'auto') ? parseFloat(isoStepInput) : (zInfo.step || 2.0);
-                const dataUrl = generateIDWImage(data.pt_lats, data.pt_lons, data.pt_vals, scale, cmin, cmax, showIso, stepVal, zInfo.unit);
+                let stepVal = (isoStepInput !== 'auto') ? parseFloat(isoStepInput) : (zInfo.step || 2.0);
+                if (okres && okres.startsWith('trend') && isoStepInput === 'auto') {
+                    stepVal = (zmienna === 'wilg') ? 5.0 : 1.0;
+                }
+                const unitStr = (okres && okres.startsWith('trend')) ? `${zInfo.unit || ''}/h` : zInfo.unit;
+                const dataUrl = generateIDWImage(data.pt_lats, data.pt_lons, data.pt_vals, scale, cmin, cmax, showIso, stepVal, unitStr);
                 const bounds = [[48.5, 13.5], [55.5, 24.5]];
                 idwOverlay = L.imageOverlay(dataUrl, bounds, { opacity: opacityBg, pane: 'weatherPane' }).addTo(map);
             }
