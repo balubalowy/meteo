@@ -1496,6 +1496,9 @@ window.initMapa = function() {
                     const sRh = st.wilgotnosc_wzgledna;
                     const timeLabel = sHour ? ` (${sHour}:00 UTC)` : '';
                     
+                    window._stationMetaMap = window._stationMetaMap || {};
+                    window._stationMetaMap[String(sid)] = { lat: coord.lat, lon: coord.lon, nazwa: sName };
+                    
                     dataObj['cisnienie'].pt_lats.push(coord.lat);
                     dataObj['cisnienie'].pt_lons.push(coord.lon);
                     dataObj['cisnienie'].pt_vals.push(pVal);
@@ -1514,6 +1517,11 @@ window.initMapa = function() {
                     const lon = parseFloat(st.lon);
                     if(isNaN(lat) || isNaN(lon)) continue;
                     const nazwa = st.nazwa_stacji;
+                    const kod = String(st.kod_stacji || st.id_stacji || '');
+                    if (kod) {
+                        window._stationMetaMap = window._stationMetaMap || {};
+                        window._stationMetaMap[kod] = { lat, lon, nazwa };
+                    }
                     
                     const isDataValid = (dateStr) => {
                         if(!dateStr) return false;
@@ -1603,9 +1611,185 @@ window.initMapa = function() {
             }
         }
 
+        // Cache historii w pamięci (60s) - zapobiega ponownemu pobieraniu przy zmianie widoku
+        let _firebaseHistoryCache = null;
+        let _firebaseHistoryCacheTime = 0;
+
+        function getStationVal(st, zmienna) {
+            if (!st) return null;
+            if (zmienna === 'temp') return st.temp ?? st.temperatura ?? null;
+            if (zmienna === 'grunt') return st.temp_grunt ?? st.temperatura_gruntu ?? null;
+            if (zmienna === 'wilg') return st.wilg ?? st.wilgotnosc ?? null;
+            if (zmienna === 'wiatr') return st.wiatr_max ?? st.maks_poryw_kmh ?? null;
+            if (zmienna === 'wiatr_sr') return st.wiatr_sr ?? st.wiatr_sr_kmh ?? null;
+            if (zmienna === 'cisnienie') return st.cisnienie ?? null;
+            if (zmienna === 'rosy') {
+                const t = st.temp ?? st.temperatura;
+                const rh = st.wilg ?? st.wilgotnosc;
+                return (t !== null && rh !== null) ? calculateDewPoint(t, rh) : null;
+            }
+            return null;
+        }
+
+        async function fetchFirebaseHistory() {
+            const now = Date.now();
+            if (_firebaseHistoryCache && (now - _firebaseHistoryCacheTime < 60000)) {
+                return _firebaseHistoryCache;
+            }
+            const token = window.getFirebaseToken ? await window.getFirebaseToken() : null;
+            const authParam = token ? `?auth=${token}` : '';
+            const res = await fetch(`https://meteo-bbe28-default-rtdb.europe-west1.firebasedatabase.app/imgw_historia.json${authParam}`);
+            if (!res.ok) throw new Error(`Status ${res.status}`);
+            const data = await res.json();
+            if (!data) return [];
+            
+            const list = Array.isArray(data) ? data : Object.values(data);
+            const sorted = list.filter(s => s && s.stacje).sort((a, b) => {
+                const tA = new Date(a.czas || a.czas_pobrania).getTime();
+                const tB = new Date(b.czas || b.czas_pobrania).getTime();
+                return tA - tB;
+            });
+            _firebaseHistoryCache = sorted;
+            _firebaseHistoryCacheTime = now;
+            return sorted;
+        }
+
+        // Wyliczanie trendu czasowego (tempo zmian na godzinę)
+        function computeTrendData(snapshots, zmienna, okres) {
+            if (snapshots.length < 2) {
+                const firstTime = snapshots[0]?.czas ? snapshots[0].czas.slice(11, 16) : '--:--';
+                return {
+                    error: `Oczekiwanie na kolejny pomiar historii (zapisano 1 snapshot o ${firstTime}). Cloudflare zapisuje dane co 30 minut.`
+                };
+            }
+            const hoursBack = parseInt(okres.replace('trend', '').replace('h', '')) || 1;
+            const latestSnap = snapshots[snapshots.length - 1];
+            const latestDt = new Date(latestSnap.czas || latestSnap.czas_pobrania);
+            const targetDt = new Date(latestDt.getTime() - hoursBack * 3600 * 1000);
+
+            let bestSnap = null;
+            let minDiffSec = Infinity;
+            for (const s of snapshots) {
+                const sDt = new Date(s.czas || s.czas_pobrania);
+                const diffSec = Math.abs((sDt - targetDt) / 1000);
+                if (diffSec < minDiffSec && diffSec <= 45 * 60) {
+                    minDiffSec = diffSec;
+                    bestSnap = s;
+                }
+            }
+
+            if (!bestSnap) {
+                const firstTime = (snapshots[0].czas || snapshots[0].czas_pobrania || '').slice(11, 16);
+                const lastTime = (latestSnap.czas || latestSnap.czas_pobrania || '').slice(11, 16);
+                return {
+                    error: `Brak pomiaru z odleglosci ${hoursBack}h w bazie (dostepna historia: ${firstTime} - ${lastTime}).`
+                };
+            }
+
+            const pastDt = new Date(bestSnap.czas || bestSnap.czas_pobrania);
+            const dtHours = Math.max(0.1, (latestDt.getTime() - pastDt.getTime()) / 3600000);
+            const pastMap = new Map();
+            (bestSnap.stacje || []).forEach(s => pastMap.set(String(s.kod), s));
+
+            const defaultZi = DEFAULT_ZMIENNE[zmienna] || DEFAULT_ZMIENNE['temp'];
+            const result = { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] };
+
+            for (const st of (latestSnap.stacje || [])) {
+                const kod = String(st.kod);
+                const meta = window._stationMetaMap ? window._stationMetaMap[kod] : null;
+                if (!meta) continue;
+
+                const stPast = pastMap.get(kod);
+                if (!stPast) continue;
+
+                const vNow = getStationVal(st, zmienna);
+                const vPast = getStationVal(stPast, zmienna);
+                if (vNow === null || vPast === null) continue;
+
+                if (zmienna === 'wiatr' || zmienna === 'wiatr_sr') {
+                    const nU = (meta.nazwa || '').toUpperCase();
+                    if ((vNow > 120 || vPast > 120) && !nU.includes('ŚNIEŻKA') && !nU.includes('KASPROWY')) continue;
+                }
+
+                const delta = Math.round((vNow - vPast) * 10) / 10;
+                const rate = Math.round((delta / dtHours) * 10) / 10;
+                const znak = rate > 0 ? '+' : '';
+                const dZnak = delta > 0 ? '+' : '';
+                const pTime = pastDt.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+                const nTime = latestDt.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+
+                result.pt_lats.push(meta.lat);
+                result.pt_lons.push(meta.lon);
+                result.pt_vals.push(rate);
+                result.pt_dirs.push(null);
+                result.pt_txts.push(`${znak}${rate.toFixed(1)}`);
+                result.pt_hov.push(
+                    `<b>${meta.nazwa}</b><br>` +
+                    `Trend ${defaultZi.nazwa}: <b>${znak}${rate.toFixed(1)} ${defaultZi.unit}/h</b><br>` +
+                    `Zmiana w ${dtHours.toFixed(1)}h: ${dZnak}${delta.toFixed(1)} ${defaultZi.unit} (z ${vPast} o ${pTime} do ${vNow} o ${nTime})`
+                );
+            }
+            return result;
+        }
+
+        // Wyliczanie ekstremow (min/max z 5 godzin)
+        function computeMinMaxData(snapshots, zmienna, okres) {
+            if (!snapshots.length) return { error: 'Brak snapshotow w historii Firebase.' };
+            const isMax = okres.startsWith('max');
+            const defaultZi = DEFAULT_ZMIENNE[zmienna] || DEFAULT_ZMIENNE['temp'];
+            const result = { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] };
+
+            const stationHistory = new Map();
+            for (const snap of snapshots) {
+                const sDt = new Date(snap.czas || snap.czas_pobrania);
+                const sTime = sDt.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+                for (const st of (snap.stacje || [])) {
+                    const kod = String(st.kod);
+                    const val = getStationVal(st, zmienna);
+                    if (val === null) continue;
+                    if (!stationHistory.has(kod)) stationHistory.set(kod, []);
+                    stationHistory.get(kod).push({ val, time: sTime, dir: st.kierunek ?? st.wiatr_kierunek });
+                }
+            }
+
+            stationHistory.forEach((entries, kod) => {
+                const meta = window._stationMetaMap ? window._stationMetaMap[kod] : null;
+                if (!meta || !entries.length) return;
+
+                let best = entries[0];
+                for (let i = 1; i < entries.length; i++) {
+                    if (isMax ? entries[i].val > best.val : entries[i].val < best.val) best = entries[i];
+                }
+
+                result.pt_lats.push(meta.lat);
+                result.pt_lons.push(meta.lon);
+                result.pt_vals.push(best.val);
+                result.pt_dirs.push(best.dir ?? null);
+                result.pt_txts.push(`${best.val.toFixed(1)}`);
+                result.pt_hov.push(
+                    `<b>${meta.nazwa}</b><br>` +
+                    `${isMax ? 'Maksimum' : 'Minimum'} ${defaultZi.nazwa}: <b>${best.val.toFixed(1)} ${defaultZi.unit}</b> (${best.time})`
+                );
+            });
+
+            return result;
+        }
+
+        async function getIMGWHistoryData(zmienna, okres) {
+            if (!window._stationMetaMap || Object.keys(window._stationMetaMap).length === 0) {
+                await getIMGWLiveData();
+            }
+            const snapshots = await fetchFirebaseHistory();
+            if (okres.startsWith('trend')) {
+                return computeTrendData(snapshots, zmienna, okres);
+            }
+            return computeMinMaxData(snapshots, zmienna, okres);
+        }
+
         window.renderIMGW = async function() {
             const okres = document.getElementById('imgw-okres').value;
             const zmienna = document.getElementById('imgw-zmienna').value;
+            const loadingEl = document.getElementById('imgw-loading');
             
             let data = null;
             
@@ -1615,32 +1799,35 @@ window.initMapa = function() {
                     data = liveDataObj[zmienna];
                 }
             } else {
-                // Historia Firebase (Lazy-load na żądanie - oszczędza 11.75 MB przy każdym załadowaniu strony)
-                if (!imgwData) {
-                    const loadingEl = document.getElementById('imgw-loading');
+                if (loadingEl) {
+                    loadingEl.style.display = 'flex';
+                    loadingEl.innerHTML = '<i data-lucide="loader" class="spin"></i> Obliczanie trendu i historii z bazy...';
+                }
+                try {
+                    data = await getIMGWHistoryData(zmienna, okres);
+                } catch (e) {
+                    console.error("Blad pobierania historii Firebase:", e);
                     if (loadingEl) {
                         loadingEl.style.display = 'flex';
-                        loadingEl.innerHTML = '<i data-lucide="loader" class="spin"></i> Wczytywanie danych historycznych (Firebase)...';
+                        loadingEl.innerHTML = `<span style="color:#f87171;">Blad polaczenia z Firebase (${e.message}). Upewnij sie, ze jestes zalogowany.</span>`;
                     }
-                    try {
-                        let token = window.getFirebaseToken ? await window.getFirebaseToken() : null;
-                        let authParam = token ? `?auth=${token}` : '';
-                        const res = await fetch(`https://meteo-bbe28-default-rtdb.europe-west1.firebasedatabase.app/imgw_map_data.json${authParam}`);
-                        const text = await res.text();
-                        if (window.trackFirebaseDownload) window.trackFirebaseDownload(text.length);
-                        imgwData = JSON.parse(text);
-                    } catch (e) {
-                        console.error("Błąd pobierania historii Firebase:", e);
-                    } finally {
-                        if (loadingEl) loadingEl.style.display = 'none';
-                    }
+                    return;
+                } finally {
+                    if (loadingEl && (!data || !data.error)) loadingEl.style.display = 'none';
                 }
-                if(!imgwData || !imgwData.MAP_DATA) return;
-                const ds = imgwData.MAP_DATA[zmienna];
-                if(ds && ds[okres]) data = ds[okres];
             }
 
-            if(!data) return;
+            if (data && data.error) {
+                if (loadingEl) {
+                    loadingEl.style.display = 'flex';
+                    loadingEl.innerHTML = `<span style="color:#fbbf24; font-size:0.85rem;">${data.error}</span>`;
+                }
+                imgwLayerGroup.clearLayers();
+                if(idwOverlay) { map.removeLayer(idwOverlay); idwOverlay = null; }
+                return;
+            }
+
+            if(!data || !data.pt_lats || !data.pt_lats.length) return;
 
             imgwLayerGroup.clearLayers();
             if(idwOverlay) {
