@@ -1669,25 +1669,30 @@ window.initMapa = function() {
 
             let bestSnap = null;
             let minDiffSec = Infinity;
-            for (const s of snapshots) {
+            // Szukamy snapshotu najbliższego zadanemu czasowi (targetDt) spośród wcześniejszych pomiarów
+            for (let i = 0; i < snapshots.length - 1; i++) {
+                const s = snapshots[i];
                 const sDt = new Date(s.czas || s.czas_pobrania);
                 const diffSec = Math.abs((sDt - targetDt) / 1000);
-                if (diffSec < minDiffSec && diffSec <= 45 * 60) {
+                if (diffSec < minDiffSec) {
                     minDiffSec = diffSec;
                     bestSnap = s;
                 }
             }
 
             if (!bestSnap) {
-                const firstTime = (snapshots[0].czas || snapshots[0].czas_pobrania || '').slice(11, 16);
-                const lastTime = (latestSnap.czas || latestSnap.czas_pobrania || '').slice(11, 16);
                 return {
-                    error: `Brak pomiaru z odleglosci ${hoursBack}h w bazie (dostepna historia: ${firstTime} - ${lastTime}).`
+                    error: 'Brak wcześniejszego pomiaru w historii do obliczenia trendu.'
                 };
             }
 
             const pastDt = new Date(bestSnap.czas || bestSnap.czas_pobrania);
-            const dtHours = Math.max(0.1, (latestDt.getTime() - pastDt.getTime()) / 3600000);
+            const dtHours = (latestDt.getTime() - pastDt.getTime()) / 3600000;
+            if (dtHours < 0.16) {
+                return {
+                    error: `Zbyt mały odstęp czasu między pomiarami (${Math.round(dtHours * 60)} min). Wymagane min. 10 min.`
+                };
+            }
             const pastMap = new Map();
             (bestSnap.stacje || []).forEach(s => pastMap.set(String(s.kod), s));
 
