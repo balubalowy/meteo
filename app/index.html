@@ -114,10 +114,7 @@
           <nav class="nav-links" aria-label="Główna nawigacja portalu">
           <a href="#" class="nav-link btn btn-ghost tab-btn active" data-tab="tab-overview"><i data-lucide="layout-dashboard"></i> Pulpit</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-mapa" style="color: var(--accent-primary);"><i data-lucide="map"></i> Mapy</a>
-          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-skale"><i data-lucide="scale"></i> Skale</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-calculators"><i data-lucide="calculator"></i> Kalkulatory</a>
-          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-knowledge"><i data-lucide="book-open"></i> Wiedza</a>
-          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-stats"><i data-lucide="bar-chart-2"></i> Statystyki</a>
           <a href="https://balubalowy.github.io/system/" target="_blank" class="nav-link btn btn-ghost" style="opacity: 0.75; font-size: 0.85rem;" title="Otwórz System B-Core"><i data-lucide="command" style="width: 14px; height: 14px; color: var(--accent-primary);"></i> B-Core</a>
         </nav>
       </div>
@@ -207,12 +204,7 @@
         </div>
       </div>
 
-      <!-- TAB 2: SKALE (IF + SOB) -->
-      <div id="tab-skale" class="tab-view dynamic-tab" data-src="partials/tab-skale.html">
-        <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
-          <i data-lucide="loader" class="spin"></i> Ładowanie...
-        </div>
-      </div>
+
 
       <!-- TAB 3: KALKULATORY -->
       <div id="tab-calculators" class="tab-view dynamic-tab" data-src="partials/tab-calculators.html">
@@ -221,12 +213,7 @@
         </div>
       </div>
 
-      <!-- TAB 4: WIEDZA -->
-      <div id="tab-knowledge" class="tab-view dynamic-tab" data-src="partials/tab-knowledge.html">
-        <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
-          <i data-lucide="loader" class="spin"></i> Ładowanie...
-        </div>
-      </div>
+
 
       <!-- TAB 6: MAPY -->
       <div id="tab-mapa" class="tab-view dynamic-tab" data-src="partials/tab-mapa.html" style="height: calc(100vh - 70px); padding: 0;">
@@ -242,16 +229,7 @@
   </div>
 </div>
 
-      <div id="tab-stats" class="tab-view">
-        <h2 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 10px;">
-          <i data-lucide="bar-chart-2"></i> Pamiętnik burz
-        </h2>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">Statystyki z arkusza obserwacji burzowych.</p>
-        
-        <div id="storm-stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;"></div>
-        <div id="storm-ratings-container"></div>
-        <div id="repo-stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;"></div>
-      </div>
+
     </main>
   </div> <!-- /#app-root -->
 

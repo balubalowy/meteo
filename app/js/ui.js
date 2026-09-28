@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Dynamiczne doładowywanie zależności pod konkretne zakładki
             if (targetTab === 'tab-mapa') {
                 await ensureMapDependencies();
-            } else if (targetTab === 'tab-knowledge' || targetTab === 'tab-cloud-identifier') {
+            } else if (targetTab === 'tab-cloud-identifier') {
                 await ensureCloudsDependencies();
             }
             
