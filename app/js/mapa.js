@@ -1313,96 +1313,216 @@ window.initMapa = function() {
             return Math.log(Math.tan(Math.PI / 4.0 + rad / 2.0));
         }
 
-        function generateIDWImage(lats, lons, vals, scale, cmin, cmax, drawIso, stepVal = null, unit = '') {
-            const w = 360, h = 270;
-            const offCanvas = document.createElement('canvas');
-            offCanvas.width = w; 
-            offCanvas.height = h;
-            const offCtx = offCanvas.getContext('2d');
-            const imgData = offCtx.createImageData(w, h);
-            const valGrid = new Float32Array(w * h);
-            
-            const minLat = 48.5, maxLat = 55.5;
-            const minLon = 13.5, maxLon = 24.5;
+        function generateIDWImage(lats, lons, vals, scale, cmin, cmax, drawIso, stepVal = null, unit = '', geoBounds = null, clipToPoland = false) {
+            const minLat = geoBounds ? geoBounds.minLat : 48.5;
+            const maxLat = geoBounds ? geoBounds.maxLat : 55.5;
+            const minLon = geoBounds ? geoBounds.minLon : 13.5;
+            const maxLon = geoBounds ? geoBounds.maxLon : 24.5;
             const minMercY = latToMercY(minLat);
             const maxMercY = latToMercY(maxLat);
-            
+
+            // Siatka obliczeniowa (lekka i szybka dla IDW, adaptacyjna dla szerszego obszaru)
+            const gw = geoBounds ? 220 : 180;
+            const gh = geoBounds ? 140 : 135;
+            // Docelowe płótno wysokiej rozdzielczości (dla ostrych wektorów)
+            const w = 1200, h = 900;
+
             const pts = [];
-            for(let i=0; i<lats.length; i++) {
-                const px = ((lons[i] - minLon) / (maxLon - minLon)) * w;
-                const py = (1 - (latToMercY(lats[i]) - minMercY) / (maxMercY - minMercY)) * h;
-                pts.push({x: px, y: py, v: vals[i]});
+            for (let i = 0; i < lats.length; i++) {
+                const px = ((lons[i] - minLon) / (maxLon - minLon)) * gw;
+                const py = (1 - (latToMercY(lats[i]) - minMercY) / (maxMercY - minMercY)) * gh;
+                pts.push({ x: px, y: py, v: vals[i] });
             }
 
-            for (let y = 0; y < h; y++) {
-                for (let x = 0; x < w; x++) {
+            const valGrid = new Float32Array(gw * gh);
+            const heatCanvas = document.createElement('canvas');
+            heatCanvas.width = gw;
+            heatCanvas.height = gh;
+            const heatCtx = heatCanvas.getContext('2d');
+            const heatImgData = heatCtx.createImageData(gw, gh);
+
+            for (let y = 0; y < gh; y++) {
+                for (let x = 0; x < gw; x++) {
                     let num = 0, den = 0;
-                    for(let i=0; i<pts.length; i++) {
+                    for (let i = 0; i < pts.length; i++) {
                         const dx = x - pts[i].x;
                         const dy = y - pts[i].y;
-                        let d2 = dx*dx + dy*dy;
-                        if(d2 < 0.5) d2 = 0.5;
-                        const weight = 1.0 / (d2 * d2);
+                        let d2 = dx * dx + dy * dy;
+                        if (d2 < 1.0) d2 = 1.0;
+                        const weight = 1.0 / (d2 * Math.sqrt(d2)); // waga d^2.5
                         num += weight * pts[i].v;
                         den += weight;
                     }
                     const val = num / den;
-                    const idx = (y * w + x);
+                    const idx = y * gw + x;
                     valGrid[idx] = val;
-                    
+
                     const rgba = getColorRGBA(val, scale, cmin, cmax);
                     const pIdx = idx * 4;
-                    imgData.data[pIdx] = rgba[0];
-                    imgData.data[pIdx+1] = rgba[1];
-                    imgData.data[pIdx+2] = rgba[2];
-                    imgData.data[pIdx+3] = rgba[3]; 
+                    heatImgData.data[pIdx] = rgba[0];
+                    heatImgData.data[pIdx + 1] = rgba[1];
+                    heatImgData.data[pIdx + 2] = rgba[2];
+                    heatImgData.data[pIdx + 3] = rgba[3];
                 }
             }
-            
-            const isoLabels = [];
+            heatCtx.putImageData(heatImgData, 0, 0);
+
+            // Wygładzanie tła na płótnie o wysokiej rozdzielczości (GPU bicubic filter)
+            const offCanvas = document.createElement('canvas');
+            offCanvas.width = w;
+            offCanvas.height = h;
+            const offCtx = offCanvas.getContext('2d');
+            offCtx.imageSmoothingEnabled = true;
+            offCtx.imageSmoothingQuality = 'high';
+            offCtx.drawImage(heatCanvas, 0, 0, w, h);
+
+            // Wygładzona siatka pod wektorowe izolinie (eliminacja szumu mikroskali)
+            const smoothGrid = new Float32Array(gw * gh);
+            for (let y = 0; y < gh; y++) {
+                for (let x = 0; x < gw; x++) {
+                    if (x === 0 || x === gw - 1 || y === 0 || y === gh - 1) {
+                        smoothGrid[y * gw + x] = valGrid[y * gw + x];
+                    } else {
+                        smoothGrid[y * gw + x] = (
+                            valGrid[(y - 1) * gw + x - 1] + 2 * valGrid[(y - 1) * gw + x] + valGrid[(y - 1) * gw + x + 1] +
+                            2 * valGrid[y * gw + x - 1] + 4 * valGrid[y * gw + x] + 2 * valGrid[y * gw + x + 1] +
+                            valGrid[(y + 1) * gw + x - 1] + 2 * valGrid[(y + 1) * gw + x] + valGrid[(y + 1) * gw + x + 1]
+                        ) / 16.0;
+                    }
+                }
+            }
+
+            // Kreślenie wektorowych izolinii algorytmem Marching Squares z podpikselową interpolacją liniową
             if (drawIso) {
                 const step = (stepVal && !isNaN(stepVal) && stepVal > 0) ? stepVal : ((cmax - cmin) / 15);
-                for (let y = 0; y < h - 1; y++) {
-                    for (let x = 0; x < w - 1; x++) {
-                        const idx = y * w + x;
-                        const v1 = valGrid[idx];
-                        const v2 = valGrid[idx + 1];
-                        const v3 = valGrid[idx + w];
-                        
-                        const q1 = Math.floor(v1 / step);
-                        const q2 = Math.floor(v2 / step);
-                        const q3 = Math.floor(v3 / step);
+                const startVal = Math.ceil(cmin / step) * step;
+                const scaleX = w / (gw - 1);
+                const scaleY = h / (gh - 1);
 
-                        if (q1 !== q2 || q1 !== q3) {
-                            const pIdx = idx * 4;
-                            imgData.data[pIdx] = 15;
-                            imgData.data[pIdx+1] = 23;
-                            imgData.data[pIdx+2] = 42;
-                            imgData.data[pIdx+3] = 220; // Elegancka, wyraźna linia izobary/izolinii
-                            
-                            // Próbkowanie etykiet (co ok. 60 px)
-                            if (x > 20 && x < w - 20 && y > 20 && y < h - 20 && x % 55 === 0 && y % 45 === 0) {
-                                const roundedVal = (Math.round(v1 / step) * step).toFixed(step < 1 ? 1 : 0);
-                                isoLabels.push({ x, y, text: roundedVal });
+                offCtx.lineWidth = 1.5;
+                offCtx.strokeStyle = 'rgba(15, 23, 42, 0.85)';
+                offCtx.lineCap = 'round';
+                offCtx.lineJoin = 'round';
+
+                const isoLabels = [];
+
+                for (let T = startVal; T <= cmax; T += step) {
+                    const segs = [];
+                    for (let j = 0; j < gh - 1; j++) {
+                        for (let i = 0; i < gw - 1; i++) {
+                            const idx = j * gw + i;
+                            const v0 = smoothGrid[idx];
+                            const v1 = smoothGrid[idx + 1];
+                            const v2 = smoothGrid[idx + gw + 1];
+                            const v3 = smoothGrid[idx + gw];
+
+                            let mask = 0;
+                            if (v0 >= T) mask |= 1;
+                            if (v1 >= T) mask |= 2;
+                            if (v2 >= T) mask |= 4;
+                            if (v3 >= T) mask |= 8;
+
+                            if (mask === 0 || mask === 15) continue;
+
+                            const pt = (gx, gy) => ({ x: gx * scaleX, y: gy * scaleY });
+                            const itop = () => pt(i + (T - v0) / (v1 - v0), j);
+                            const iright = () => pt(i + 1, j + (T - v1) / (v2 - v1));
+                            const ibot = () => pt(i + (T - v3) / (v2 - v3), j + 1);
+                            const ileft = () => pt(i, j + (T - v0) / (v3 - v0));
+
+                            const center = (v0 + v1 + v2 + v3) * 0.25;
+                            if (mask === 1) segs.push([ileft(), itop()]);
+                            else if (mask === 2) segs.push([itop(), iright()]);
+                            else if (mask === 3) segs.push([ileft(), iright()]);
+                            else if (mask === 4) segs.push([iright(), ibot()]);
+                            else if (mask === 5) {
+                                if (center >= T) { segs.push([ileft(), itop()]); segs.push([iright(), ibot()]); }
+                                else { segs.push([ileft(), ibot()]); segs.push([itop(), iright()]); }
+                            } else if (mask === 6) segs.push([itop(), ibot()]);
+                            else if (mask === 7) segs.push([ileft(), ibot()]);
+                            else if (mask === 8) segs.push([ibot(), ileft()]);
+                            else if (mask === 9) segs.push([itop(), ibot()]);
+                            else if (mask === 10) {
+                                if (center >= T) { segs.push([itop(), iright()]); segs.push([ibot(), ileft()]); }
+                                else { segs.push([itop(), ileft()]); segs.push([ibot(), iright()]); }
+                            } else if (mask === 11) segs.push([iright(), ibot()]);
+                            else if (mask === 12) segs.push([ileft(), iright()]);
+                            else if (mask === 13) segs.push([itop(), iright()]);
+                            else if (mask === 14) segs.push([ileft(), itop()]);
+                        }
+                    }
+
+                    if (segs.length > 0) {
+                        offCtx.beginPath();
+                        for (let s = 0; s < segs.length; s++) {
+                            offCtx.moveTo(segs[s][0].x, segs[s][0].y);
+                            offCtx.lineTo(segs[s][1].x, segs[s][1].y);
+                        }
+                        offCtx.stroke();
+
+                        // Dobór pozycji etykiet – odrzucenie punktów skrajnych
+                        const candidates = segs.filter(s => {
+                            const mx = (s[0].x + s[1].x) * 0.5;
+                            const my = (s[0].y + s[1].y) * 0.5;
+                            return mx > w * 0.18 && mx < w * 0.82 && my > h * 0.18 && my < h * 0.82;
+                        });
+
+                        if (candidates.length > 0) {
+                            const midIdx = Math.floor(candidates.length / 2);
+                            const p = candidates[midIdx];
+                            const lx = (p[0].x + p[1].x) * 0.5;
+                            const ly = (p[0].y + p[1].y) * 0.5;
+                            const labelTxt = Number(T).toFixed(step < 1 ? 1 : 0) + (unit ? unit : '');
+                            isoLabels.push({ x: lx, y: ly, text: labelTxt });
+
+                            if (candidates.length > 40) {
+                                const p2 = candidates[Math.floor(candidates.length * 0.2)];
+                                const lx2 = (p2[0].x + p2[1].x) * 0.5;
+                                const ly2 = (p2[0].y + p2[1].y) * 0.5;
+                                if (Math.hypot(lx - lx2, ly - ly2) > 220) {
+                                    isoLabels.push({ x: lx2, y: ly2, text: labelTxt });
+                                }
                             }
                         }
                     }
                 }
-            }
-            
-            offCtx.putImageData(imgData, 0, 0);
 
-            // Nanoszenie etykiet liczbowych na linie izobar/izolinii
-            if (drawIso && isoLabels.length > 0) {
-                offCtx.font = 'bold 9px monospace';
-                offCtx.textAlign = 'center';
-                offCtx.textBaseline = 'middle';
-                for (let lbl of isoLabels) {
-                    offCtx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-                    offCtx.fillRect(lbl.x - 14, lbl.y - 6, 28, 12);
-                    offCtx.fillStyle = '#ffffff';
-                    offCtx.fillText(lbl.text, lbl.x, lbl.y);
+                // Eleganckie kapsułki etykiet (Pill badges)
+                if (isoLabels.length > 0) {
+                    offCtx.save();
+                    offCtx.font = 'bold 11px system-ui, -apple-system, sans-serif';
+                    offCtx.textAlign = 'center';
+                    offCtx.textBaseline = 'middle';
+
+                    for (let lbl of isoLabels) {
+                        const tw = offCtx.measureText(lbl.text).width;
+                        const bw = tw + 10;
+                        const bh = 17;
+                        const bx = lbl.x - bw / 2;
+                        const by = lbl.y - bh / 2;
+
+                        offCtx.fillStyle = 'rgba(15, 23, 42, 0.90)';
+                        offCtx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+                        offCtx.lineWidth = 1;
+
+                        offCtx.beginPath();
+                        if (offCtx.roundRect) {
+                            offCtx.roundRect(bx, by, bw, bh, 4);
+                        } else {
+                            offCtx.rect(bx, by, bw, bh);
+                        }
+                        offCtx.fill();
+                        offCtx.stroke();
+
+                        offCtx.fillStyle = '#ffffff';
+                        offCtx.fillText(lbl.text, lbl.x, lbl.y + 0.5);
+                    }
+                    offCtx.restore();
                 }
+            }
+
+            if (!clipToPoland) {
+                return offCanvas.toDataURL();
             }
 
             // Główny canvas z precyzyjnym przycięciem (clip) ściśle do konturów Polski w projekcji Mercator
@@ -1447,6 +1567,120 @@ window.initMapa = function() {
             return (b * alpha) / (a - alpha);
         }
 
+        // 75 stacji przygranicznych (do 200 km od granicy Polski) zasilających ciągłość synoptyczną
+        const FOREIGN_STATIONS = [
+            // Niemcy (DE)
+            { name: "Berlin", cc: "DE", lat: 52.52, lon: 13.40 },
+            { name: "Poczdam", cc: "DE", lat: 52.39, lon: 13.06 },
+            { name: "Frankfurt n/Odrą", cc: "DE", lat: 52.34, lon: 14.55 },
+            { name: "Chociebuż (Cottbus)", cc: "DE", lat: 51.76, lon: 14.33 },
+            { name: "Drezno", cc: "DE", lat: 51.05, lon: 13.74 },
+            { name: "Lipsk", cc: "DE", lat: 51.34, lon: 12.37 },
+            { name: "Görlitz", cc: "DE", lat: 51.15, lon: 14.99 },
+            { name: "Żytawa (Zittau)", cc: "DE", lat: 50.90, lon: 14.80 },
+            { name: "Pasewalk", cc: "DE", lat: 53.51, lon: 13.99 },
+            { name: "Neubrandenburg", cc: "DE", lat: 53.56, lon: 13.26 },
+            { name: "Greifswald", cc: "DE", lat: 54.09, lon: 13.38 },
+            { name: "Stralsund", cc: "DE", lat: 54.31, lon: 13.09 },
+            // Czechy (CZ)
+            { name: "Praga", cc: "CZ", lat: 50.08, lon: 14.44 },
+            { name: "Liberec", cc: "CZ", lat: 50.77, lon: 15.06 },
+            { name: "Trutnov", cc: "CZ", lat: 50.56, lon: 15.91 },
+            { name: "Hradec Králové", cc: "CZ", lat: 50.21, lon: 15.83 },
+            { name: "Pardubice", cc: "CZ", lat: 50.04, lon: 15.78 },
+            { name: "Jeseník", cc: "CZ", lat: 50.23, lon: 17.20 },
+            { name: "Šumperk", cc: "CZ", lat: 49.96, lon: 16.97 },
+            { name: "Bruntál", cc: "CZ", lat: 49.99, lon: 17.46 },
+            { name: "Opawa", cc: "CZ", lat: 49.94, lon: 17.90 },
+            { name: "Ostrawa", cc: "CZ", lat: 49.83, lon: 18.29 },
+            { name: "Karwina", cc: "CZ", lat: 49.85, lon: 18.54 },
+            { name: "Ołomuniec", cc: "CZ", lat: 49.59, lon: 17.25 },
+            { name: "Brno", cc: "CZ", lat: 49.19, lon: 16.61 },
+            // Słowacja (SK)
+            { name: "Bratysława", cc: "SK", lat: 48.15, lon: 17.11 },
+            { name: "Żylina", cc: "SK", lat: 49.22, lon: 18.74 },
+            { name: "Czadca", cc: "SK", lat: 49.44, lon: 18.79 },
+            { name: "Namiestów", cc: "SK", lat: 49.40, lon: 19.48 },
+            { name: "Dolný Kubín", cc: "SK", lat: 49.21, lon: 19.30 },
+            { name: "Rużomberk", cc: "SK", lat: 49.08, lon: 19.31 },
+            { name: "Liptowski Mikułasz", cc: "SK", lat: 49.08, lon: 19.61 },
+            { name: "Poprad", cc: "SK", lat: 49.06, lon: 20.30 },
+            { name: "Kieżmark", cc: "SK", lat: 49.14, lon: 20.43 },
+            { name: "Stara Lubowla", cc: "SK", lat: 49.30, lon: 20.69 },
+            { name: "Bardejów", cc: "SK", lat: 49.29, lon: 21.27 },
+            { name: "Świdnik", cc: "SK", lat: 49.30, lon: 21.57 },
+            { name: "Preszów", cc: "SK", lat: 49.00, lon: 21.24 },
+            { name: "Koszyce", cc: "SK", lat: 48.72, lon: 21.26 },
+            // Ukraina (UA)
+            { name: "Lwów", cc: "UA", lat: 49.84, lon: 24.03 },
+            { name: "Rawa Ruska", cc: "UA", lat: 50.25, lon: 23.63 },
+            { name: "Żółkiew", cc: "UA", lat: 50.06, lon: 23.97 },
+            { name: "Jaworów", cc: "UA", lat: 49.94, lon: 23.39 },
+            { name: "Drohobycz", cc: "UA", lat: 49.35, lon: 23.51 },
+            { name: "Stryj", cc: "UA", lat: 49.26, lon: 23.86 },
+            { name: "Użhorod", cc: "UA", lat: 48.62, lon: 22.30 },
+            { name: "Sambor", cc: "UA", lat: 49.52, lon: 23.20 },
+            { name: "Włodzimierz", cc: "UA", lat: 50.75, lon: 24.32 },
+            { name: "Kowel", cc: "UA", lat: 51.22, lon: 24.71 },
+            { name: "Łuck", cc: "UA", lat: 50.74, lon: 25.34 },
+            { name: "Równe", cc: "UA", lat: 50.62, lon: 26.25 },
+            { name: "Iwano-Frankiwsk", cc: "UA", lat: 48.92, lon: 24.71 },
+            // Białoruś (BY)
+            { name: "Brześć", cc: "BY", lat: 52.10, lon: 23.69 },
+            { name: "Kobryń", cc: "BY", lat: 52.21, lon: 24.36 },
+            { name: "Prużana", cc: "BY", lat: 52.56, lon: 24.47 },
+            { name: "Bereza", cc: "BY", lat: 52.53, lon: 24.98 },
+            { name: "Wołkowysk", cc: "BY", lat: 53.16, lon: 24.45 },
+            { name: "Grodno", cc: "BY", lat: 53.68, lon: 23.83 },
+            { name: "Szczuczyn", cc: "BY", lat: 53.60, lon: 24.74 },
+            { name: "Lida", cc: "BY", lat: 53.89, lon: 25.30 },
+            // Litwa (LT)
+            { name: "Druskieniki", cc: "LT", lat: 54.01, lon: 23.97 },
+            { name: "Olita", cc: "LT", lat: 54.40, lon: 24.04 },
+            { name: "Łoździeje", cc: "LT", lat: 54.23, lon: 23.51 },
+            { name: "Mariampol", cc: "LT", lat: 54.56, lon: 23.35 },
+            { name: "Kowno", cc: "LT", lat: 54.90, lon: 23.90 },
+            { name: "Wilno", cc: "LT", lat: 54.69, lon: 25.28 },
+            { name: "Taurogi", cc: "LT", lat: 55.25, lon: 22.29 },
+            { name: "Kłajpeda", cc: "LT", lat: 55.71, lon: 21.14 },
+            // Obwód Królewiecki / Rosja (RU)
+            { name: "Królewiec", cc: "RU", lat: 54.71, lon: 20.51 },
+            { name: "Bagrationowsk", cc: "RU", lat: 54.38, lon: 20.63 },
+            { name: "Czerniachowsk", cc: "RU", lat: 54.64, lon: 21.81 },
+            { name: "Sowieck", cc: "RU", lat: 55.08, lon: 21.88 },
+            { name: "Gusiew", cc: "RU", lat: 54.60, lon: 22.20 },
+            { name: "Bałtijsk", cc: "RU", lat: 54.65, lon: 19.89 },
+            { name: "Mamonowo", cc: "RU", lat: 54.46, lon: 19.95 }
+        ];
+
+        let foreignLiveCache = null;
+        let foreignLiveCacheTime = 0;
+
+        // Pobieranie danych bieżących dla stacji przygranicznych (Open-Meteo multi-location API)
+        // Docs: https://open-meteo.com/en/docs
+        async function fetchForeignBorderData() {
+            const now = Date.now();
+            if (foreignLiveCache && (now - foreignLiveCacheTime < 120000)) {
+                return foreignLiveCache;
+            }
+            const lats = FOREIGN_STATIONS.map(s => s.lat.toFixed(2)).join(',');
+            const lons = FOREIGN_STATIONS.map(s => s.lon.toFixed(2)).join(',');
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,relative_humidity_2m,dew_point_2m,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m`;
+            
+            try {
+                const resp = await fetch(url);
+                if (!resp.ok) return null;
+                const json = await resp.json();
+                const results = Array.isArray(json) ? json : [json];
+                foreignLiveCache = results;
+                foreignLiveCacheTime = now;
+                return results;
+            } catch (e) {
+                console.warn("Błąd pobierania stacji zagranicznych (Open-Meteo):", e);
+                return null;
+            }
+        }
+
         let imgwLiveCache = null;
         let imgwLiveCacheTime = 0;
 
@@ -1458,25 +1692,25 @@ window.initMapa = function() {
             document.getElementById('imgw-loading').innerHTML = '<i data-lucide="loader" class="spin"></i> Pobieranie danych z IMGW (Live)...';
             
             try {
-                // Pobieranie danych automatycznych (meteo) oraz synoptycznych (synop) równolegle
-                // IMGW API Docs: https://danepubliczne.imgw.pl/api/data/meteo/ | https://danepubliczne.imgw.pl/api/data/synop
-                const [resMeteo, resSynop] = await Promise.all([
-                    fetch('https://danepubliczne.imgw.pl/api/data/meteo/'),
-                    fetch('https://danepubliczne.imgw.pl/api/data/synop')
+                // Pobieranie danych IMGW oraz stacji przygranicznych z Open-Meteo równolegle
+                const [resMeteo, resSynop, foreignData] = await Promise.all([
+                    fetch('https://danepubliczne.imgw.pl/api/data/meteo/').catch(() => ({ json: () => [] })),
+                    fetch('https://danepubliczne.imgw.pl/api/data/synop').catch(() => ({ json: () => [] })),
+                    fetchForeignBorderData()
                 ]);
                 const rawData = await resMeteo.json();
                 const synopData = await resSynop.json();
                 
                 const dataObj = {
-                    'temp': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
-                    'cisnienie': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
-                    'wiatr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
-                    'wiatr_sr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
-                    'rosy': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
-                    'lcl': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
-                    'wilg': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
-                    'grunt': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] },
-                    'synop': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] }
+                    'temp': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
+                    'cisnienie': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
+                    'wiatr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
+                    'wiatr_sr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
+                    'rosy': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
+                    'lcl': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
+                    'wilg': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
+                    'grunt': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
+                    'synop': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] }
                 };
 
                 // Przetwarzanie stacji SYNOP dla ciśnienia atmosferycznego (zredukowane do poziomu morza w hPa)
@@ -1510,6 +1744,7 @@ window.initMapa = function() {
                         `Temperatura: ${sTemp || '-'}°C, Wilgotność: ${sRh || '-'}%<br>` +
                         `Wiatr: ${sWind || '-'} m/s (${st.kierunek_wiatru || '-'}°)`
                     );
+                    dataObj['cisnienie'].pt_foreign.push(false);
                 }
 
                 for(let st of rawData) {
@@ -1579,6 +1814,7 @@ window.initMapa = function() {
                         dataObj[zmienna].pt_dirs.push(dir !== undefined ? dir : null);
                         dataObj[zmienna].pt_txts.push(txt);
                         dataObj[zmienna].pt_hov.push(`<b>${nazwa}</b><br>${hov}`);
+                        dataObj[zmienna].pt_foreign.push(false);
                         if(extra) {
                             if(!dataObj[zmienna].pt_extras) dataObj[zmienna].pt_extras = [];
                             dataObj[zmienna].pt_extras.push(extra);
@@ -1597,6 +1833,62 @@ window.initMapa = function() {
                     if(!isNaN(temp) && isDataValid(temp_t)) {
                         const extra = { temp, dewPoint, wiatr_sr_kmh, wiatr_poryw_kmh, wiatr_kier, wilg };
                         addData('synop', temp, '', `Temp: ${temp?.toFixed(1)}°C${formatTime(temp_t)}<br>Wiatr: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}<br>Wilg: ${wilg}%${formatTime(wilg_t)}`, wiatr_kier, temp_t, extra);
+                    }
+                }
+
+                // Przetwarzanie stacji zagranicznych z Open-Meteo
+                if (Array.isArray(foreignData) && foreignData.length > 0) {
+                    for (let i = 0; i < FOREIGN_STATIONS.length; i++) {
+                        const meta = FOREIGN_STATIONS[i];
+                        const item = foreignData[i];
+                        if (!item || !item.current) continue;
+                        const cur = item.current;
+
+                        const lat = meta.lat;
+                        const lon = meta.lon;
+                        const nazwa = `${meta.name} [${meta.cc}]`;
+                        const timeStr = cur.time ? cur.time.replace('T', ' ') : '';
+
+                        const temp = typeof cur.temperature_2m === 'number' ? cur.temperature_2m : NaN;
+                        const rh = typeof cur.relative_humidity_2m === 'number' ? cur.relative_humidity_2m : NaN;
+                        const dp = typeof cur.dew_point_2m === 'number' ? cur.dew_point_2m : (calculateDewPoint(temp, rh) ?? NaN);
+                        const pMsl = typeof cur.pressure_msl === 'number' ? cur.pressure_msl : NaN;
+                        const wSpd = typeof cur.wind_speed_10m === 'number' ? cur.wind_speed_10m : NaN;
+                        const wDir = typeof cur.wind_direction_10m === 'number' ? cur.wind_direction_10m : null;
+                        const wGust = typeof cur.wind_gusts_10m === 'number' ? cur.wind_gusts_10m : NaN;
+
+                        let lcl_m = NaN;
+                        if (!isNaN(temp) && !isNaN(dp)) {
+                            lcl_m = Math.round(125 * Math.max(0, temp - dp));
+                        }
+
+                        const addForeignPoint = (zmienna, val, txt, hov, dir, extra) => {
+                            if (isNaN(val) || val === null) return;
+                            dataObj[zmienna].pt_lats.push(lat);
+                            dataObj[zmienna].pt_lons.push(lon);
+                            dataObj[zmienna].pt_vals.push(val);
+                            dataObj[zmienna].pt_dirs.push(dir !== undefined ? dir : null);
+                            dataObj[zmienna].pt_txts.push(txt);
+                            dataObj[zmienna].pt_hov.push(`<b>${nazwa}</b> (Zagranica)<br>${hov}`);
+                            dataObj[zmienna].pt_foreign.push(true);
+                            if (extra) {
+                                if (!dataObj[zmienna].pt_extras) dataObj[zmienna].pt_extras = [];
+                                dataObj[zmienna].pt_extras.push(extra);
+                            }
+                        };
+
+                        if (!isNaN(temp)) addForeignPoint('temp', temp, temp.toFixed(1) + '°', `Temperatura: ${temp.toFixed(1)}°C (${timeStr})`);
+                        if (!isNaN(pMsl)) addForeignPoint('cisnienie', pMsl, pMsl.toFixed(1), `Ciśnienie (MSL): <b>${pMsl.toFixed(1)} hPa</b> (${timeStr})`);
+                        if (!isNaN(rh)) addForeignPoint('wilg', rh, rh.toFixed(0) + '%', `Wilgotność: ${rh.toFixed(0)}% (${timeStr})`);
+                        if (!isNaN(dp)) addForeignPoint('rosy', dp, dp.toFixed(1) + '°', `Punkt Rosy: ${dp.toFixed(1)}°C (${timeStr})`);
+                        if (!isNaN(lcl_m)) addForeignPoint('lcl', lcl_m, lcl_m + 'm', `Podstawa Chmur (LCL): <b>${lcl_m} m n.p.g.</b><br>Temp: ${temp.toFixed(1)}°C, Punkt Rosy: ${dp.toFixed(1)}°C`);
+                        if (!isNaN(wGust)) addForeignPoint('wiatr', wGust, wGust.toFixed(0), `Poryw Wiatru: ${wGust.toFixed(0)} km/h (${timeStr})`, wDir);
+                        if (!isNaN(wSpd)) addForeignPoint('wiatr_sr', wSpd, wSpd.toFixed(0), `Wiatr (Śr): ${wSpd.toFixed(0)} km/h (${timeStr})`, wDir);
+
+                        if (!isNaN(temp)) {
+                            const extra = { temp, dewPoint: dp, wiatr_sr_kmh: wSpd, wiatr_poryw_kmh: wGust, wiatr_kier: wDir, wilg: rh };
+                            addForeignPoint('synop', temp, '', `Temp: ${temp.toFixed(1)}°C<br>Wiatr: ${!isNaN(wGust) ? wGust.toFixed(0) : (!isNaN(wSpd) ? wSpd.toFixed(0) : '-')} km/h<br>Wilg: ${!isNaN(rh) ? rh : '-'}%`, wDir, extra);
+                        }
                     }
                 }
                 
@@ -1882,11 +2174,15 @@ window.initMapa = function() {
             const showTxt = document.getElementById('chk-txt') ? document.getElementById('chk-txt').checked : true;
             const showPt = document.getElementById('chk-pt') ? document.getElementById('chk-pt').checked : false;
             const showIso = document.getElementById('chk-iso') ? document.getElementById('chk-iso').checked : false;
+            const showForeign = document.getElementById('chk-foreign') ? document.getElementById('chk-foreign').checked : true;
             const ptColorMode = document.getElementById('pt-color-mode') ? document.getElementById('pt-color-mode').value : 'scale';
             const opacityBg = window.MAP_LAYERS && window.MAP_LAYERS['inter'] ? (window.MAP_LAYERS['inter'].opacity / 100) : (document.getElementById('opa-bg') ? parseInt(document.getElementById('opa-bg').value) / 100 : 0.7);
             
             if(showStations && data.pt_lats && (showTxt || showPt)) {
                 for(let i=0; i<data.pt_lats.length; i++) {
+                    const isForeign = !!(data.pt_foreign && data.pt_foreign[i]);
+                    if (isForeign && !showForeign) continue;
+                    
                     let htmlContent = '';
                     const val = data.pt_vals[i];
                     
@@ -1972,8 +2268,34 @@ window.initMapa = function() {
                     stepVal = (zmienna === 'wilg') ? 5.0 : 1.0;
                 }
                 const unitStr = (okres && okres.startsWith('trend')) ? `${zInfo.unit || ''}/h` : zInfo.unit;
-                const dataUrl = generateIDWImage(data.pt_lats, data.pt_lons, data.pt_vals, scale, cmin, cmax, showIso, stepVal, unitStr);
-                const bounds = [[48.5, 13.5], [55.5, 24.5]];
+
+                let idwLats = data.pt_lats;
+                let idwLons = data.pt_lons;
+                let idwVals = data.pt_vals;
+
+                if (!showForeign && data.pt_foreign) {
+                    idwLats = [];
+                    idwLons = [];
+                    idwVals = [];
+                    for (let i = 0; i < data.pt_lats.length; i++) {
+                        if (!data.pt_foreign[i]) {
+                            idwLats.push(data.pt_lats[i]);
+                            idwLons.push(data.pt_lons[i]);
+                            idwVals.push(data.pt_vals[i]);
+                        }
+                    }
+                }
+
+                const hasForeignActive = showForeign && data.pt_foreign && data.pt_foreign.some(f => f);
+                const geoBounds = hasForeignActive 
+                    ? { minLat: 47.5, maxLat: 56.5, minLon: 11.5, maxLon: 27.0 }
+                    : { minLat: 48.5, maxLat: 55.5, minLon: 13.5, maxLon: 24.5 };
+                const bounds = hasForeignActive
+                    ? [[47.5, 11.5], [56.5, 27.0]]
+                    : [[48.5, 13.5], [55.5, 24.5]];
+                const clipToPoland = !hasForeignActive;
+
+                const dataUrl = generateIDWImage(idwLats, idwLons, idwVals, scale, cmin, cmax, showIso, stepVal, unitStr, geoBounds, clipToPoland);
                 idwOverlay = L.imageOverlay(dataUrl, bounds, { opacity: opacityBg, pane: 'weatherPane' }).addTo(map);
             }
         }
