@@ -1670,8 +1670,18 @@ window.initMapa = function() {
     {"name": "Przerow", "cc": "CZ", "lat": 49.46, "lon": 17.45},
     {"name": "Zlin", "cc": "CZ", "lat": 49.23, "lon": 17.67},
     {"name": "Brno", "cc": "CZ", "lat": 49.19, "lon": 16.61},
+    {"name": "Harrachov", "cc": "CZ", "lat": 50.77, "lon": 15.43},
+    {"name": "Ceska Lipa", "cc": "CZ", "lat": 50.69, "lon": 14.54},
+    {"name": "Decin", "cc": "CZ", "lat": 50.78, "lon": 14.21},
+    {"name": "Usti nad Labem", "cc": "CZ", "lat": 50.66, "lon": 14.03},
+    {"name": "Novy Bor", "cc": "CZ", "lat": 50.76, "lon": 14.56},
+    {"name": "Jaromer", "cc": "CZ", "lat": 50.36, "lon": 15.92},
+    {"name": "Rokytnice v Orlickych horach", "cc": "CZ", "lat": 50.16, "lon": 16.46},
+    {"name": "Koprivnice", "cc": "CZ", "lat": 49.60, "lon": 18.14},
+    {"name": "Valasske Mezirici", "cc": "CZ", "lat": 49.47, "lon": 17.97},
+    {"name": "Vsetin", "cc": "CZ", "lat": 49.34, "lon": 17.99},
 
-    // Słowacja (SK) - 40 stacji
+    // Słowacja (SK) - 50 stacji
     {"name": "Czadca", "cc": "SK", "lat": 49.44, "lon": 18.79},
     {"name": "Turzovka", "cc": "SK", "lat": 49.40, "lon": 18.62},
     {"name": "Kysucke Nove Mesto", "cc": "SK", "lat": 49.30, "lon": 18.78},
@@ -1712,6 +1722,16 @@ window.initMapa = function() {
     {"name": "Trebisov", "cc": "SK", "lat": 48.63, "lon": 21.72},
     {"name": "Banska Bystrzyca", "cc": "SK", "lat": 48.74, "lon": 19.15},
     {"name": "Bratyslawa", "cc": "SK", "lat": 48.15, "lon": 17.11},
+    {"name": "Oravska Lesna", "cc": "SK", "lat": 49.37, "lon": 19.18},
+    {"name": "Spiska Stara Wies", "cc": "SK", "lat": 49.38, "lon": 20.36},
+    {"name": "Zdiar", "cc": "SK", "lat": 49.27, "lon": 20.27},
+    {"name": "Tatranska Lomnica", "cc": "SK", "lat": 49.17, "lon": 20.28},
+    {"name": "Stary Smokovec", "cc": "SK", "lat": 49.14, "lon": 20.22},
+    {"name": "Zubrohlava", "cc": "SK", "lat": 49.41, "lon": 19.51},
+    {"name": "Giraltovce", "cc": "SK", "lat": 49.11, "lon": 21.52},
+    {"name": "Ubla", "cc": "SK", "lat": 48.90, "lon": 22.39},
+    {"name": "Sobrance", "cc": "SK", "lat": 48.74, "lon": 22.18},
+    {"name": "Roznava", "cc": "SK", "lat": 48.66, "lon": 20.53},
 
     // Ukraina (UA) - 35 stacji
     {"name": "Lwow", "cc": "UA", "lat": 49.84, "lon": 24.03},
@@ -1749,8 +1769,18 @@ window.initMapa = function() {
     {"name": "Rowne", "cc": "UA", "lat": 50.62, "lon": 26.25},
     {"name": "Dubno", "cc": "UA", "lat": 50.42, "lon": 25.74},
     {"name": "Iwano-Frankiwsk", "cc": "UA", "lat": 48.92, "lon": 24.71},
+    {"name": "Uzhorod", "cc": "UA", "lat": 48.62, "lon": 22.30},
+    {"name": "Mukaczewo", "cc": "UA", "lat": 48.44, "lon": 22.72},
+    {"name": "Wielki Berezny", "cc": "UA", "lat": 48.89, "lon": 22.46},
+    {"name": "Pereczyn", "cc": "UA", "lat": 48.74, "lon": 22.47},
+    {"name": "Ratno", "cc": "UA", "lat": 51.67, "lon": 24.53},
+    {"name": "Maniewicze", "cc": "UA", "lat": 51.29, "lon": 25.55},
+    {"name": "Sarny", "cc": "UA", "lat": 51.33, "lon": 26.60},
+    {"name": "Kostopol", "cc": "UA", "lat": 50.88, "lon": 26.44},
+    {"name": "Brody", "cc": "UA", "lat": 50.08, "lon": 25.15},
+    {"name": "Tarnopol", "cc": "UA", "lat": 49.55, "lon": 25.59},
 
-    // Białoruś (BY) - 20 stacji
+    // Białoruś (BY) - 30 stacji
     {"name": "Brzesc", "cc": "BY", "lat": 52.10, "lon": 23.69},
     {"name": "Zabinka", "cc": "BY", "lat": 52.20, "lon": 24.02},
     {"name": "Kobryn", "cc": "BY", "lat": 52.21, "lon": 24.36},
@@ -1771,6 +1801,16 @@ window.initMapa = function() {
     {"name": "Skidel", "cc": "BY", "lat": 53.59, "lon": 24.25},
     {"name": "Szczuczyn", "cc": "BY", "lat": 53.60, "lon": 24.74},
     {"name": "Lida", "cc": "BY", "lat": 53.89, "lon": 25.30},
+    {"name": "Sopockinie", "cc": "BY", "lat": 53.83, "lon": 23.65},
+    {"name": "Indura", "cc": "BY", "lat": 53.46, "lon": 23.88},
+    {"name": "Porozowo", "cc": "BY", "lat": 52.93, "lon": 24.36},
+    {"name": "Szereszewo", "cc": "BY", "lat": 52.56, "lon": 24.21},
+    {"name": "Drohiczyn Poleski", "cc": "BY", "lat": 52.19, "lon": 25.16},
+    {"name": "Iwacewicze", "cc": "BY", "lat": 52.71, "lon": 25.34},
+    {"name": "Baranowicze", "cc": "BY", "lat": 53.13, "lon": 26.02},
+    {"name": "Radun", "cc": "BY", "lat": 54.05, "lon": 24.99},
+    {"name": "Woranawa", "cc": "BY", "lat": 54.15, "lon": 25.32},
+    {"name": "Iwje", "cc": "BY", "lat": 53.93, "lon": 25.77},
 
     // Litwa (LT) - 20 stacji
     {"name": "Druskieniki", "cc": "LT", "lat": 54.01, "lon": 23.97},
@@ -1879,7 +1919,7 @@ window.initMapa = function() {
             if (foreignAsosCache && (now - foreignAsosCacheTime < 120000)) {
                 return foreignAsosCache;
             }
-            const networks = ['CZ__ASOS', 'SK__ASOS', 'DE__ASOS', 'LT__ASOS', 'UA__ASOS'];
+            const networks = ['CZ__ASOS', 'SK__ASOS', 'DE__ASOS', 'LT__ASOS', 'UA__ASOS', 'BY__ASOS'];
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 4500);
 
