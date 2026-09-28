@@ -1224,17 +1224,6 @@ window.initMapa = function() {
             [0.75, "#0284c7"], [1.0, "#1e3a8a"]
         ];
 
-        const DEFAULT_COLORS = {
-            "TEMP_COLORSCALE": DEFAULT_TEMP_COLORSCALE,
-            "WIND_COLORSCALE": DEFAULT_WIND_COLORSCALE,
-            "HUMIDITY_COLORSCALE": DEFAULT_HUMIDITY_COLORSCALE,
-            "DEWPOINT_COLORSCALE": DEFAULT_DEWPOINT_COLORSCALE,
-            "LCL_COLORSCALE": DEFAULT_LCL_COLORSCALE,
-            "TREND_TEMP_COLORSCALE": DEFAULT_TREND_TEMP_COLORSCALE,
-            "TREND_HUMIDITY_COLORSCALE": DEFAULT_TREND_HUMIDITY_COLORSCALE,
-            "SNOW_COLORSCALE": DEFAULT_SNOW_COLORSCALE
-        };
-
         const DEFAULT_SNOW_COLORSCALE = [
             [0.0,  "#fdf2f8"], // 0 cm: bardzo blady pastelowy róż
             [0.08, "#fbcfe8"], // ~5 cm: lekki róż
@@ -1254,6 +1243,17 @@ window.initMapa = function() {
             [1.0,  "#ef4444"], // 100%: przekroczenie normy (czerwony)
             [1.3,  "#a855f7"]  // 130%+: ekstremalne przekroczenie normy (fiolet)
         ];
+
+        const DEFAULT_COLORS = {
+            "TEMP_COLORSCALE": DEFAULT_TEMP_COLORSCALE,
+            "WIND_COLORSCALE": DEFAULT_WIND_COLORSCALE,
+            "HUMIDITY_COLORSCALE": DEFAULT_HUMIDITY_COLORSCALE,
+            "DEWPOINT_COLORSCALE": DEFAULT_DEWPOINT_COLORSCALE,
+            "LCL_COLORSCALE": DEFAULT_LCL_COLORSCALE,
+            "TREND_TEMP_COLORSCALE": DEFAULT_TREND_TEMP_COLORSCALE,
+            "TREND_HUMIDITY_COLORSCALE": DEFAULT_TREND_HUMIDITY_COLORSCALE,
+            "SNOW_COLORSCALE": DEFAULT_SNOW_COLORSCALE
+        };
 
         const DEFAULT_ZMIENNE = {
             "temp":             { "nazwa": "Temperatura", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
