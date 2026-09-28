@@ -1263,13 +1263,9 @@ window.initMapa = function() {
             "wilg":             { "nazwa": "Wilgotność", "cscale": DEFAULT_HUMIDITY_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "%", "step": 10.0 },
             "rosy":             { "nazwa": "Punkt Rosy", "cscale": DEFAULT_DEWPOINT_COLORSCALE, "cmin": -10, "cmax": 28, "unit": "°C", "step": 2.0 },
             "lcl":              { "nazwa": "Podstawa Chmur (LCL)", "cscale": DEFAULT_LCL_COLORSCALE, "cmin": 0, "cmax": 3000, "unit": "m", "step": 250.0 },
-            "synop":            { "nazwa": "Model Synoptyczny", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
             "cisnienie":        { "nazwa": "Ciśnienie", "cscale": DEFAULT_PRESSURE_COLORSCALE, "cmin": 980, "cmax": 1040, "unit": "hPa", "step": 2.0 },
             "snieg":            { "nazwa": "Pokrywa Śnieżna", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "cm", "step": 5.0 },
-            "snieg_swiezy":     { "nazwa": "Świeży Śnieg", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 50, "unit": "cm", "step": 2.0 },
-            "snieg_zapas":      { "nazwa": "Zapas Wody w Śniegu", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 300, "unit": "mm", "step": 20.0 },
-            "snieg_obciazenie": { "nazwa": "Obciążenie Śniegiem", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 5, "unit": "kN/m²", "step": 0.5 },
-            "snieg_norma":      { "nazwa": "% Normy Obciążenia", "cscale": DEFAULT_SNOW_SAFETY_COLORSCALE, "cmin": 0, "cmax": 120, "unit": "%", "step": 10.0 }
+            "snieg_swiezy":     { "nazwa": "Świeży Śnieg", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 50, "unit": "cm", "step": 2.0 }
         };
         
         function hexToRgb(hex) {
@@ -1943,11 +1939,11 @@ window.initMapa = function() {
                 // Podział na 2 zapytania równoległe (Polska + granice) dla stabilności i uniknięcia błędu 503
                 const plLats = PL_ICON_FILL_COORDS.map(s => s.lat.toFixed(2)).join(',');
                 const plLons = PL_ICON_FILL_COORDS.map(s => s.lon.toFixed(2)).join(',');
-                const plUrl = `https://api.open-meteo.com/v1/forecast?latitude=${plLats}&longitude=${plLons}&current=temperature_2m,relative_humidity_2m,dew_point_2m,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=icon_seamless`;
+                const plUrl = `https://api.open-meteo.com/v1/forecast?latitude=${plLats}&longitude=${plLons}&current=temperature_2m,relative_humidity_2m,dew_point_2m,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,snow_depth,snowfall,soil_temperature_6cm&models=icon_seamless`;
 
                 const fLats = FOREIGN_STATIONS.map(s => s.lat.toFixed(2)).join(',');
                 const fLons = FOREIGN_STATIONS.map(s => s.lon.toFixed(2)).join(',');
-                const fUrl = `https://api.open-meteo.com/v1/forecast?latitude=${fLats}&longitude=${fLons}&current=temperature_2m,relative_humidity_2m,dew_point_2m,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=icon_seamless`;
+                const fUrl = `https://api.open-meteo.com/v1/forecast?latitude=${fLats}&longitude=${fLons}&current=temperature_2m,relative_humidity_2m,dew_point_2m,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,snow_depth,snowfall,soil_temperature_6cm&models=icon_seamless`;
 
                 const [resPL, resForeign] = await Promise.all([
                     fetch(plUrl).then(r => r.ok ? r.json() : []).catch(() => []),
@@ -2007,21 +2003,26 @@ window.initMapa = function() {
                 let reqMeteo = Promise.resolve([]);
                 let reqSynop = Promise.resolve([]);
                 let reqAsos = Promise.resolve([]);
+                let reqSnow = Promise.resolve(null);
                 let reqModel = Promise.resolve({ pl: [], foreign: [] });
 
                 if (dataMode === 'stations' || dataMode === 'hybrid') {
                     reqMeteo = fetch('https://danepubliczne.imgw.pl/api/data/meteo/').then(r => r.ok ? r.json() : []).catch(() => []);
                     reqSynop = fetch('https://danepubliczne.imgw.pl/api/data/synop').then(r => r.ok ? r.json() : []).catch(() => []);
                     reqAsos = fetchForeignASOSData();
+                    if (window.getSnowData) {
+                        reqSnow = window.getSnowData().catch(() => null);
+                    }
                 }
                 if (dataMode === 'model' || dataMode === 'hybrid') {
                     reqModel = fetchIconModelData();
                 }
 
-                const [rawData, synopData, asosData, modelData] = await Promise.all([
+                const [rawData, synopData, asosData, snowData, modelData] = await Promise.all([
                     reqMeteo,
                     reqSynop,
                     reqAsos,
+                    reqSnow,
                     reqModel
                 ]);
                 
@@ -2034,7 +2035,8 @@ window.initMapa = function() {
                     'lcl': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
                     'wilg': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
                     'grunt': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
-                    'synop': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [], pt_extras: [] }
+                    'snieg': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
+                    'snieg_swiezy': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] }
                 };
 
                 // Śledzenie koordynatów stacji fizycznych do deduplikacji w trybie hybrydowym
@@ -2047,7 +2049,8 @@ window.initMapa = function() {
                     'lcl': { lats: [], lons: [] },
                     'wilg': { lats: [], lons: [] },
                     'grunt': { lats: [], lons: [] },
-                    'synop': { lats: [], lons: [] }
+                    'snieg': { lats: [], lons: [] },
+                    'snieg_swiezy': { lats: [], lons: [] }
                 };
 
                 // 1. STACJE SYNOP IMGW (Ciśnienie QNH oraz podstawowe parametry)
@@ -2182,10 +2185,7 @@ window.initMapa = function() {
                         addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}`, wiatr_kier, wiatr_por_t);
                         addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`, wiatr_kier, wiatr_sr_t);
                         
-                        if (!isNaN(temp) && isDataValid(temp_t)) {
-                            const extra = { temp, dewPoint, wiatr_sr_kmh, wiatr_poryw_kmh, wiatr_kier, wilg };
-                            addData('synop', temp, '', `Temp: ${temp?.toFixed(1)}°C${formatTime(temp_t)}<br>Wiatr: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}<br>Wilg: ${wilg}%${formatTime(wilg_t)}`, wiatr_kier, temp_t, extra);
-                        }
+
                     }
                 }
 
@@ -2248,9 +2248,40 @@ window.initMapa = function() {
                         if (!isNaN(wGust)) addAsosPoint('wiatr', wGust, wGust.toFixed(0), `Poryw Wiatru: ${wGust.toFixed(0)} km/h${timeLabel}`, wDir);
                         if (!isNaN(wSpd)) addAsosPoint('wiatr_sr', wSpd, wSpd.toFixed(0), `Wiatr (Śr): ${wSpd.toFixed(0)} km/h${timeLabel}`, wDir);
 
-                        if (!isNaN(temp)) {
-                            const extra = { temp, dewPoint: dp, wiatr_sr_kmh: wSpd, wiatr_poryw_kmh: wGust, wiatr_kier: wDir, wilg: rh };
-                            addAsosPoint('synop', temp, '', `Temp: ${temp.toFixed(1)}°C<br>Wiatr: ${!isNaN(wGust) ? wGust.toFixed(0) : (!isNaN(wSpd) ? wSpd.toFixed(0) : '-')} km/h<br>Wilg: ${!isNaN(rh) ? rh : '-'}%`, wDir, extra);
+
+                    }
+                }
+
+                // 3b. STACJE ŚNIEGOWE IMGW (Pokrywa śnieżna z biuletynu monitoringu hydrologiczno-meteorologicznego)
+                if (snowData && dataMode !== 'model') {
+                    if (snowData['snieg'] && Array.isArray(snowData['snieg'].pt_lats)) {
+                        for (let i = 0; i < snowData['snieg'].pt_lats.length; i++) {
+                            dataObj['snieg'].pt_lats.push(snowData['snieg'].pt_lats[i]);
+                            dataObj['snieg'].pt_lons.push(snowData['snieg'].pt_lons[i]);
+                            dataObj['snieg'].pt_vals.push(snowData['snieg'].pt_vals[i]);
+                            dataObj['snieg'].pt_dirs.push(null);
+                            dataObj['snieg'].pt_txts.push(snowData['snieg'].pt_txts[i]);
+                            dataObj['snieg'].pt_hov.push(snowData['snieg'].pt_hov[i]);
+                            dataObj['snieg'].pt_foreign.push(false);
+                            dataObj['snieg'].pt_types.push('ODCZYT');
+
+                            realCoords['snieg'].lats.push(snowData['snieg'].pt_lats[i]);
+                            realCoords['snieg'].lons.push(snowData['snieg'].pt_lons[i]);
+                        }
+                    }
+                    if (snowData['snieg_swiezy'] && Array.isArray(snowData['snieg_swiezy'].pt_lats)) {
+                        for (let i = 0; i < snowData['snieg_swiezy'].pt_lats.length; i++) {
+                            dataObj['snieg_swiezy'].pt_lats.push(snowData['snieg_swiezy'].pt_lats[i]);
+                            dataObj['snieg_swiezy'].pt_lons.push(snowData['snieg_swiezy'].pt_lons[i]);
+                            dataObj['snieg_swiezy'].pt_vals.push(snowData['snieg_swiezy'].pt_vals[i]);
+                            dataObj['snieg_swiezy'].pt_dirs.push(null);
+                            dataObj['snieg_swiezy'].pt_txts.push(snowData['snieg_swiezy'].pt_txts[i]);
+                            dataObj['snieg_swiezy'].pt_hov.push(snowData['snieg_swiezy'].pt_hov[i]);
+                            dataObj['snieg_swiezy'].pt_foreign.push(false);
+                            dataObj['snieg_swiezy'].pt_types.push('ODCZYT');
+
+                            realCoords['snieg_swiezy'].lats.push(snowData['snieg_swiezy'].pt_lats[i]);
+                            realCoords['snieg_swiezy'].lons.push(snowData['snieg_swiezy'].pt_lons[i]);
                         }
                     }
                 }
@@ -2323,10 +2354,16 @@ window.initMapa = function() {
                             if (!isNaN(wGust)) addModelPoint('wiatr', wGust, wGust.toFixed(0), `Poryw Wiatru (Model): ${wGust.toFixed(0)} km/h${timeLabel}`, wDir);
                             if (!isNaN(wSpd)) addModelPoint('wiatr_sr', wSpd, wSpd.toFixed(0), `Wiatr Śr (Model): ${wSpd.toFixed(0)} km/h${timeLabel}`, wDir);
 
-                            if (!isNaN(temp)) {
-                                const extra = { temp, dewPoint: dp, wiatr_sr_kmh: wSpd, wiatr_poryw_kmh: wGust, wiatr_kier: wDir, wilg: rh };
-                                addModelPoint('synop', temp, '', `Temp: ${temp.toFixed(1)}°C<br>Wiatr: ${!isNaN(wGust) ? wGust.toFixed(0) : (!isNaN(wSpd) ? wSpd.toFixed(0) : '-')} km/h<br>Wilg: ${!isNaN(rh) ? rh : '-'}%`, wDir, extra);
-                            }
+                            // Temperatura gruntu (-6 cm)
+                            const tSoil = typeof cur.soil_temperature_6cm === 'number' ? cur.soil_temperature_6cm : NaN;
+                            if (!isNaN(tSoil)) addModelPoint('grunt', tSoil, tSoil.toFixed(1) + '°', `Temperatura gruntu -6cm (Model): <b>${tSoil.toFixed(1)}°C</b>${timeLabel}`);
+
+                            // Pokrywa śnieżna i świeży śnieg z modelu numerycznego
+                            const snowVal = typeof cur.snow_depth === 'number' ? Math.round(cur.snow_depth * 100 * 10) / 10 : NaN;
+                            if (!isNaN(snowVal)) addModelPoint('snieg', snowVal, `${Math.round(snowVal)}cm`, `Pokrywa śnieżna (Model): <b>${snowVal.toFixed(1)} cm</b>${timeLabel}`);
+
+                            const freshVal = typeof cur.snowfall === 'number' ? Math.round(cur.snowfall * 10) / 10 : NaN;
+                            if (!isNaN(freshVal)) addModelPoint('snieg_swiezy', freshVal, `${Math.round(freshVal)}cm`, `Świeżo spadły śnieg (Model): <b>${freshVal.toFixed(1)} cm</b>${timeLabel}`);
                         }
                     };
 
@@ -2572,22 +2609,7 @@ window.initMapa = function() {
             
             let data = null;
             
-                        if (zmienna.startsWith('snieg')) {
-                if (loadingEl) {
-                    loadingEl.style.display = 'flex';
-                    loadingEl.innerHTML = '<i data-lucide="loader" class="spin"></i> Pobieranie biuletynu pokrywy śnieżnej IMGW...';
-                }
-                try {
-                    if (window.getSnowData) {
-                        const snowDataObj = await window.getSnowData();
-                        data = snowDataObj[zmienna];
-                    }
-                } catch (e) {
-                    console.error("Błąd pobierania danych śniegu:", e);
-                } finally {
-                    if (loadingEl) loadingEl.style.display = 'none';
-                }
-            } else if (okres === 'now') {
+            if (okres === 'now') {
                 const liveDataObj = await getIMGWLiveData();
                 if(liveDataObj) {
                     data = liveDataObj[zmienna];
@@ -2687,68 +2709,25 @@ window.initMapa = function() {
                     if (ptColorMode === 'scale') ptColor = "rgb(" + getColorRGBA(val, scale, cmin, cmax).slice(0,3).join(',') + ")";
                     else if (ptColorMode === 'black') ptColor = "black";
                     
-                    if(zmienna === 'synop' && !okres.startsWith('trend') && data.pt_extras && data.pt_extras[i]) {
-                        // Render full synoptic station model
-                        const ex = data.pt_extras[i];
-                        htmlContent = `<div style="position: relative; width: 40px; height: 40px; margin: -10px -10px;">`;
-                        
-                        // Center dot
-                        const isForecastSynop = !!(data.pt_types && data.pt_types[i] === 'PROGNOZA');
-                        const dotBorder = isForecastSynop ? '2px dashed #60a5fa' : '1px solid rgba(255,255,255,0.7)';
-                        htmlContent += `<div style="position: absolute; top: 15px; left: 15px; width: 10px; height: 10px; background: ${ptColor}; border-radius: 50%; box-shadow: 0 0 2px black; border: ${dotBorder}; z-index: 10;"></div>`;
-                        
-                        // Top-left: Temperature (Red)
-                        htmlContent += `<div style="position: absolute; top: -2px; left: -10px; width: 25px; text-align: right; color: #f87171; font-weight: bold; font-size: 0.8rem; text-shadow: 0 0 2px black, 0 0 3px black;">${ex.temp?.toFixed(1)}</div>`;
-                        
-                        // Bottom-left: Dew Point (Green/Blue)
-                        if(ex.dewPoint) {
-                            htmlContent += `<div style="position: absolute; top: 22px; left: -10px; width: 25px; text-align: right; color: #60a5fa; font-weight: bold; font-size: 0.8rem; text-shadow: 0 0 2px black, 0 0 3px black;">${ex.dewPoint?.toFixed(1)}</div>`;
-                        }
-                        
-                        // Top-right: Gust / Wind
-                        if(ex.wiatr_poryw_kmh && ex.wiatr_poryw_kmh > 0) {
-                            htmlContent += `<div style="position: absolute; top: -2px; left: 25px; width: 25px; text-align: left; color: #fbbf24; font-weight: bold; font-size: 0.75rem; text-shadow: 0 0 2px black, 0 0 3px black;">${ex.wiatr_poryw_kmh?.toFixed(0)}</div>`;
-                        }
-                        
-                        // Bottom-right: Humidity
-                        if(!isNaN(ex.wilg)) {
-                            htmlContent += `<div style="position: absolute; top: 22px; left: 25px; width: 25px; text-align: left; color: #9ca3af; font-size: 0.7rem; text-shadow: 0 0 2px black, 0 0 3px black;">${ex.wilg}%</div>`;
-                        }
-                        
-                        // Wind Barb (Feathers)
-                        if(!isNaN(ex.wiatr_kier) && ex.wiatr_sr_kmh > 0) {
-                            const dir = ex.wiatr_kier + 180;
-                            htmlContent += `<div style="position: absolute; top: 11px; left: 11px; width: 18px; height: 18px; transform: rotate(${dir}deg); transform-origin: center;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 2px black);">
-                                    <line x1="12" y1="24" x2="12" y2="4"></line>
-                                    <line x1="12" y1="4" x2="18" y2="8"></line>
-                                </svg>
-                            </div>`;
-                        }
-                        
-                        htmlContent += `</div>`;
-                        
-                    } else {
-                        // Standard marker
-                        const isForecast = !!(data.pt_types && data.pt_types[i] === 'PROGNOZA');
-                        const forecastSuffix = isForecast ? '<span style="font-size:0.65rem; color:#60a5fa; vertical-align:top; font-weight:normal; margin-left:1px;" title="Wartość z modelu ICON">~</span>' : '';
-                        if(showTxt) htmlContent += `<div style="color: white; text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}${forecastSuffix}</div>`;
-                        
-                        const isWind = (zmienna === 'wiatr' || zmienna === 'wiatr_sr');
-                        
-                        if (isWind && !okres.startsWith('trend') && data.pt_dirs && !isNaN(data.pt_dirs[i]) && data.pt_dirs[i] !== null) {
-                            const dir = data.pt_dirs[i] + 180;
-                            htmlContent += `<div style="width:18px; height:18px; margin:2px auto; transform: rotate(${dir}deg); color: ${ptColor}; text-shadow: 0 0 2px black;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 1px black);">
-                                    <line x1="12" y1="21" x2="12" y2="3"></line>
-                                    <polyline points="5 10 12 3 19 10"></polyline>
-                                </svg>
-                            </div>`;
-                        } else if(showPt) {
-                            const borderStyle = isForecast ? '2px dashed #60a5fa' : '1px solid rgba(255,255,255,0.7)';
-                            const opacityStyle = isForecast ? 'opacity: 0.9;' : '';
-                            htmlContent += `<div style="width:10px;height:10px;background:${ptColor};border-radius:50%;margin:2px auto;box-shadow:0 0 2px black; border:${borderStyle}; ${opacityStyle}"></div>`;
-                        }
+                    // Standard marker dla wszystkich parametrów
+                    const isForecast = !!(data.pt_types && data.pt_types[i] === 'PROGNOZA');
+                    const forecastSuffix = isForecast ? '<span style="font-size:0.65rem; color:#60a5fa; vertical-align:top; font-weight:normal; margin-left:1px;" title="Wartość z modelu ICON">~</span>' : '';
+                    if(showTxt) htmlContent += `<div style="color: white; text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}${forecastSuffix}</div>`;
+                    
+                    const isWind = (zmienna === 'wiatr' || zmienna === 'wiatr_sr');
+                    
+                    if (isWind && !okres.startsWith('trend') && data.pt_dirs && !isNaN(data.pt_dirs[i]) && data.pt_dirs[i] !== null) {
+                        const dir = data.pt_dirs[i] + 180;
+                        htmlContent += `<div style="width:18px; height:18px; margin:2px auto; transform: rotate(${dir}deg); color: ${ptColor}; text-shadow: 0 0 2px black;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0px 0px 1px black);">
+                                <line x1="12" y1="21" x2="12" y2="3"></line>
+                                <polyline points="5 10 12 3 19 10"></polyline>
+                            </svg>
+                        </div>`;
+                    } else if(showPt) {
+                        const borderStyle = isForecast ? '2px dashed #60a5fa' : '1px solid rgba(255,255,255,0.7)';
+                        const opacityStyle = isForecast ? 'opacity: 0.9;' : '';
+                        htmlContent += `<div style="width:10px;height:10px;background:${ptColor};border-radius:50%;margin:2px auto;box-shadow:0 0 2px black; border:${borderStyle}; ${opacityStyle}"></div>`;
                     }
                     
                     const icon = L.divIcon({
@@ -2789,8 +2768,7 @@ window.initMapa = function() {
                     }
                 }
 
-                const isSnowVar = zmienna.startsWith('snieg');
-                const hasForeignActive = !isSnowVar && showForeign && data.pt_foreign && data.pt_foreign.some(f => f);
+                const hasForeignActive = showForeign && data.pt_foreign && data.pt_foreign.some(f => f);
                 const geoBounds = hasForeignActive 
                     ? { minLat: 47.0, maxLat: 56.5, minLon: 11.0, maxLon: 27.5 }
                     : { minLat: 48.5, maxLat: 55.5, minLon: 13.5, maxLon: 24.5 };
