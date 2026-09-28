@@ -252,3 +252,106 @@
             Wzór: α = arctan(H / D). 1 ft = 0.3048 m. Dla odległości &gt; 15 km uwzględniono poprawkę na sferyczność Ziemi: Δh ≈ D² / (2R), gdzie R = 6371 km.
           </div>
         </div>
+
+        <!-- Klasyfikator Chmur (WMO) -->
+        <div class="card mt-2" x-data="cloudClassifier">
+          <div class="card-header-bar">
+            <div class="card-title">8. Klasyfikator chmur (WMO)</div>
+          </div>
+          <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.5;">
+            Wybierz cechy obserwowane na niebie. Narzędzie filtruje taksonomię WMO oraz przedstawia interpretację synoptyczną i prognostyczną.
+          </p>
+
+          <div class="grid-2">
+            <div>
+              <div class="form-group">
+                <label class="form-label">1. Rodzaj (Genus):</label>
+                <select class="form-select" x-model="rodzaj" @change="zmianaRodzaju()">
+                  <option value="Brak">-- Wybierz rodzaj --</option>
+                  <option value="Cirrus">Cirrus (Ci)</option>
+                  <option value="Cirrocumulus">Cirrocumulus (Cc)</option>
+                  <option value="Cirrostratus">Cirrostratus (Cs)</option>
+                  <option value="Altocumulus">Altocumulus (Ac)</option>
+                  <option value="Altostratus">Altostratus (As)</option>
+                  <option value="Stratocumulus">Stratocumulus (Sc)</option>
+                  <option value="Stratus">Stratus (St)</option>
+                  <option value="Cumulus">Cumulus (Cu)</option>
+                  <option value="Nimbostratus">Nimbostratus (Ns)</option>
+                  <option value="Cumulonimbus">Cumulonimbus (Cb)</option>
+                </select>
+              </div>
+
+              <div class="form-group" x-show="rodzaj !== 'Brak'">
+                <label class="form-label">2. Gatunek (Species):</label>
+                <select class="form-select" x-model="gatunek">
+                  <template x-for="g in dostepneGatunki" :key="g">
+                    <option :value="g" x-text="g"></option>
+                  </template>
+                </select>
+              </div>
+
+              <div class="grid-2" x-show="rodzaj !== 'Brak'">
+                <div class="form-group">
+                  <label class="form-label">3. Odmiana (Variety):</label>
+                  <select class="form-select" x-model="odmiana">
+                    <template x-for="o in dostepneOdmiany" :key="o">
+                      <option :value="o" x-text="o"></option>
+                    </template>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">4. Forma (Feature):</label>
+                  <select class="form-select" x-model="forma">
+                    <template x-for="f in dostepneFormy" :key="f">
+                      <option :value="f" x-text="f"></option>
+                    </template>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Podgląd synoptyczny -->
+            <div style="background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-subtle); padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div x-show="rodzaj === 'Brak'" style="padding: 2.5rem 1rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                Wskaż rodzaj chmury, aby otrzymać diagnozę synoptyczną, piętro oraz weryfikację cech w atlasie WMO.
+              </div>
+
+              <div x-show="rodzaj !== 'Brak' && forecastInfo" style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px;">
+                  <div>
+                    <div style="font-size: 1.15rem; font-weight: 700; color: var(--accent-primary); font-family: monospace;" x-text="fullCloudName"></div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                      <span x-text="forecastInfo?.level"></span> • <span x-text="forecastInfo?.composition"></span>
+                    </div>
+                  </div>
+                  <div :style="`background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; border: 1px solid ${forecastInfo?.threat_color}; color: ${forecastInfo?.threat_color};`">
+                    Zagrożenie: <span x-text="forecastInfo?.threat"></span>
+                  </div>
+                </div>
+
+                <div class="result-box" style="margin-top: 4px; padding: 10px; font-size: 0.85rem; line-height: 1.5; color: var(--text-secondary);">
+                  <div class="stat-label" style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; color: var(--text-primary); font-weight: 600;">
+                    <i data-lucide="compass" style="width: 14px; height: 14px; color: var(--accent-primary);"></i> Czego się spodziewać (Prognostyka):
+                  </div>
+                  <span x-text="forecastInfo?.forecast"></span>
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px;">
+                  <template x-if="forecastInfo?.wmo_url">
+                    <a :href="forecastInfo?.wmo_url" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="font-size: 0.78rem; padding: 6px 10px; border: 1px solid var(--border-subtle); color: var(--accent-primary); display: flex; align-items: center; gap: 6px; text-decoration: none;">
+                      <i data-lucide="book-open" style="width: 13px; height: 13px;"></i> WMO Cloud Atlas
+                    </a>
+                  </template>
+                  <button type="button" class="btn btn-primary" style="font-size: 0.78rem; padding: 6px 10px; display: flex; align-items: center; gap: 6px; cursor: pointer;" @click="szukajWGoogle()">
+                    <i data-lucide="search" style="width: 13px; height: 13px;"></i> Google Grafika
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.725rem; color: var(--text-secondary); margin-top: 0.6rem; border-top: 1px solid var(--border-subtle); padding-top: 6px;">
+            Systematyka WMO (World Meteorological Organization). Filtrowanie wyklucza niezgodne kombinacje taksonomiczne.
+          </div>
+        </div>

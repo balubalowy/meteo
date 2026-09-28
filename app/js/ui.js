@@ -106,6 +106,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const html = await res.text();
                     activeView.innerHTML = html;
                     
+                    if (window.Alpine && typeof window.Alpine.initTree === 'function') {
+                        window.Alpine.initTree(activeView);
+                    }
                     if (typeof lucide !== 'undefined') lucide.createIcons();
                     
                     if (targetTab === 'tab-mapa' && typeof window.initMapa === 'function') {
