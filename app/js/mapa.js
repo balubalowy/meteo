@@ -1266,6 +1266,7 @@ window.initMapa = function() {
             "synop":            { "nazwa": "Model Synoptyczny", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
             "cisnienie":        { "nazwa": "Ciśnienie", "cscale": DEFAULT_PRESSURE_COLORSCALE, "cmin": 980, "cmax": 1040, "unit": "hPa", "step": 2.0 },
             "snieg":            { "nazwa": "Pokrywa Śnieżna", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "cm", "step": 5.0 },
+            "snieg_swiezy":     { "nazwa": "Świeży Śnieg", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 50, "unit": "cm", "step": 2.0 },
             "snieg_zapas":      { "nazwa": "Zapas Wody w Śniegu", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 300, "unit": "mm", "step": 20.0 },
             "snieg_obciazenie": { "nazwa": "Obciążenie Śniegiem", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 5, "unit": "kN/m²", "step": 0.5 },
             "snieg_norma":      { "nazwa": "% Normy Obciążenia", "cscale": DEFAULT_SNOW_SAFETY_COLORSCALE, "cmin": 0, "cmax": 120, "unit": "%", "step": 10.0 }

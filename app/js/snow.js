@@ -92,10 +92,23 @@
                         const t = middle[i];
                         if (t.length === 1 && t >= '1' && t <= '9' && gatunek === null) {
                             gatunek = parseInt(t, 10);
+                        } else if (t.length >= 3 && t[0] >= '1' && t[0] <= '9' && gatunek === null && zapas === null && t.indexOf('.') === -1) {
+                            // Rozdzielenie sklejenia gatunek (1 cyfra) + zapas wody (2-3 cyfry), np. 7330 -> gatunek 7, zapas 330
+                            gatunek = parseInt(t[0], 10);
+                            zapas = parseFloat(t.substring(1)) || 0;
                         } else if (t.indexOf('.') !== -1 && obciazenie === 0) {
-                            obciazenie = parseFloat(t) || 0;
+                            // Rozróżnienie świeżego śniegu vs obciążenia: świeży śnieg pojawia się PRZED kodem gatunku
+                            if (gatunek === null && swiezy === null) {
+                                swiezy = parseFloat(t) || 0;
+                            } else {
+                                obciazenie = parseFloat(t) || 0;
+                            }
                         } else if (t.indexOf('.') === -1 && zapas === null) {
-                            zapas = parseFloat(t) || 0;
+                            if (gatunek === null && swiezy === null) {
+                                swiezy = parseFloat(t) || 0;
+                            } else {
+                                zapas = parseFloat(t) || 0;
+                            }
                         }
                     }
                 }
@@ -199,6 +212,20 @@
             dataObj['snieg'].pt_txts.push(`${grubosc.toFixed(0)}cm`);
             dataObj['snieg'].pt_hov.push(baseTooltip);
             dataObj['snieg'].pt_foreign.push(false);
+
+            const swiezyVal = (r.swiezy != null && !isNaN(r.swiezy)) ? r.swiezy : 0;
+            dataObj['snieg_swiezy'].pt_lats.push(lat);
+            dataObj['snieg_swiezy'].pt_lons.push(lon);
+            dataObj['snieg_swiezy'].pt_vals.push(swiezyVal);
+            dataObj['snieg_swiezy'].pt_dirs.push(null);
+            dataObj['snieg_swiezy'].pt_txts.push(`${swiezyVal.toFixed(0)}cm`);
+            dataObj['snieg_swiezy'].pt_hov.push(
+                `<b>${nazwa}</b> [${r.woj || ''}, ${r.alt || '-'} m n.p.m.]<br>` +
+                `Świeżo spadły śnieg: <b>${swiezyVal.toFixed(0)} cm</b>${dateStr}<br>` +
+                `Całkowita pokrywa: <b>${grubosc.toFixed(0)} cm</b><br>` +
+                `Gatunek śniegu: <b>${r.gatunek_opis}</b>`
+            );
+            dataObj['snieg_swiezy'].pt_foreign.push(false);
 
             if (zapas != null) {
                 dataObj['snieg_zapas'].pt_lats.push(lat);
