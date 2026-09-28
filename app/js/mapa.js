@@ -260,18 +260,6 @@ window.initMapa = function() {
             alert('Funkcja eksportu wymaga html2canvas i odpowiedniego skonfigurowania proxy dla kafelków mapy. (Do zaimplementowania w kolejnym kroku)');
         };
 
-        window.openEnsembleModal = function() {
-            const modal = document.getElementById('ensemble-modal');
-            modal.style.display = 'block';
-            
-            const thresh = document.getElementById('ens-thresh').value;
-            const days = document.getElementById('ens-days').value;
-            
-            // Wgrywamy iframe z prognozą
-            const container = document.getElementById('ensemble-iframe-container');
-            container.innerHTML = `<iframe src="prognoza/dashboard.html?v=3&thresh=${thresh}&days=${days}" style="width: 100%; height: 100%; border: none;"></iframe>`;
-        };
-
         // ----------------------------------------------------
         // PODKŁADY MAPOWE (CARTO, ESRI HILLSHADE, OPENTOPO)
         // ----------------------------------------------------
@@ -744,8 +732,11 @@ window.initMapa = function() {
         function updateStrikeCounterUI() {
             const countEl = document.getElementById('bo-strike-count');
             if (countEl) {
-                const plCount = activeStrikes.filter(s => s.lat >= 48.8 && s.lat <= 55.2 && s.lon >= 13.9 && s.lon <= 24.3).length;
-                countEl.textContent = `${activeStrikes.length} (${plCount} w PL)`;
+                if (activeStrikes.length > 0) {
+                    countEl.textContent = `(${activeStrikes.length})`;
+                } else {
+                    countEl.textContent = '';
+                }
             }
         }
 
@@ -820,14 +811,14 @@ window.initMapa = function() {
         // MENEDŻER WARSTW (Domyślna kolejność, widoczność i krycie wg preferencji)
         // ----------------------------------------------------
         window.MAP_LAYERS = {
-            'drawings':   { id: 'drawings',   name: 'Kreator Ostrzeżeń',     visible: false, opacity: 100, pane: 'drawingsPane' },
-            'stations':   { id: 'stations',   name: 'Stacje i Pomiary IMGW', visible: true,  opacity: 100, pane: 'stationsPane' },
-            'boundaries': { id: 'boundaries', name: 'Granice',               visible: true,  opacity: 100, pane: 'boundariesPane' },
-            'lightning':  { id: 'lightning',  name: 'Wyładowania (Live)',    visible: false, opacity: 95,  pane: 'lightningPane' },
-            'radar':      { id: 'radar',      name: 'Radar Opadów',          visible: false, opacity: 87,  pane: 'radarPane' },
-            'sat_day':    { id: 'sat_day',    name: 'Satelita Dzienny (HRV)', visible: false, opacity: 100, pane: 'satellitePane' },
-            'inter':      { id: 'inter',      name: 'Interpolacja IMGW',     visible: true,  opacity: 70,  pane: 'weatherPane' },
-            'sat_night':  { id: 'sat_night',  name: 'Satelita Nocny (IR)',   visible: false, opacity: 60,  pane: 'satelliteNightPane' }
+            'drawings':   { id: 'drawings',   name: 'Rysowanie',            visible: false, opacity: 100, pane: 'drawingsPane' },
+            'stations':   { id: 'stations',   name: 'Stacje',               visible: true,  opacity: 100, pane: 'stationsPane' },
+            'boundaries': { id: 'boundaries', name: 'Granice',              visible: true,  opacity: 100, pane: 'boundariesPane' },
+            'lightning':  { id: 'lightning',  name: 'Wyładowania',          visible: false, opacity: 95,  pane: 'lightningPane' },
+            'radar':      { id: 'radar',      name: 'Radar',                visible: false, opacity: 87,  pane: 'radarPane' },
+            'sat_day':    { id: 'sat_day',    name: 'Satelita (dzień)',     visible: false, opacity: 100, pane: 'satellitePane' },
+            'inter':      { id: 'inter',      name: 'Interpolacja',         visible: true,  opacity: 70,  pane: 'weatherPane' },
+            'sat_night':  { id: 'sat_night',  name: 'Satelita (noc)',       visible: false, opacity: 60,  pane: 'satelliteNightPane' }
         };
 
         // Domyślna kolejność od góry (wierzch) do dołu
@@ -976,7 +967,7 @@ window.initMapa = function() {
                 if (!item) return '';
                 const isTop = idx === 0;
                 const isBottom = idx === window.layerOrder.length - 1;
-                const extraInfo = key === 'lightning' ? ` <span id="bo-strike-count" style="font-size: 0.65rem; color: #eab308; font-weight: normal;">(0)</span>` : '';
+                const extraInfo = key === 'lightning' ? ` <span id="bo-strike-count" style="font-size: 0.65rem; color: #eab308; font-weight: normal;"></span>` : '';
                 return `
                     <div class="layer-item-card" style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 7px 10px; display: flex; flex-direction: column; gap: 5px;">
                         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -1257,12 +1248,12 @@ window.initMapa = function() {
 
         const DEFAULT_ZMIENNE = {
             "temp":             { "nazwa": "Temperatura", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
-            "grunt":            { "nazwa": "Temp. Gruntu", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
-            "wiatr":            { "nazwa": "Poryw Wiatru", "cscale": DEFAULT_WIND_COLORSCALE, "cmin": 0, "cmax": 259, "unit": "km/h", "step": 10.0 },
-            "wiatr_sr":         { "nazwa": "Śr. Wiatr", "cscale": DEFAULT_WIND_COLORSCALE, "cmin": 0, "cmax": 259, "unit": "km/h", "step": 10.0 },
-            "wilg":             { "nazwa": "Wilgotność", "cscale": DEFAULT_HUMIDITY_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "%", "step": 10.0 },
+            "grunt":            { "nazwa": "Temperatura Gruntu", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
             "rosy":             { "nazwa": "Punkt Rosy", "cscale": DEFAULT_DEWPOINT_COLORSCALE, "cmin": -10, "cmax": 28, "unit": "°C", "step": 2.0 },
-            "lcl":              { "nazwa": "Podstawa Chmur (LCL)", "cscale": DEFAULT_LCL_COLORSCALE, "cmin": 0, "cmax": 3000, "unit": "m", "step": 250.0 },
+            "wilg":             { "nazwa": "Wilgotność", "cscale": DEFAULT_HUMIDITY_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "%", "step": 10.0 },
+            "lcl":              { "nazwa": "LCL", "cscale": DEFAULT_LCL_COLORSCALE, "cmin": 0, "cmax": 3000, "unit": "m", "step": 250.0 },
+            "wiatr_sr":         { "nazwa": "Prędkość Wiatru", "cscale": DEFAULT_WIND_COLORSCALE, "cmin": 0, "cmax": 259, "unit": "km/h", "step": 10.0 },
+            "wiatr":            { "nazwa": "Porywy Wiatru", "cscale": DEFAULT_WIND_COLORSCALE, "cmin": 0, "cmax": 259, "unit": "km/h", "step": 10.0 },
             "cisnienie":        { "nazwa": "Ciśnienie", "cscale": DEFAULT_PRESSURE_COLORSCALE, "cmin": 980, "cmax": 1040, "unit": "hPa", "step": 2.0 },
             "snieg":            { "nazwa": "Pokrywa Śnieżna", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "cm", "step": 5.0 },
             "snieg_swiezy":     { "nazwa": "Świeży Śnieg", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 50, "unit": "cm", "step": 2.0 }
@@ -1984,8 +1975,14 @@ window.initMapa = function() {
         const imgwLiveCacheByMode = {};
 
         async function getIMGWLiveData() {
-            const modeSelect = document.getElementById('imgw-data-mode');
-            const dataMode = modeSelect ? modeSelect.value : 'hybrid';
+            const chkModel = document.getElementById('chk-source-model');
+            let dataMode = 'stations';
+            if (chkModel) {
+                dataMode = chkModel.checked ? 'hybrid' : 'stations';
+            } else {
+                const modeSelect = document.getElementById('imgw-data-mode');
+                dataMode = modeSelect ? modeSelect.value : 'stations';
+            }
             const now = Date.now();
             
             if (imgwLiveCacheByMode[dataMode] && (now - imgwLiveCacheByMode[dataMode].time < 60000)) {
