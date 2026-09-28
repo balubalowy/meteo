@@ -37,3 +37,42 @@
 .map-tile {
     aspect-ratio: 1 / 1;
 }
+
+/* Przełącznik suwakowy (toggle switch) dla bazy danych */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 28px;
+    height: 16px;
+    cursor: pointer;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-slider {
+    position: absolute;
+    inset: 0;
+    background-color: #334155;
+    transition: 0.2s;
+    border-radius: 16px;
+}
+.toggle-slider::before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #ffffff;
+    transition: 0.2s;
+    border-radius: 50%;
+}
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--accent-primary, #3b82f6);
+}
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(12px);
+}
+

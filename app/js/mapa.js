@@ -1594,7 +1594,7 @@ window.initMapa = function() {
 
         // 215 stacji przygranicznych (do 250 km od granicy Polski) zasilających ciągłość synoptyczną
         const FOREIGN_STATIONS = [
-    # Niemcy (DE) - 40 stacji
+    // Niemcy (DE) - 40 stacji
     {"name": "Stralsund", "cc": "DE", "lat": 54.31, "lon": 13.09},
     {"name": "Greifswald", "cc": "DE", "lat": 54.09, "lon": 13.38},
     {"name": "Wolgast", "cc": "DE", "lat": 54.05, "lon": 13.77},
@@ -1636,7 +1636,7 @@ window.initMapa = function() {
     {"name": "Chemnitz", "cc": "DE", "lat": 50.83, "lon": 12.92},
     {"name": "Freiberg", "cc": "DE", "lat": 50.92, "lon": 13.34},
 
-    # Czechy (CZ) - 45 stacji
+    // Czechy (CZ) - 45 stacji
     {"name": "Frydlant", "cc": "CZ", "lat": 50.92, "lon": 15.08},
     {"name": "Liberec", "cc": "CZ", "lat": 50.77, "lon": 15.06},
     {"name": "Jablonec nad Nisou", "cc": "CZ", "lat": 50.72, "lon": 15.17},
@@ -1683,7 +1683,7 @@ window.initMapa = function() {
     {"name": "Zlin", "cc": "CZ", "lat": 49.23, "lon": 17.67},
     {"name": "Brno", "cc": "CZ", "lat": 49.19, "lon": 16.61},
 
-    # Słowacja (SK) - 40 stacji
+    // Słowacja (SK) - 40 stacji
     {"name": "Czadca", "cc": "SK", "lat": 49.44, "lon": 18.79},
     {"name": "Turzovka", "cc": "SK", "lat": 49.40, "lon": 18.62},
     {"name": "Kysucke Nove Mesto", "cc": "SK", "lat": 49.30, "lon": 18.78},
@@ -1725,7 +1725,7 @@ window.initMapa = function() {
     {"name": "Banska Bystrzyca", "cc": "SK", "lat": 48.74, "lon": 19.15},
     {"name": "Bratyslawa", "cc": "SK", "lat": 48.15, "lon": 17.11},
 
-    # Ukraina (UA) - 35 stacji
+    // Ukraina (UA) - 35 stacji
     {"name": "Lwow", "cc": "UA", "lat": 49.84, "lon": 24.03},
     {"name": "Rawa Ruska", "cc": "UA", "lat": 50.25, "lon": 23.63},
     {"name": "Zolkiew", "cc": "UA", "lat": 50.06, "lon": 23.97},
@@ -1762,7 +1762,7 @@ window.initMapa = function() {
     {"name": "Dubno", "cc": "UA", "lat": 50.42, "lon": 25.74},
     {"name": "Iwano-Frankiwsk", "cc": "UA", "lat": 48.92, "lon": 24.71},
 
-    # Białoruś (BY) - 20 stacji
+    // Białoruś (BY) - 20 stacji
     {"name": "Brzesc", "cc": "BY", "lat": 52.10, "lon": 23.69},
     {"name": "Zabinka", "cc": "BY", "lat": 52.20, "lon": 24.02},
     {"name": "Kobryn", "cc": "BY", "lat": 52.21, "lon": 24.36},
@@ -1784,7 +1784,7 @@ window.initMapa = function() {
     {"name": "Szczuczyn", "cc": "BY", "lat": 53.60, "lon": 24.74},
     {"name": "Lida", "cc": "BY", "lat": 53.89, "lon": 25.30},
 
-    # Litwa (LT) - 20 stacji
+    // Litwa (LT) - 20 stacji
     {"name": "Druskieniki", "cc": "LT", "lat": 54.01, "lon": 23.97},
     {"name": "Wiejsieje", "cc": "LT", "lat": 54.10, "lon": 23.70},
     {"name": "Lozdzieje", "cc": "LT", "lat": 54.23, "lon": 23.51},
@@ -1806,7 +1806,7 @@ window.initMapa = function() {
     {"name": "Taurogi (Taurage)", "cc": "LT", "lat": 55.25, "lon": 22.29},
     {"name": "Klajpeda", "cc": "LT", "lat": 55.71, "lon": 21.14},
 
-    # Obwód Królewiecki (RU) - 15 stacji
+    // Obwód Królewiecki (RU) - 15 stacji
     {"name": "Krolewiec", "cc": "RU", "lat": 54.71, "lon": 20.51},
     {"name": "Baltijsk", "cc": "RU", "lat": 54.65, "lon": 19.89},
     {"name": "Swietlyj", "cc": "RU", "lat": 54.67, "lon": 20.13},
@@ -2254,10 +2254,41 @@ window.initMapa = function() {
             return computeMinMaxData(snapshots, zmienna, okres);
         }
 
+        // Przełącznik operacyjny połączenia z bazą Firebase RTDB
+        window.toggleDatabaseConnection = function(forcedState) {
+            const chk = document.getElementById('chk-db-connect');
+            if (!chk) return;
+            if (typeof forcedState === 'boolean') chk.checked = forcedState;
+            const isEnabled = chk.checked;
+            const okresSelect = document.getElementById('imgw-okres');
+            if (okresSelect) {
+                const options = okresSelect.querySelectorAll('option');
+                options.forEach(opt => {
+                    if (opt.value !== 'now') {
+                        opt.disabled = !isEnabled;
+                        opt.title = isEnabled ? '' : 'Wymaga włączenia bazy RTDB';
+                    }
+                });
+                if (!isEnabled && okresSelect.value !== 'now') {
+                    okresSelect.value = 'now';
+                    window.renderIMGW();
+                }
+            }
+        };
+
         window.renderIMGW = async function() {
-            const okres = document.getElementById('imgw-okres').value;
+            const okresSelect = document.getElementById('imgw-okres');
+            let okres = okresSelect ? okresSelect.value : 'now';
             const zmienna = document.getElementById('imgw-zmienna').value;
             const loadingEl = document.getElementById('imgw-loading');
+            const dbCheckbox = document.getElementById('chk-db-connect');
+            const isDbEnabled = dbCheckbox && dbCheckbox.checked;
+
+            // Zabezpieczenie: jeśli baza jest wyłączona, a wybrany był horyzont historyczny, wymuś 'now'
+            if (okres !== 'now' && !zmienna.startsWith('snieg') && !isDbEnabled) {
+                if (okresSelect) okresSelect.value = 'now';
+                okres = 'now';
+            }
             
             let data = null;
             
@@ -2485,6 +2516,11 @@ window.initMapa = function() {
                 const dataUrl = generateIDWImage(idwLats, idwLons, idwVals, scale, cmin, cmax, showIso, stepVal, unitStr, geoBounds, clipToPoland);
                 idwOverlay = L.imageOverlay(dataUrl, bounds, { opacity: opacityBg, pane: 'weatherPane' }).addTo(map);
             }
+        }
+
+        // Inicjalizacja stanu przełącznika bazy danych (domyślnie wyłączony)
+        if (typeof window.toggleDatabaseConnection === 'function') {
+            window.toggleDatabaseConnection(false);
         }
 
         // Initial render dla aktualnych danych ('now' korzysta z lekkiego API 25 KB)
