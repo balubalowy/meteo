@@ -38,6 +38,14 @@
             </div>
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div>
+                    <label style="font-size: 0.75rem; color: var(--text-secondary);">Źródło danych:</label>
+                    <select id="imgw-data-mode" class="form-select" aria-label="Wybór źródła danych (odczyty stacji vs model)" onchange="renderIMGW()" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
+                        <option value="hybrid" selected>Hybryda (Stacje + Model ICON)</option>
+                        <option value="stations">Tylko Stacje (Prawdziwy Odczyt)</option>
+                        <option value="model">Tylko Model (DWD ICON)</option>
+                    </select>
+                </div>
+                <div>
                     <label style="font-size: 0.75rem; color: var(--text-secondary);">Parametr:</label>
                     <select id="imgw-zmienna" class="form-select" aria-label="Wybór parametru meteorologicznego IMGW" onchange="renderIMGW()" style="padding: 4px 8px; font-size: 0.85rem; width: 100%;">
                         <option value="temp">Temperatura (°C)</option>

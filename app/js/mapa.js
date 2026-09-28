@@ -1825,252 +1825,531 @@ window.initMapa = function() {
     {"name": "Sowieck", "cc": "RU", "lat": 55.08, "lon": 21.88}
 ];
 
-        let foreignLiveCache = null;
-        let foreignLiveCacheTime = 0;
+        // Punkty uzupełniające siatkę w Polsce modelem numerycznym DWD ICON
+        const PL_ICON_FILL_COORDS = [
+            {"name": "Czersk (Bory Tucholskie)", "lat": 53.79, "lon": 17.97},
+            {"name": "Tuchola", "lat": 53.59, "lon": 17.86},
+            {"name": "Czarna Woda", "lat": 53.84, "lon": 18.25},
+            {"name": "Sepolno Krajenskie", "lat": 53.45, "lon": 17.53},
+            {"name": "Rypin", "lat": 53.07, "lon": 19.41},
+            {"name": "Radziejow", "lat": 52.62, "lon": 18.52},
+            {"name": "Drawsko Pomorskie", "lat": 53.53, "lon": 15.81},
+            {"name": "Czaplinek", "lat": 53.55, "lon": 16.32},
+            {"name": "Bialogard", "lat": 54.01, "lon": 15.99},
+            {"name": "Swidwin", "lat": 53.77, "lon": 15.77},
+            {"name": "Sulecin", "lat": 52.44, "lon": 15.12},
+            {"name": "Krosno Odrzanskie", "lat": 52.05, "lon": 15.10},
+            {"name": "Zary", "lat": 51.64, "lon": 15.14},
+            {"name": "Szprotawa", "lat": 51.56, "lon": 15.54},
+            {"name": "Miedzychod (Puszcza Notecka)", "lat": 52.61, "lon": 15.89},
+            {"name": "Wronki", "lat": 52.71, "lon": 16.38},
+            {"name": "Trzcianka", "lat": 53.04, "lon": 16.46},
+            {"name": "Gostyn", "lat": 51.88, "lon": 17.01},
+            {"name": "Wrzesnia", "lat": 52.33, "lon": 17.57},
+            {"name": "Turek", "lat": 52.02, "lon": 18.50},
+            {"name": "Poddebice", "lat": 51.90, "lon": 18.96},
+            {"name": "Lask", "lat": 51.59, "lon": 19.13},
+            {"name": "Pajeczno", "lat": 51.15, "lon": 18.99},
+            {"name": "Rawa Mazowiecka", "lat": 51.76, "lon": 20.25},
+            {"name": "Lowicz", "lat": 52.11, "lon": 19.94},
+            {"name": "Szczytno", "lat": 53.56, "lon": 20.99},
+            {"name": "Gizycko", "lat": 54.04, "lon": 21.76},
+            {"name": "Monki", "lat": 53.40, "lon": 22.80},
+            {"name": "Sokolka", "lat": 53.41, "lon": 23.50},
+            {"name": "Bielsk Podlaski", "lat": 52.77, "lon": 23.19},
+            {"name": "Wysokie Mazowieckie", "lat": 52.92, "lon": 22.51},
+            {"name": "Ostrow Mazowiecka", "lat": 52.80, "lon": 21.90},
+            {"name": "Wegrow", "lat": 52.40, "lon": 22.02},
+            {"name": "Sokolow Podlaski", "lat": 52.41, "lon": 22.25},
+            {"name": "Radzyn Podlaski", "lat": 51.78, "lon": 22.62},
+            {"name": "Parczew (Polesie)", "lat": 51.64, "lon": 22.90},
+            {"name": "Leczna", "lat": 51.30, "lon": 22.88},
+            {"name": "Krasnystaw", "lat": 50.99, "lon": 23.17},
+            {"name": "Hrubieszow", "lat": 50.80, "lon": 23.89},
+            {"name": "Janow Lubelski", "lat": 50.71, "lon": 22.41},
+            {"name": "Zwolen", "lat": 51.36, "lon": 21.59},
+            {"name": "Lipsko", "lat": 51.16, "lon": 21.65},
+            {"name": "Ilza", "lat": 51.16, "lon": 21.24},
+            {"name": "Przysucha", "lat": 51.36, "lon": 20.63},
+            {"name": "Garwolin", "lat": 51.90, "lon": 21.61},
+            {"name": "Ryki", "lat": 51.63, "lon": 21.93},
+            {"name": "Jedrzejow", "lat": 50.64, "lon": 20.30},
+            {"name": "Ostrowiec Swietokrzyski", "lat": 50.93, "lon": 21.39},
+            {"name": "Stalowa Wola", "lat": 50.58, "lon": 22.05},
+            {"name": "Przeworsk", "lat": 50.06, "lon": 22.49},
+            {"name": "Brzozow", "lat": 49.69, "lon": 22.02},
+            {"name": "Dabrowa Tarnowska", "lat": 50.17, "lon": 20.99},
+            {"name": "Chrzanow", "lat": 50.14, "lon": 19.40}
+        ];
 
-        // Pobieranie danych bieżących dla stacji przygranicznych (Open-Meteo multi-location API)
-        // Docs: https://open-meteo.com/en/docs
-        async function fetchForeignBorderData() {
+        let foreignAsosCache = null;
+        let foreignAsosCacheTime = 0;
+
+        // Pobieranie danych bieżących ze stacji METAR/ASOS (Iowa Environmental Mesonet)
+        // Docs: https://mesonet.agron.iastate.edu/api/1/docs#/default/service_currents__fmt__get
+        async function fetchForeignASOSData() {
             const now = Date.now();
-            if (foreignLiveCache && (now - foreignLiveCacheTime < 120000)) {
-                return foreignLiveCache;
+            if (foreignAsosCache && (now - foreignAsosCacheTime < 120000)) {
+                return foreignAsosCache;
             }
-            const lats = FOREIGN_STATIONS.map(s => s.lat.toFixed(2)).join(',');
-            const lons = FOREIGN_STATIONS.map(s => s.lon.toFixed(2)).join(',');
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,relative_humidity_2m,dew_point_2m,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m`;
-            
+            const networks = ['CZ__ASOS', 'SK__ASOS', 'DE__ASOS', 'LT__ASOS', 'UA__ASOS'];
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4500);
+
             try {
-                const resp = await fetch(url);
-                if (!resp.ok) return null;
-                const json = await resp.json();
-                const results = Array.isArray(json) ? json : [json];
-                foreignLiveCache = results;
-                foreignLiveCacheTime = now;
-                return results;
+                const fetchPromises = networks.map(net =>
+                    fetch(`https://mesonet.agron.iastate.edu/api/1/currents.json?network=${net}`, {
+                        signal: controller.signal
+                    }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] }))
+                );
+                const results = await Promise.all(fetchPromises);
+                clearTimeout(timeoutId);
+
+                const stations = [];
+                for (const res of results) {
+                    if (!res || !Array.isArray(res.data)) continue;
+                    for (const d of res.data) {
+                        const lat = parseFloat(d.lat);
+                        const lon = parseFloat(d.lon);
+                        const sid = d.station || '';
+                        // Bbox wokół Polski (promień ~200 km) z pominięciem polskich stacji EPxx
+                        if (!isNaN(lat) && !isNaN(lon) && lat >= 48.0 && lat <= 56.5 && lon >= 11.5 && lon <= 26.5 && !sid.startsWith('EP')) {
+                            stations.push(d);
+                        }
+                    }
+                }
+                foreignAsosCache = stations;
+                foreignAsosCacheTime = now;
+                return stations;
             } catch (e) {
-                console.warn("Błąd pobierania stacji zagranicznych (Open-Meteo):", e);
-                return null;
+                clearTimeout(timeoutId);
+                console.warn("Błąd pobierania stacji ASOS IEM:", e);
+                return foreignAsosCache || [];
             }
         }
 
-        let imgwLiveCache = null;
-        let imgwLiveCacheTime = 0;
+        let iconModelCache = null;
+        let iconModelCacheTime = 0;
+
+        // Pobieranie danych modelu numerycznego DWD ICON (Open-Meteo multi-location API)
+        // Docs: https://open-meteo.com/en/docs
+        async function fetchIconModelData() {
+            const now = Date.now();
+            if (iconModelCache && (now - iconModelCacheTime < 180000)) {
+                return iconModelCache;
+            }
+
+            try {
+                // Podział na 2 zapytania równoległe (Polska + granice) dla stabilności i uniknięcia błędu 503
+                const plLats = PL_ICON_FILL_COORDS.map(s => s.lat.toFixed(2)).join(',');
+                const plLons = PL_ICON_FILL_COORDS.map(s => s.lon.toFixed(2)).join(',');
+                const plUrl = `https://api.open-meteo.com/v1/forecast?latitude=${plLats}&longitude=${plLons}&current=temperature_2m,relative_humidity_2m,dew_point_2m,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=icon_seamless`;
+
+                const fLats = FOREIGN_STATIONS.map(s => s.lat.toFixed(2)).join(',');
+                const fLons = FOREIGN_STATIONS.map(s => s.lon.toFixed(2)).join(',');
+                const fUrl = `https://api.open-meteo.com/v1/forecast?latitude=${fLats}&longitude=${fLons}&current=temperature_2m,relative_humidity_2m,dew_point_2m,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=icon_seamless`;
+
+                const [resPL, resForeign] = await Promise.all([
+                    fetch(plUrl).then(r => r.ok ? r.json() : []).catch(() => []),
+                    fetch(fUrl).then(r => r.ok ? r.json() : []).catch(() => [])
+                ]);
+
+                const arrPL = Array.isArray(resPL) ? resPL : (resPL ? [resPL] : []);
+                const arrForeign = Array.isArray(resForeign) ? resForeign : (resForeign ? [resForeign] : []);
+
+                const combined = { pl: arrPL, foreign: arrForeign };
+                iconModelCache = combined;
+                iconModelCacheTime = now;
+                return combined;
+            } catch (e) {
+                console.warn("Błąd pobierania modelu ICON z Open-Meteo:", e);
+                return iconModelCache || { pl: [], foreign: [] };
+            }
+        }
+
+        // Pomocnicza funkcja wyliczania odległości (w km) do najbliższej stacji pomiarowej
+        function getMinDistKm(lat, lon, stationLats, stationLons) {
+            if (!stationLats || !stationLats.length) return 99999;
+            let minDist = 99999;
+            const radLat = lat * Math.PI / 180;
+            const cosLat = Math.cos(radLat);
+            for (let i = 0; i < stationLats.length; i++) {
+                const dLat = (lat - stationLats[i]) * 111.0;
+                const dLon = (lon - stationLons[i]) * 111.0 * cosLat;
+                const d = Math.sqrt(dLat * dLat + dLon * dLon);
+                if (d < minDist) {
+                    minDist = d;
+                    if (d < 18) return d;
+                }
+            }
+            return minDist;
+        }
+
+        const imgwLiveCacheByMode = {};
 
         async function getIMGWLiveData() {
+            const modeSelect = document.getElementById('imgw-data-mode');
+            const dataMode = modeSelect ? modeSelect.value : 'hybrid';
             const now = Date.now();
-            if(imgwLiveCache && (now - imgwLiveCacheTime < 60000)) return imgwLiveCache; // 1 min cache
             
-            document.getElementById('imgw-loading').style.display = 'flex';
-            document.getElementById('imgw-loading').innerHTML = '<i data-lucide="loader" class="spin"></i> Pobieranie danych z IMGW (Live)...';
+            if (imgwLiveCacheByMode[dataMode] && (now - imgwLiveCacheByMode[dataMode].time < 60000)) {
+                return imgwLiveCacheByMode[dataMode].data;
+            }
+            
+            const loadingEl = document.getElementById('imgw-loading');
+            if (loadingEl) {
+                loadingEl.style.display = 'flex';
+                loadingEl.innerHTML = '<i data-lucide="loader" class="spin"></i> Pobieranie danych meteorologicznych...';
+            }
             
             try {
-                // Pobieranie danych IMGW oraz stacji przygranicznych z Open-Meteo równolegle
-                const [resMeteo, resSynop, foreignData] = await Promise.all([
-                    fetch('https://danepubliczne.imgw.pl/api/data/meteo/').catch(() => ({ json: () => [] })),
-                    fetch('https://danepubliczne.imgw.pl/api/data/synop').catch(() => ({ json: () => [] })),
-                    fetchForeignBorderData()
+                // Równoległe pobieranie wymaganych źródeł w zależności od trybu
+                let reqMeteo = Promise.resolve([]);
+                let reqSynop = Promise.resolve([]);
+                let reqAsos = Promise.resolve([]);
+                let reqModel = Promise.resolve({ pl: [], foreign: [] });
+
+                if (dataMode === 'stations' || dataMode === 'hybrid') {
+                    reqMeteo = fetch('https://danepubliczne.imgw.pl/api/data/meteo/').then(r => r.ok ? r.json() : []).catch(() => []);
+                    reqSynop = fetch('https://danepubliczne.imgw.pl/api/data/synop').then(r => r.ok ? r.json() : []).catch(() => []);
+                    reqAsos = fetchForeignASOSData();
+                }
+                if (dataMode === 'model' || dataMode === 'hybrid') {
+                    reqModel = fetchIconModelData();
+                }
+
+                const [rawData, synopData, asosData, modelData] = await Promise.all([
+                    reqMeteo,
+                    reqSynop,
+                    reqAsos,
+                    reqModel
                 ]);
-                const rawData = await resMeteo.json();
-                const synopData = await resSynop.json();
                 
                 const dataObj = {
-                    'temp': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
-                    'cisnienie': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
-                    'wiatr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
-                    'wiatr_sr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
-                    'rosy': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
-                    'lcl': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
-                    'wilg': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
-                    'grunt': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] },
-                    'synop': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [] }
+                    'temp': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
+                    'cisnienie': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
+                    'wiatr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
+                    'wiatr_sr': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
+                    'rosy': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
+                    'lcl': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
+                    'wilg': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
+                    'grunt': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [] },
+                    'synop': { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_foreign: [], pt_types: [], pt_extras: [] }
                 };
 
-                // Przetwarzanie stacji SYNOP dla ciśnienia atmosferycznego (zredukowane do poziomu morza w hPa)
-                for (let st of synopData) {
-                    const sid = st.id_stacji;
-                    const pVal = parseFloat(st.cisnienie);
-                    if (isNaN(pVal) || !pVal) continue;
-                    
-                    const coord = SYNOP_STATIONS_COORDS[sid];
-                    if (!coord) continue;
-                    
-                    const sName = coord.name || st.stacja;
-                    const sDate = st.data_pomiaru;
-                    const sHour = st.godzina_pomiaru;
-                    const sTemp = st.temperatura;
-                    const sWind = st.predkosc_wiatru;
-                    const sRh = st.wilgotnosc_wzgledna;
-                    const timeLabel = sHour ? ` (${sHour}:00 UTC)` : '';
-                    
-                    window._stationMetaMap = window._stationMetaMap || {};
-                    window._stationMetaMap[String(sid)] = { lat: coord.lat, lon: coord.lon, nazwa: sName };
-                    
-                    dataObj['cisnienie'].pt_lats.push(coord.lat);
-                    dataObj['cisnienie'].pt_lons.push(coord.lon);
-                    dataObj['cisnienie'].pt_vals.push(pVal);
-                    dataObj['cisnienie'].pt_dirs.push(null);
-                    dataObj['cisnienie'].pt_txts.push(pVal.toFixed(1));
-                    dataObj['cisnienie'].pt_hov.push(
-                        `<b>${sName}</b> (Stacja SYNOP)<br>` +
-                        `Ciśnienie (QNH): <b>${pVal.toFixed(1)} hPa</b>${timeLabel}<br>` +
-                        `Temperatura: ${sTemp || '-'}°C, Wilgotność: ${sRh || '-'}%<br>` +
-                        `Wiatr: ${sWind || '-'} m/s (${st.kierunek_wiatru || '-'}°)`
-                    );
-                    dataObj['cisnienie'].pt_foreign.push(false);
-                }
+                // Śledzenie koordynatów stacji fizycznych do deduplikacji w trybie hybrydowym
+                const realCoords = {
+                    'temp': { lats: [], lons: [] },
+                    'cisnienie': { lats: [], lons: [] },
+                    'wiatr': { lats: [], lons: [] },
+                    'wiatr_sr': { lats: [], lons: [] },
+                    'rosy': { lats: [], lons: [] },
+                    'lcl': { lats: [], lons: [] },
+                    'wilg': { lats: [], lons: [] },
+                    'grunt': { lats: [], lons: [] },
+                    'synop': { lats: [], lons: [] }
+                };
 
-                for(let st of rawData) {
-                    const lat = parseFloat(st.lat);
-                    const lon = parseFloat(st.lon);
-                    if(isNaN(lat) || isNaN(lon)) continue;
-                    const nazwa = st.nazwa_stacji;
-                    const kod = String(st.kod_stacji || st.id_stacji || '');
-                    if (kod) {
+                // 1. STACJE SYNOP IMGW (Ciśnienie QNH oraz podstawowe parametry)
+                if (Array.isArray(synopData) && dataMode !== 'model') {
+                    for (const st of synopData) {
+                        const sid = st.id_stacji;
+                        const pVal = parseFloat(st.cisnienie);
+                        if (isNaN(pVal) || !pVal) continue;
+                        
+                        const coord = SYNOP_STATIONS_COORDS[sid];
+                        if (!coord) continue;
+                        
+                        const sName = coord.name || st.stacja;
+                        const sHour = st.godzina_pomiaru;
+                        const sTemp = st.temperatura;
+                        const sWind = st.predkosc_wiatru;
+                        const sRh = st.wilgotnosc_wzgledna;
+                        const timeLabel = sHour ? ` (${sHour}:00 UTC)` : '';
+                        
                         window._stationMetaMap = window._stationMetaMap || {};
-                        window._stationMetaMap[kod] = { lat, lon, nazwa };
-                    }
-                    
-                    const isDataValid = (dateStr) => {
-                        if(!dateStr) return false;
-                        const parts = dateStr.split(/[- :]/);
-                        if (parts.length < 6) return false;
-                        const dataDate = new Date(Date.UTC(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]));
-                        const diffHours = (Date.now() - dataDate.getTime()) / (1000 * 60 * 60);
-                        return diffHours <= 3.5 && diffHours >= -1; // tolerancja dla spóźnionych stacji
-                    };
+                        window._stationMetaMap[String(sid)] = { lat: coord.lat, lon: coord.lon, nazwa: sName };
+                        
+                        dataObj['cisnienie'].pt_lats.push(coord.lat);
+                        dataObj['cisnienie'].pt_lons.push(coord.lon);
+                        dataObj['cisnienie'].pt_vals.push(pVal);
+                        dataObj['cisnienie'].pt_dirs.push(null);
+                        dataObj['cisnienie'].pt_txts.push(pVal.toFixed(1));
+                        dataObj['cisnienie'].pt_hov.push(
+                            `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">` +
+                            `<b style="font-size:0.85rem;">${sName}</b>` +
+                            `<span class="badge-odczyt">ODCZYT</span>` +
+                            `</div>` +
+                            `Ciśnienie (QNH): <b>${pVal.toFixed(1)} hPa</b>${timeLabel}<br>` +
+                            `Temperatura: ${sTemp || '-'}°C, Wilgotność: ${sRh || '-'}%<br>` +
+                            `Wiatr: ${sWind || '-'} m/s (${st.kierunek_wiatru || '-'}°)`
+                        );
+                        dataObj['cisnienie'].pt_foreign.push(false);
+                        dataObj['cisnienie'].pt_types.push('ODCZYT');
 
-                    const temp = parseFloat(st.temperatura_powietrza);
-                    const temp_t = st.temperatura_powietrza_data;
-                    const temp_grunt = parseFloat(st.temperatura_gruntu);
-                    const grunt_t = st.temperatura_gruntu_data;
-                    const wilg = parseFloat(st.wilgotnosc_wzgledna);
-                    const wilg_t = st.wilgotnosc_wzgledna_data;
-                    const wiatr_sr = parseFloat(st.wiatr_srednia_predkosc);
-                    const wiatr_sr_t = st.wiatr_srednia_predkosc_data;
-                    const wiatr_poryw = parseFloat(st.wiatr_poryw_10min);
-                    const wiatr_max = parseFloat(st.wiatr_predkosc_maksymalna);
-                    
-                    const wiatr_kier = parseFloat(st.wiatr_kierunek);
-                    
-                    // Weź nowszy czas z porywów
-                    const wiatr_por_t = st.wiatr_poryw_10min_data || st.wiatr_predkosc_maksymalna_data;
-                    
-                    const formatTime = (dateStr) => {
-                        if(!dateStr) return '';
-                        const parts = dateStr.split(/[- :]/);
-                        if(parts.length >= 6) {
-                            const utcDate = new Date(Date.UTC(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]));
-                            const localTime = utcDate.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
-                            return ` <span style="font-size:0.75rem; color:#a1a1aa;">(${localTime})</span>`;
-                        }
-                        return '';
-                    };
-                    
-                    const dewPoint = calculateDewPoint(temp, wilg);
-                    
-                    // Obliczenie wysokości podstawy chmur (LCL) wg wzoru Espy'ego: h_LCL = 125 * (T - Td)
-                    let lcl_m = NaN;
-                    if (!isNaN(temp) && dewPoint !== null && !isNaN(dewPoint)) {
-                        lcl_m = Math.round(125 * Math.max(0, temp - dewPoint));
-                    }
-                    
-                    const porywy = [wiatr_poryw, wiatr_max].filter(v => !isNaN(v)).map(v => v * 3.6);
-                    const wiatr_poryw_kmh = porywy.length ? Math.max(...porywy) : NaN;
-                    const wiatr_sr_kmh = !isNaN(wiatr_sr) ? wiatr_sr * 3.6 : NaN;
-
-                    const addData = (zmienna, val, txt, hov, dir, t_str, extra) => {
-                        if(isNaN(val) || !isDataValid(t_str)) return;
-                        dataObj[zmienna].pt_lats.push(lat);
-                        dataObj[zmienna].pt_lons.push(lon);
-                        dataObj[zmienna].pt_vals.push(val);
-                        dataObj[zmienna].pt_dirs.push(dir !== undefined ? dir : null);
-                        dataObj[zmienna].pt_txts.push(txt);
-                        dataObj[zmienna].pt_hov.push(`<b>${nazwa}</b><br>${hov}`);
-                        dataObj[zmienna].pt_foreign.push(false);
-                        if(extra) {
-                            if(!dataObj[zmienna].pt_extras) dataObj[zmienna].pt_extras = [];
-                            dataObj[zmienna].pt_extras.push(extra);
-                        }
-                    };
-
-                    addData('temp', temp, temp?.toFixed(1) + '°', `Temperatura: ${temp?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
-                    addData('grunt', temp_grunt, temp_grunt?.toFixed(1) + '°', `Temp. Gruntu: ${temp_grunt?.toFixed(1)}°C${formatTime(grunt_t)}`, undefined, grunt_t);
-                    addData('wilg', wilg, wilg?.toFixed(0) + '%', `Wilgotność: ${wilg?.toFixed(0)}%${formatTime(wilg_t)}`, undefined, wilg_t);
-                    addData('rosy', dewPoint, dewPoint?.toFixed(1) + '°', `Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
-                    addData('lcl', lcl_m, !isNaN(lcl_m) ? (lcl_m + 'm') : '', `Podstawa Chmur (LCL): <b>${lcl_m} m n.p.g.</b><br>Temperatura: ${temp?.toFixed(1)}°C, Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
-                    addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}`, wiatr_kier, wiatr_por_t);
-                    addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`, wiatr_kier, wiatr_sr_t);
-                    
-                    // synop: display temp as value, but text contains more info
-                    if(!isNaN(temp) && isDataValid(temp_t)) {
-                        const extra = { temp, dewPoint, wiatr_sr_kmh, wiatr_poryw_kmh, wiatr_kier, wilg };
-                        addData('synop', temp, '', `Temp: ${temp?.toFixed(1)}°C${formatTime(temp_t)}<br>Wiatr: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}<br>Wilg: ${wilg}%${formatTime(wilg_t)}`, wiatr_kier, temp_t, extra);
+                        realCoords['cisnienie'].lats.push(coord.lat);
+                        realCoords['cisnienie'].lons.push(coord.lon);
                     }
                 }
 
-                // Przetwarzanie stacji zagranicznych z Open-Meteo
-                if (Array.isArray(foreignData) && foreignData.length > 0) {
-                    for (let i = 0; i < FOREIGN_STATIONS.length; i++) {
-                        const meta = FOREIGN_STATIONS[i];
-                        const item = foreignData[i];
-                        if (!item || !item.current) continue;
-                        const cur = item.current;
-
-                        const lat = meta.lat;
-                        const lon = meta.lon;
-                        const nazwa = `${meta.name} [${meta.cc}]`;
-                        const timeStr = cur.time ? cur.time.replace('T', ' ') : '';
-
-                        const temp = typeof cur.temperature_2m === 'number' ? cur.temperature_2m : NaN;
-                        const rh = typeof cur.relative_humidity_2m === 'number' ? cur.relative_humidity_2m : NaN;
-                        const dp = typeof cur.dew_point_2m === 'number' ? cur.dew_point_2m : (calculateDewPoint(temp, rh) ?? NaN);
-                        const pMsl = typeof cur.pressure_msl === 'number' ? cur.pressure_msl : NaN;
-                        const wSpd = typeof cur.wind_speed_10m === 'number' ? cur.wind_speed_10m : NaN;
-                        const wDir = typeof cur.wind_direction_10m === 'number' ? cur.wind_direction_10m : null;
-                        const wGust = typeof cur.wind_gusts_10m === 'number' ? cur.wind_gusts_10m : NaN;
-
-                        let lcl_m = NaN;
-                        if (!isNaN(temp) && !isNaN(dp)) {
-                            lcl_m = Math.round(125 * Math.max(0, temp - dp));
+                // 2. STACJE METEO IMGW (Polska - automatyczne stacje telemetryczne)
+                if (Array.isArray(rawData) && dataMode !== 'model') {
+                    for (const st of rawData) {
+                        const lat = parseFloat(st.lat);
+                        const lon = parseFloat(st.lon);
+                        if (isNaN(lat) || isNaN(lon)) continue;
+                        const nazwa = st.nazwa_stacji;
+                        const kod = String(st.kod_stacji || st.id_stacji || '');
+                        if (kod) {
+                            window._stationMetaMap = window._stationMetaMap || {};
+                            window._stationMetaMap[kod] = { lat, lon, nazwa };
                         }
+                        
+                        const isDataValid = (dateStr) => {
+                            if (!dateStr) return false;
+                            const parts = dateStr.split(/[- :]/);
+                            if (parts.length < 6) return false;
+                            const dataDate = new Date(Date.UTC(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]));
+                            const diffHours = (Date.now() - dataDate.getTime()) / (1000 * 60 * 60);
+                            return diffHours <= 3.5 && diffHours >= -1;
+                        };
 
-                        const addForeignPoint = (zmienna, val, txt, hov, dir, extra) => {
-                            if (isNaN(val) || val === null) return;
+                        const temp = parseFloat(st.temperatura_powietrza);
+                        const temp_t = st.temperatura_powietrza_data;
+                        const temp_grunt = parseFloat(st.temperatura_gruntu);
+                        const grunt_t = st.temperatura_gruntu_data;
+                        const wilg = parseFloat(st.wilgotnosc_wzgledna);
+                        const wilg_t = st.wilgotnosc_wzgledna_data;
+                        const wiatr_sr = parseFloat(st.wiatr_srednia_predkosc);
+                        const wiatr_sr_t = st.wiatr_srednia_predkosc_data;
+                        const wiatr_poryw = parseFloat(st.wiatr_poryw_10min);
+                        const wiatr_max = parseFloat(st.wiatr_predkosc_maksymalna);
+                        const wiatr_kier = parseFloat(st.wiatr_kierunek);
+                        const wiatr_por_t = st.wiatr_poryw_10min_data || st.wiatr_predkosc_maksymalna_data;
+                        
+                        const formatTime = (dateStr) => {
+                            if (!dateStr) return '';
+                            const parts = dateStr.split(/[- :]/);
+                            if (parts.length >= 6) {
+                                const utcDate = new Date(Date.UTC(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5]));
+                                const localTime = utcDate.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+                                return ` <span style="font-size:0.75rem; color:#a1a1aa;">(${localTime})</span>`;
+                            }
+                            return '';
+                        };
+                        
+                        const dewPoint = calculateDewPoint(temp, wilg);
+                        let lcl_m = NaN;
+                        if (!isNaN(temp) && dewPoint !== null && !isNaN(dewPoint)) {
+                            lcl_m = Math.round(125 * Math.max(0, temp - dewPoint));
+                        }
+                        
+                        const porywy = [wiatr_poryw, wiatr_max].filter(v => !isNaN(v)).map(v => v * 3.6);
+                        const wiatr_poryw_kmh = porywy.length ? Math.max(...porywy) : NaN;
+                        const wiatr_sr_kmh = !isNaN(wiatr_sr) ? wiatr_sr * 3.6 : NaN;
+
+                        const addData = (zmienna, val, txt, hov, dir, t_str, extra) => {
+                            if (isNaN(val) || !isDataValid(t_str)) return;
                             dataObj[zmienna].pt_lats.push(lat);
                             dataObj[zmienna].pt_lons.push(lon);
                             dataObj[zmienna].pt_vals.push(val);
                             dataObj[zmienna].pt_dirs.push(dir !== undefined ? dir : null);
                             dataObj[zmienna].pt_txts.push(txt);
-                            dataObj[zmienna].pt_hov.push(`<b>${nazwa}</b> (Zagranica)<br>${hov}`);
-                            dataObj[zmienna].pt_foreign.push(true);
+                            dataObj[zmienna].pt_hov.push(
+                                `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">` +
+                                `<b style="font-size:0.85rem;">${nazwa}</b>` +
+                                `<span class="badge-odczyt">ODCZYT</span>` +
+                                `</div>` +
+                                `${hov}`
+                            );
+                            dataObj[zmienna].pt_foreign.push(false);
+                            dataObj[zmienna].pt_types.push('ODCZYT');
+                            
+                            realCoords[zmienna].lats.push(lat);
+                            realCoords[zmienna].lons.push(lon);
+
                             if (extra) {
                                 if (!dataObj[zmienna].pt_extras) dataObj[zmienna].pt_extras = [];
                                 dataObj[zmienna].pt_extras.push(extra);
                             }
                         };
 
-                        if (!isNaN(temp)) addForeignPoint('temp', temp, temp.toFixed(1) + '°', `Temperatura: ${temp.toFixed(1)}°C (${timeStr})`);
-                        if (!isNaN(pMsl)) addForeignPoint('cisnienie', pMsl, pMsl.toFixed(1), `Ciśnienie (MSL): <b>${pMsl.toFixed(1)} hPa</b> (${timeStr})`);
-                        if (!isNaN(rh)) addForeignPoint('wilg', rh, rh.toFixed(0) + '%', `Wilgotność: ${rh.toFixed(0)}% (${timeStr})`);
-                        if (!isNaN(dp)) addForeignPoint('rosy', dp, dp.toFixed(1) + '°', `Punkt Rosy: ${dp.toFixed(1)}°C (${timeStr})`);
-                        if (!isNaN(lcl_m)) addForeignPoint('lcl', lcl_m, lcl_m + 'm', `Podstawa Chmur (LCL): <b>${lcl_m} m n.p.g.</b><br>Temp: ${temp.toFixed(1)}°C, Punkt Rosy: ${dp.toFixed(1)}°C`);
-                        if (!isNaN(wGust)) addForeignPoint('wiatr', wGust, wGust.toFixed(0), `Poryw Wiatru: ${wGust.toFixed(0)} km/h (${timeStr})`, wDir);
-                        if (!isNaN(wSpd)) addForeignPoint('wiatr_sr', wSpd, wSpd.toFixed(0), `Wiatr (Śr): ${wSpd.toFixed(0)} km/h (${timeStr})`, wDir);
-
-                        if (!isNaN(temp)) {
-                            const extra = { temp, dewPoint: dp, wiatr_sr_kmh: wSpd, wiatr_poryw_kmh: wGust, wiatr_kier: wDir, wilg: rh };
-                            addForeignPoint('synop', temp, '', `Temp: ${temp.toFixed(1)}°C<br>Wiatr: ${!isNaN(wGust) ? wGust.toFixed(0) : (!isNaN(wSpd) ? wSpd.toFixed(0) : '-')} km/h<br>Wilg: ${!isNaN(rh) ? rh : '-'}%`, wDir, extra);
+                        addData('temp', temp, temp?.toFixed(1) + '°', `Temperatura: ${temp?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
+                        addData('grunt', temp_grunt, temp_grunt?.toFixed(1) + '°', `Temp. Gruntu: ${temp_grunt?.toFixed(1)}°C${formatTime(grunt_t)}`, undefined, grunt_t);
+                        addData('wilg', wilg, wilg?.toFixed(0) + '%', `Wilgotność: ${wilg?.toFixed(0)}%${formatTime(wilg_t)}`, undefined, wilg_t);
+                        addData('rosy', dewPoint, dewPoint?.toFixed(1) + '°', `Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
+                        addData('lcl', lcl_m, !isNaN(lcl_m) ? (lcl_m + 'm') : '', `Podstawa Chmur (LCL): <b>${lcl_m} m n.p.g.</b><br>Temperatura: ${temp?.toFixed(1)}°C, Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
+                        addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}`, wiatr_kier, wiatr_por_t);
+                        addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`, wiatr_kier, wiatr_sr_t);
+                        
+                        if (!isNaN(temp) && isDataValid(temp_t)) {
+                            const extra = { temp, dewPoint, wiatr_sr_kmh, wiatr_poryw_kmh, wiatr_kier, wilg };
+                            addData('synop', temp, '', `Temp: ${temp?.toFixed(1)}°C${formatTime(temp_t)}<br>Wiatr: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}<br>Wilg: ${wilg}%${formatTime(wilg_t)}`, wiatr_kier, temp_t, extra);
                         }
                     }
                 }
+
+                // 3. STACJE ZAGRANICZNE METAR/ASOS (Prawdziwe dane pomiarowe z Iowa Mesonet)
+                if (Array.isArray(asosData) && asosData.length > 0 && dataMode !== 'model') {
+                    for (const st of asosData) {
+                        const lat = parseFloat(st.lat);
+                        const lon = parseFloat(st.lon);
+                        if (isNaN(lat) || isNaN(lon)) continue;
+
+                        const cc = (st.network || '').slice(0, 2);
+                        const sName = `${st.name || st.station} [${cc}]`;
+                        const timeStr = st.local_valid ? st.local_valid.slice(11, 16) : (st.valid ? st.valid.slice(11, 16) : '');
+                        const timeLabel = timeStr ? ` (${timeStr})` : '';
+
+                        const temp = st.tmpf != null ? Math.round(((st.tmpf - 32) * 5 / 9) * 10) / 10 : NaN;
+                        const dp = st.dwpf != null ? Math.round(((st.dwpf - 32) * 5 / 9) * 10) / 10 : NaN;
+                        const rh = st.relh != null ? Math.round(st.relh) : NaN;
+                        const pMsl = st.alti != null ? Math.round(st.alti * 33.8639 * 10) / 10 : NaN;
+                        const wSpd = st.sknt != null ? Math.round(st.sknt * 1.852) : NaN;
+                        const wGust = st.gust != null ? Math.round(st.gust * 1.852) : (!isNaN(wSpd) ? wSpd : NaN);
+                        const wDir = st.drct != null ? st.drct : null;
+
+                        let lcl_m = NaN;
+                        if (!isNaN(temp) && !isNaN(dp)) {
+                            lcl_m = Math.round(125 * Math.max(0, temp - dp));
+                        }
+
+                        const addAsosPoint = (zmienna, val, txt, hov, dir, extra) => {
+                            if (isNaN(val) || val === null) return;
+                            dataObj[zmienna].pt_lats.push(lat);
+                            dataObj[zmienna].pt_lons.push(lon);
+                            dataObj[zmienna].pt_vals.push(val);
+                            dataObj[zmienna].pt_dirs.push(dir !== undefined ? dir : null);
+                            dataObj[zmienna].pt_txts.push(txt);
+                            dataObj[zmienna].pt_hov.push(
+                                `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">` +
+                                `<b style="font-size:0.85rem;">${sName}</b>` +
+                                `<span class="badge-odczyt">ODCZYT ASOS</span>` +
+                                `</div>` +
+                                `${hov}`
+                            );
+                            dataObj[zmienna].pt_foreign.push(true);
+                            dataObj[zmienna].pt_types.push('ODCZYT');
+
+                            realCoords[zmienna].lats.push(lat);
+                            realCoords[zmienna].lons.push(lon);
+
+                            if (extra) {
+                                if (!dataObj[zmienna].pt_extras) dataObj[zmienna].pt_extras = [];
+                                dataObj[zmienna].pt_extras.push(extra);
+                            }
+                        };
+
+                        if (!isNaN(temp)) addAsosPoint('temp', temp, temp.toFixed(1) + '°', `Temperatura: ${temp.toFixed(1)}°C${timeLabel}`);
+                        if (!isNaN(pMsl)) addAsosPoint('cisnienie', pMsl, pMsl.toFixed(1), `Ciśnienie (QNH): <b>${pMsl.toFixed(1)} hPa</b>${timeLabel}`);
+                        if (!isNaN(rh)) addAsosPoint('wilg', rh, rh.toFixed(0) + '%', `Wilgotność: ${rh.toFixed(0)}%${timeLabel}`);
+                        if (!isNaN(dp)) addAsosPoint('rosy', dp, dp.toFixed(1) + '°', `Punkt Rosy: ${dp.toFixed(1)}°C${timeLabel}`);
+                        if (!isNaN(lcl_m)) addAsosPoint('lcl', lcl_m, lcl_m + 'm', `Podstawa Chmur (LCL): <b>${lcl_m} m n.p.g.</b><br>Temp: ${temp.toFixed(1)}°C, Punkt Rosy: ${dp.toFixed(1)}°C`);
+                        if (!isNaN(wGust)) addAsosPoint('wiatr', wGust, wGust.toFixed(0), `Poryw Wiatru: ${wGust.toFixed(0)} km/h${timeLabel}`, wDir);
+                        if (!isNaN(wSpd)) addAsosPoint('wiatr_sr', wSpd, wSpd.toFixed(0), `Wiatr (Śr): ${wSpd.toFixed(0)} km/h${timeLabel}`, wDir);
+
+                        if (!isNaN(temp)) {
+                            const extra = { temp, dewPoint: dp, wiatr_sr_kmh: wSpd, wiatr_poryw_kmh: wGust, wiatr_kier: wDir, wilg: rh };
+                            addAsosPoint('synop', temp, '', `Temp: ${temp.toFixed(1)}°C<br>Wiatr: ${!isNaN(wGust) ? wGust.toFixed(0) : (!isNaN(wSpd) ? wSpd.toFixed(0) : '-')} km/h<br>Wilg: ${!isNaN(rh) ? rh : '-'}%`, wDir, extra);
+                        }
+                    }
+                }
+
+                // 4. MODEL DWD ICON (Open-Meteo) — wypełnianie luk (hybryda) lub pełna siatka modelu
+                if (dataMode === 'hybrid' || dataMode === 'model') {
+                    const isHybrid = (dataMode === 'hybrid');
+                    
+                    const processModelList = (metaList, itemsList, isForeignList) => {
+                        if (!Array.isArray(metaList) || !Array.isArray(itemsList)) return;
+                        for (let i = 0; i < metaList.length; i++) {
+                            const meta = metaList[i];
+                            const item = itemsList[i];
+                            if (!meta || !item || !item.current) continue;
+                            const cur = item.current;
+
+                            const lat = meta.lat;
+                            const lon = meta.lon;
+                            const sName = isForeignList ? `${meta.name} [${meta.cc}]` : meta.name;
+                            const timeStr = cur.time ? cur.time.replace('T', ' ') : '';
+                            const timeLabel = timeStr ? ` (${timeStr})` : '';
+
+                            const temp = typeof cur.temperature_2m === 'number' ? cur.temperature_2m : NaN;
+                            const rh = typeof cur.relative_humidity_2m === 'number' ? cur.relative_humidity_2m : NaN;
+                            const dp = typeof cur.dew_point_2m === 'number' ? cur.dew_point_2m : (calculateDewPoint(temp, rh) ?? NaN);
+                            const pMsl = typeof cur.pressure_msl === 'number' ? cur.pressure_msl : NaN;
+                            const wSpd = typeof cur.wind_speed_10m === 'number' ? cur.wind_speed_10m : NaN;
+                            const wDir = typeof cur.wind_direction_10m === 'number' ? cur.wind_direction_10m : null;
+                            const wGust = typeof cur.wind_gusts_10m === 'number' ? cur.wind_gusts_10m : NaN;
+
+                            let lcl_m = NaN;
+                            if (!isNaN(temp) && !isNaN(dp)) {
+                                lcl_m = Math.round(125 * Math.max(0, temp - dp));
+                            }
+
+                            const addModelPoint = (zmienna, val, txt, hov, dir, extra) => {
+                                if (isNaN(val) || val === null) return;
+                                // W trybie hybrydowym: jeśli w promieniu 22 km istnieje stacja fizyczna z tym parametrem, pomiń prognozę modelu
+                                if (isHybrid && realCoords[zmienna].lats.length > 0) {
+                                    const d = getMinDistKm(lat, lon, realCoords[zmienna].lats, realCoords[zmienna].lons);
+                                    if (d < 22.0) return;
+                                }
+
+                                dataObj[zmienna].pt_lats.push(lat);
+                                dataObj[zmienna].pt_lons.push(lon);
+                                dataObj[zmienna].pt_vals.push(val);
+                                dataObj[zmienna].pt_dirs.push(dir !== undefined ? dir : null);
+                                dataObj[zmienna].pt_txts.push(txt);
+                                dataObj[zmienna].pt_hov.push(
+                                    `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">` +
+                                    `<b style="font-size:0.85rem;">${sName}</b>` +
+                                    `<span class="badge-prognoza">PROGNOZA ICON</span>` +
+                                    `</div>` +
+                                    `${hov}`
+                                );
+                                dataObj[zmienna].pt_foreign.push(isForeignList);
+                                dataObj[zmienna].pt_types.push('PROGNOZA');
+
+                                if (extra) {
+                                    if (!dataObj[zmienna].pt_extras) dataObj[zmienna].pt_extras = [];
+                                    dataObj[zmienna].pt_extras.push(extra);
+                                }
+                            };
+
+                            if (!isNaN(temp)) addModelPoint('temp', temp, temp.toFixed(1) + '°', `Temperatura (Model): ${temp.toFixed(1)}°C${timeLabel}`);
+                            if (!isNaN(pMsl)) addModelPoint('cisnienie', pMsl, pMsl.toFixed(1), `Ciśnienie MSL (Model): <b>${pMsl.toFixed(1)} hPa</b>${timeLabel}`);
+                            if (!isNaN(rh)) addModelPoint('wilg', rh, rh.toFixed(0) + '%', `Wilgotność (Model): ${rh.toFixed(0)}%${timeLabel}`);
+                            if (!isNaN(dp)) addModelPoint('rosy', dp, dp.toFixed(1) + '°', `Punkt Rosy (Model): ${dp.toFixed(1)}°C${timeLabel}`);
+                            if (!isNaN(lcl_m)) addModelPoint('lcl', lcl_m, lcl_m + 'm', `Podstawa Chmur LCL (Model): <b>${lcl_m} m n.p.g.</b><br>Temp: ${temp.toFixed(1)}°C, Punkt Rosy: ${dp.toFixed(1)}°C`);
+                            if (!isNaN(wGust)) addModelPoint('wiatr', wGust, wGust.toFixed(0), `Poryw Wiatru (Model): ${wGust.toFixed(0)} km/h${timeLabel}`, wDir);
+                            if (!isNaN(wSpd)) addModelPoint('wiatr_sr', wSpd, wSpd.toFixed(0), `Wiatr Śr (Model): ${wSpd.toFixed(0)} km/h${timeLabel}`, wDir);
+
+                            if (!isNaN(temp)) {
+                                const extra = { temp, dewPoint: dp, wiatr_sr_kmh: wSpd, wiatr_poryw_kmh: wGust, wiatr_kier: wDir, wilg: rh };
+                                addModelPoint('synop', temp, '', `Temp: ${temp.toFixed(1)}°C<br>Wiatr: ${!isNaN(wGust) ? wGust.toFixed(0) : (!isNaN(wSpd) ? wSpd.toFixed(0) : '-')} km/h<br>Wilg: ${!isNaN(rh) ? rh : '-'}%`, wDir, extra);
+                            }
+                        }
+                    };
+
+                    // Punkty w Polsce (wypełnianie luk)
+                    if (modelData && modelData.pl) {
+                        processModelList(PL_ICON_FILL_COORDS, modelData.pl, false);
+                    }
+                    // Punkty zagraniczne
+                    if (modelData && modelData.foreign) {
+                        processModelList(FOREIGN_STATIONS, modelData.foreign, true);
+                    }
+                }
                 
-                imgwLiveCache = dataObj;
-                imgwLiveCacheTime = now;
-                document.getElementById('imgw-loading').style.display = 'none';
-                return imgwLiveCache;
+                imgwLiveCacheByMode[dataMode] = {
+                    data: dataObj,
+                    time: now
+                };
+                if (loadingEl) loadingEl.style.display = 'none';
+                return dataObj;
             } catch (err) {
-                console.error("Błąd IMGW Live API:", err);
-                document.getElementById('imgw-loading').innerHTML = "Błąd pobierania danych IMGW API.";
+                console.error("Błąd pobierania danych meteorologicznych:", err);
+                const loadingEl = document.getElementById('imgw-loading');
+                if (loadingEl) loadingEl.innerHTML = "Błąd pobierania danych meteorologicznych.";
                 return null;
             }
         }
@@ -2414,7 +2693,9 @@ window.initMapa = function() {
                         htmlContent = `<div style="position: relative; width: 40px; height: 40px; margin: -10px -10px;">`;
                         
                         // Center dot
-                        htmlContent += `<div style="position: absolute; top: 15px; left: 15px; width: 10px; height: 10px; background: ${ptColor}; border-radius: 50%; box-shadow: 0 0 2px black; border: 1px solid rgba(255,255,255,0.7); z-index: 10;"></div>`;
+                        const isForecastSynop = !!(data.pt_types && data.pt_types[i] === 'PROGNOZA');
+                        const dotBorder = isForecastSynop ? '2px dashed #60a5fa' : '1px solid rgba(255,255,255,0.7)';
+                        htmlContent += `<div style="position: absolute; top: 15px; left: 15px; width: 10px; height: 10px; background: ${ptColor}; border-radius: 50%; box-shadow: 0 0 2px black; border: ${dotBorder}; z-index: 10;"></div>`;
                         
                         // Top-left: Temperature (Red)
                         htmlContent += `<div style="position: absolute; top: -2px; left: -10px; width: 25px; text-align: right; color: #f87171; font-weight: bold; font-size: 0.8rem; text-shadow: 0 0 2px black, 0 0 3px black;">${ex.temp?.toFixed(1)}</div>`;
@@ -2449,7 +2730,9 @@ window.initMapa = function() {
                         
                     } else {
                         // Standard marker
-                        if(showTxt) htmlContent += `<div style="color: white; text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}</div>`;
+                        const isForecast = !!(data.pt_types && data.pt_types[i] === 'PROGNOZA');
+                        const forecastSuffix = isForecast ? '<span style="font-size:0.65rem; color:#60a5fa; vertical-align:top; font-weight:normal; margin-left:1px;" title="Wartość z modelu ICON">~</span>' : '';
+                        if(showTxt) htmlContent += `<div style="color: white; text-shadow: 0 0 3px black, 0 0 3px black; font-weight: bold;">${data.pt_txts[i]}${forecastSuffix}</div>`;
                         
                         const isWind = (zmienna === 'wiatr' || zmienna === 'wiatr_sr');
                         
@@ -2462,7 +2745,9 @@ window.initMapa = function() {
                                 </svg>
                             </div>`;
                         } else if(showPt) {
-                            htmlContent += `<div style="width:10px;height:10px;background:${ptColor};border-radius:50%;margin:2px auto;box-shadow:0 0 2px black; border:1px solid rgba(255,255,255,0.7);"></div>`;
+                            const borderStyle = isForecast ? '2px dashed #60a5fa' : '1px solid rgba(255,255,255,0.7)';
+                            const opacityStyle = isForecast ? 'opacity: 0.9;' : '';
+                            htmlContent += `<div style="width:10px;height:10px;background:${ptColor};border-radius:50%;margin:2px auto;box-shadow:0 0 2px black; border:${borderStyle}; ${opacityStyle}"></div>`;
                         }
                     }
                     
