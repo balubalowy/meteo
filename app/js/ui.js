@@ -41,7 +41,8 @@ async function ensureMapDependencies() {
     await Promise.all([
         loadScript('js/kreator.js'),
         loadScript('js/cmm-map.js'),
-        loadScript('js/burze.js')
+        loadScript('js/burze.js'),
+        loadScript('js/snow.js')
     ]);
     await loadScript('js/mapa.js');
     window._mapDepsLoaded = true;

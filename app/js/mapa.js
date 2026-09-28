@@ -1231,19 +1231,44 @@ window.initMapa = function() {
             "DEWPOINT_COLORSCALE": DEFAULT_DEWPOINT_COLORSCALE,
             "LCL_COLORSCALE": DEFAULT_LCL_COLORSCALE,
             "TREND_TEMP_COLORSCALE": DEFAULT_TREND_TEMP_COLORSCALE,
-            "TREND_HUMIDITY_COLORSCALE": DEFAULT_TREND_HUMIDITY_COLORSCALE
+            "TREND_HUMIDITY_COLORSCALE": DEFAULT_TREND_HUMIDITY_COLORSCALE,
+            "SNOW_COLORSCALE": DEFAULT_SNOW_COLORSCALE
         };
 
+        const DEFAULT_SNOW_COLORSCALE = [
+            [0.0,  "#fdf2f8"], // 0 cm: bardzo blady pastelowy róż
+            [0.08, "#fbcfe8"], // ~5 cm: lekki róż
+            [0.20, "#f472b6"], // ~15 cm: nasycony róż
+            [0.35, "#ec4899"], // ~30 cm: jaskrawy róż / magenta
+            [0.55, "#a855f7"], // ~50 cm: żywy fiolet
+            [0.75, "#7e22ce"], // ~75 cm: ciemny fiolet
+            [0.90, "#581c87"], // ~90 cm: głęboki fiolet
+            [1.0,  "#2e0854"]  // 100+ cm: bardzo ciemny fiolet / oberżyna
+        ];
+
+        const DEFAULT_SNOW_SAFETY_COLORSCALE = [
+            [0.0,  "#22c55e"], // 0%: bezpiecznie (zielony)
+            [0.4,  "#84cc16"], // 40%: limonkowy
+            [0.6,  "#eab308"], // 60%: uwaga (żółty)
+            [0.8,  "#f97316"], // 80%: podwyższone ryzyko (pomarańczowy)
+            [1.0,  "#ef4444"], // 100%: przekroczenie normy (czerwony)
+            [1.3,  "#a855f7"]  // 130%+: ekstremalne przekroczenie normy (fiolet)
+        ];
+
         const DEFAULT_ZMIENNE = {
-            "temp":     { "nazwa": "Temperatura", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
-            "grunt":    { "nazwa": "Temp. Gruntu", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
-            "wiatr":    { "nazwa": "Poryw Wiatru", "cscale": DEFAULT_WIND_COLORSCALE, "cmin": 0, "cmax": 259, "unit": "km/h", "step": 10.0 },
-            "wiatr_sr": { "nazwa": "Śr. Wiatr", "cscale": DEFAULT_WIND_COLORSCALE, "cmin": 0, "cmax": 259, "unit": "km/h", "step": 10.0 },
-            "wilg":     { "nazwa": "Wilgotność", "cscale": DEFAULT_HUMIDITY_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "%", "step": 10.0 },
-            "rosy":     { "nazwa": "Punkt Rosy", "cscale": DEFAULT_DEWPOINT_COLORSCALE, "cmin": -10, "cmax": 28, "unit": "°C", "step": 2.0 },
-            "lcl":      { "nazwa": "Podstawa Chmur (LCL)", "cscale": DEFAULT_LCL_COLORSCALE, "cmin": 0, "cmax": 3000, "unit": "m", "step": 250.0 },
-            "synop":    { "nazwa": "Model Synoptyczny", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
-            "cisnienie": { "nazwa": "Ciśnienie", "cscale": DEFAULT_PRESSURE_COLORSCALE, "cmin": 980, "cmax": 1040, "unit": "hPa", "step": 2.0 }
+            "temp":             { "nazwa": "Temperatura", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
+            "grunt":            { "nazwa": "Temp. Gruntu", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
+            "wiatr":            { "nazwa": "Poryw Wiatru", "cscale": DEFAULT_WIND_COLORSCALE, "cmin": 0, "cmax": 259, "unit": "km/h", "step": 10.0 },
+            "wiatr_sr":         { "nazwa": "Śr. Wiatr", "cscale": DEFAULT_WIND_COLORSCALE, "cmin": 0, "cmax": 259, "unit": "km/h", "step": 10.0 },
+            "wilg":             { "nazwa": "Wilgotność", "cscale": DEFAULT_HUMIDITY_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "%", "step": 10.0 },
+            "rosy":             { "nazwa": "Punkt Rosy", "cscale": DEFAULT_DEWPOINT_COLORSCALE, "cmin": -10, "cmax": 28, "unit": "°C", "step": 2.0 },
+            "lcl":              { "nazwa": "Podstawa Chmur (LCL)", "cscale": DEFAULT_LCL_COLORSCALE, "cmin": 0, "cmax": 3000, "unit": "m", "step": 250.0 },
+            "synop":            { "nazwa": "Model Synoptyczny", "cscale": DEFAULT_TEMP_COLORSCALE, "cmin": -40, "cmax": 50, "unit": "°C", "step": 2.0 },
+            "cisnienie":        { "nazwa": "Ciśnienie", "cscale": DEFAULT_PRESSURE_COLORSCALE, "cmin": 980, "cmax": 1040, "unit": "hPa", "step": 2.0 },
+            "snieg":            { "nazwa": "Pokrywa Śnieżna", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 100, "unit": "cm", "step": 5.0 },
+            "snieg_zapas":      { "nazwa": "Zapas Wody w Śniegu", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 300, "unit": "mm", "step": 20.0 },
+            "snieg_obciazenie": { "nazwa": "Obciążenie Śniegiem", "cscale": DEFAULT_SNOW_COLORSCALE, "cmin": 0, "cmax": 5, "unit": "kN/m²", "step": 0.5 },
+            "snieg_norma":      { "nazwa": "% Normy Obciążenia", "cscale": DEFAULT_SNOW_SAFETY_COLORSCALE, "cmin": 0, "cmax": 120, "unit": "%", "step": 10.0 }
         };
         
         function hexToRgb(hex) {
@@ -1567,91 +1592,237 @@ window.initMapa = function() {
             return (b * alpha) / (a - alpha);
         }
 
-        // 75 stacji przygranicznych (do 200 km od granicy Polski) zasilających ciągłość synoptyczną
+        // 215 stacji przygranicznych (do 250 km od granicy Polski) zasilających ciągłość synoptyczną
         const FOREIGN_STATIONS = [
-            // Niemcy (DE)
-            { name: "Berlin", cc: "DE", lat: 52.52, lon: 13.40 },
-            { name: "Poczdam", cc: "DE", lat: 52.39, lon: 13.06 },
-            { name: "Frankfurt n/Odrą", cc: "DE", lat: 52.34, lon: 14.55 },
-            { name: "Chociebuż (Cottbus)", cc: "DE", lat: 51.76, lon: 14.33 },
-            { name: "Drezno", cc: "DE", lat: 51.05, lon: 13.74 },
-            { name: "Lipsk", cc: "DE", lat: 51.34, lon: 12.37 },
-            { name: "Görlitz", cc: "DE", lat: 51.15, lon: 14.99 },
-            { name: "Żytawa (Zittau)", cc: "DE", lat: 50.90, lon: 14.80 },
-            { name: "Pasewalk", cc: "DE", lat: 53.51, lon: 13.99 },
-            { name: "Neubrandenburg", cc: "DE", lat: 53.56, lon: 13.26 },
-            { name: "Greifswald", cc: "DE", lat: 54.09, lon: 13.38 },
-            { name: "Stralsund", cc: "DE", lat: 54.31, lon: 13.09 },
-            // Czechy (CZ)
-            { name: "Praga", cc: "CZ", lat: 50.08, lon: 14.44 },
-            { name: "Liberec", cc: "CZ", lat: 50.77, lon: 15.06 },
-            { name: "Trutnov", cc: "CZ", lat: 50.56, lon: 15.91 },
-            { name: "Hradec Králové", cc: "CZ", lat: 50.21, lon: 15.83 },
-            { name: "Pardubice", cc: "CZ", lat: 50.04, lon: 15.78 },
-            { name: "Jeseník", cc: "CZ", lat: 50.23, lon: 17.20 },
-            { name: "Šumperk", cc: "CZ", lat: 49.96, lon: 16.97 },
-            { name: "Bruntál", cc: "CZ", lat: 49.99, lon: 17.46 },
-            { name: "Opawa", cc: "CZ", lat: 49.94, lon: 17.90 },
-            { name: "Ostrawa", cc: "CZ", lat: 49.83, lon: 18.29 },
-            { name: "Karwina", cc: "CZ", lat: 49.85, lon: 18.54 },
-            { name: "Ołomuniec", cc: "CZ", lat: 49.59, lon: 17.25 },
-            { name: "Brno", cc: "CZ", lat: 49.19, lon: 16.61 },
-            // Słowacja (SK)
-            { name: "Bratysława", cc: "SK", lat: 48.15, lon: 17.11 },
-            { name: "Żylina", cc: "SK", lat: 49.22, lon: 18.74 },
-            { name: "Czadca", cc: "SK", lat: 49.44, lon: 18.79 },
-            { name: "Namiestów", cc: "SK", lat: 49.40, lon: 19.48 },
-            { name: "Dolný Kubín", cc: "SK", lat: 49.21, lon: 19.30 },
-            { name: "Rużomberk", cc: "SK", lat: 49.08, lon: 19.31 },
-            { name: "Liptowski Mikułasz", cc: "SK", lat: 49.08, lon: 19.61 },
-            { name: "Poprad", cc: "SK", lat: 49.06, lon: 20.30 },
-            { name: "Kieżmark", cc: "SK", lat: 49.14, lon: 20.43 },
-            { name: "Stara Lubowla", cc: "SK", lat: 49.30, lon: 20.69 },
-            { name: "Bardejów", cc: "SK", lat: 49.29, lon: 21.27 },
-            { name: "Świdnik", cc: "SK", lat: 49.30, lon: 21.57 },
-            { name: "Preszów", cc: "SK", lat: 49.00, lon: 21.24 },
-            { name: "Koszyce", cc: "SK", lat: 48.72, lon: 21.26 },
-            // Ukraina (UA)
-            { name: "Lwów", cc: "UA", lat: 49.84, lon: 24.03 },
-            { name: "Rawa Ruska", cc: "UA", lat: 50.25, lon: 23.63 },
-            { name: "Żółkiew", cc: "UA", lat: 50.06, lon: 23.97 },
-            { name: "Jaworów", cc: "UA", lat: 49.94, lon: 23.39 },
-            { name: "Drohobycz", cc: "UA", lat: 49.35, lon: 23.51 },
-            { name: "Stryj", cc: "UA", lat: 49.26, lon: 23.86 },
-            { name: "Użhorod", cc: "UA", lat: 48.62, lon: 22.30 },
-            { name: "Sambor", cc: "UA", lat: 49.52, lon: 23.20 },
-            { name: "Włodzimierz", cc: "UA", lat: 50.75, lon: 24.32 },
-            { name: "Kowel", cc: "UA", lat: 51.22, lon: 24.71 },
-            { name: "Łuck", cc: "UA", lat: 50.74, lon: 25.34 },
-            { name: "Równe", cc: "UA", lat: 50.62, lon: 26.25 },
-            { name: "Iwano-Frankiwsk", cc: "UA", lat: 48.92, lon: 24.71 },
-            // Białoruś (BY)
-            { name: "Brześć", cc: "BY", lat: 52.10, lon: 23.69 },
-            { name: "Kobryń", cc: "BY", lat: 52.21, lon: 24.36 },
-            { name: "Prużana", cc: "BY", lat: 52.56, lon: 24.47 },
-            { name: "Bereza", cc: "BY", lat: 52.53, lon: 24.98 },
-            { name: "Wołkowysk", cc: "BY", lat: 53.16, lon: 24.45 },
-            { name: "Grodno", cc: "BY", lat: 53.68, lon: 23.83 },
-            { name: "Szczuczyn", cc: "BY", lat: 53.60, lon: 24.74 },
-            { name: "Lida", cc: "BY", lat: 53.89, lon: 25.30 },
-            // Litwa (LT)
-            { name: "Druskieniki", cc: "LT", lat: 54.01, lon: 23.97 },
-            { name: "Olita", cc: "LT", lat: 54.40, lon: 24.04 },
-            { name: "Łoździeje", cc: "LT", lat: 54.23, lon: 23.51 },
-            { name: "Mariampol", cc: "LT", lat: 54.56, lon: 23.35 },
-            { name: "Kowno", cc: "LT", lat: 54.90, lon: 23.90 },
-            { name: "Wilno", cc: "LT", lat: 54.69, lon: 25.28 },
-            { name: "Taurogi", cc: "LT", lat: 55.25, lon: 22.29 },
-            { name: "Kłajpeda", cc: "LT", lat: 55.71, lon: 21.14 },
-            // Obwód Królewiecki / Rosja (RU)
-            { name: "Królewiec", cc: "RU", lat: 54.71, lon: 20.51 },
-            { name: "Bagrationowsk", cc: "RU", lat: 54.38, lon: 20.63 },
-            { name: "Czerniachowsk", cc: "RU", lat: 54.64, lon: 21.81 },
-            { name: "Sowieck", cc: "RU", lat: 55.08, lon: 21.88 },
-            { name: "Gusiew", cc: "RU", lat: 54.60, lon: 22.20 },
-            { name: "Bałtijsk", cc: "RU", lat: 54.65, lon: 19.89 },
-            { name: "Mamonowo", cc: "RU", lat: 54.46, lon: 19.95 }
-        ];
+    # Niemcy (DE) - 40 stacji
+    {"name": "Stralsund", "cc": "DE", "lat": 54.31, "lon": 13.09},
+    {"name": "Greifswald", "cc": "DE", "lat": 54.09, "lon": 13.38},
+    {"name": "Wolgast", "cc": "DE", "lat": 54.05, "lon": 13.77},
+    {"name": "Anklam", "cc": "DE", "lat": 53.86, "lon": 13.69},
+    {"name": "Ueckermünde", "cc": "DE", "lat": 53.74, "lon": 14.05},
+    {"name": "Pasewalk", "cc": "DE", "lat": 53.51, "lon": 13.99},
+    {"name": "Neubrandenburg", "cc": "DE", "lat": 53.56, "lon": 13.26},
+    {"name": "Prenzlau", "cc": "DE", "lat": 53.32, "lon": 13.86},
+    {"name": "Schwedt (Oder)", "cc": "DE", "lat": 53.06, "lon": 14.28},
+    {"name": "Angermünde", "cc": "DE", "lat": 53.02, "lon": 14.00},
+    {"name": "Eberswalde", "cc": "DE", "lat": 52.83, "lon": 13.82},
+    {"name": "Bad Freienwalde", "cc": "DE", "lat": 52.79, "lon": 14.03},
+    {"name": "Wriezen", "cc": "DE", "lat": 52.72, "lon": 14.13},
+    {"name": "Seelow", "cc": "DE", "lat": 52.53, "lon": 14.38},
+    {"name": "Berlin-Mitte", "cc": "DE", "lat": 52.52, "lon": 13.40},
+    {"name": "Berlin-Schönefeld", "cc": "DE", "lat": 52.38, "lon": 13.52},
+    {"name": "Potsdam", "cc": "DE", "lat": 52.39, "lon": 13.06},
+    {"name": "Fürstenwalde", "cc": "DE", "lat": 52.36, "lon": 14.06},
+    {"name": "Frankfurt (Oder)", "cc": "DE", "lat": 52.34, "lon": 14.55},
+    {"name": "Eisenhüttenstadt", "cc": "DE", "lat": 52.14, "lon": 14.67},
+    {"name": "Beeskow", "cc": "DE", "lat": 52.17, "lon": 14.25},
+    {"name": "Lübben (Spreewald)", "cc": "DE", "lat": 51.94, "lon": 13.90},
+    {"name": "Guben", "cc": "DE", "lat": 51.95, "lon": 14.72},
+    {"name": "Forst (Lausitz)", "cc": "DE", "lat": 51.74, "lon": 14.65},
+    {"name": "Cottbus", "cc": "DE", "lat": 51.76, "lon": 14.33},
+    {"name": "Spremberg", "cc": "DE", "lat": 51.57, "lon": 14.38},
+    {"name": "Weißwasser", "cc": "DE", "lat": 51.50, "lon": 14.64},
+    {"name": "Hoyerswerda", "cc": "DE", "lat": 51.44, "lon": 14.25},
+    {"name": "Niesky", "cc": "DE", "lat": 51.29, "lon": 14.82},
+    {"name": "Görlitz", "cc": "DE", "lat": 51.15, "lon": 14.99},
+    {"name": "Bautzen", "cc": "DE", "lat": 51.18, "lon": 14.43},
+    {"name": "Löbau", "cc": "DE", "lat": 51.10, "lon": 14.67},
+    {"name": "Zittau", "cc": "DE", "lat": 50.90, "lon": 14.80},
+    {"name": "Drezno", "cc": "DE", "lat": 51.05, "lon": 13.74},
+    {"name": "Pirna", "cc": "DE", "lat": 50.96, "lon": 13.94},
+    {"name": "Meissen", "cc": "DE", "lat": 51.16, "lon": 13.48},
+    {"name": "Riesa", "cc": "DE", "lat": 51.30, "lon": 13.30},
+    {"name": "Lipsk", "cc": "DE", "lat": 51.34, "lon": 12.37},
+    {"name": "Chemnitz", "cc": "DE", "lat": 50.83, "lon": 12.92},
+    {"name": "Freiberg", "cc": "DE", "lat": 50.92, "lon": 13.34},
+
+    # Czechy (CZ) - 45 stacji
+    {"name": "Frydlant", "cc": "CZ", "lat": 50.92, "lon": 15.08},
+    {"name": "Liberec", "cc": "CZ", "lat": 50.77, "lon": 15.06},
+    {"name": "Jablonec nad Nisou", "cc": "CZ", "lat": 50.72, "lon": 15.17},
+    {"name": "Semily", "cc": "CZ", "lat": 50.60, "lon": 15.34},
+    {"name": "Turnov", "cc": "CZ", "lat": 50.59, "lon": 15.16},
+    {"name": "Mlada Boleslav", "cc": "CZ", "lat": 50.41, "lon": 14.91},
+    {"name": "Jicin", "cc": "CZ", "lat": 50.44, "lon": 15.35},
+    {"name": "Vrchlabi", "cc": "CZ", "lat": 50.63, "lon": 15.61},
+    {"name": "Trutnov", "cc": "CZ", "lat": 50.56, "lon": 15.91},
+    {"name": "Dvur Kralove", "cc": "CZ", "lat": 50.43, "lon": 15.81},
+    {"name": "Nachod", "cc": "CZ", "lat": 50.42, "lon": 16.16},
+    {"name": "Broumov", "cc": "CZ", "lat": 50.59, "lon": 16.33},
+    {"name": "Rychnov nad Kneznou", "cc": "CZ", "lat": 50.16, "lon": 16.28},
+    {"name": "Hradec Kralove", "cc": "CZ", "lat": 50.21, "lon": 15.83},
+    {"name": "Pardubice", "cc": "CZ", "lat": 50.04, "lon": 15.78},
+    {"name": "Chrudim", "cc": "CZ", "lat": 49.95, "lon": 15.79},
+    {"name": "Usti nad Orlici", "cc": "CZ", "lat": 49.97, "lon": 16.39},
+    {"name": "Ceska Trebova", "cc": "CZ", "lat": 49.90, "lon": 16.45},
+    {"name": "Svitavy", "cc": "CZ", "lat": 49.76, "lon": 16.47},
+    {"name": "Zamberk", "cc": "CZ", "lat": 50.09, "lon": 16.46},
+    {"name": "Kraliky", "cc": "CZ", "lat": 50.08, "lon": 16.76},
+    {"name": "Jesenik", "cc": "CZ", "lat": 50.23, "lon": 17.20},
+    {"name": "Zlate Hory", "cc": "CZ", "lat": 50.26, "lon": 17.40},
+    {"name": "Javornik", "cc": "CZ", "lat": 50.39, "lon": 17.00},
+    {"name": "Sumperk", "cc": "CZ", "lat": 49.96, "lon": 16.97},
+    {"name": "Zabreh", "cc": "CZ", "lat": 49.88, "lon": 16.87},
+    {"name": "Mohelnice", "cc": "CZ", "lat": 49.78, "lon": 16.92},
+    {"name": "Rymarov", "cc": "CZ", "lat": 49.93, "lon": 17.27},
+    {"name": "Bruntal", "cc": "CZ", "lat": 49.99, "lon": 17.46},
+    {"name": "Krnov", "cc": "CZ", "lat": 50.09, "lon": 17.70},
+    {"name": "Opawa", "cc": "CZ", "lat": 49.94, "lon": 17.90},
+    {"name": "Hlucin", "cc": "CZ", "lat": 49.90, "lon": 18.19},
+    {"name": "Ostrawa", "cc": "CZ", "lat": 49.83, "lon": 18.29},
+    {"name": "Bohumin", "cc": "CZ", "lat": 49.90, "lon": 18.36},
+    {"name": "Karwina", "cc": "CZ", "lat": 49.85, "lon": 18.54},
+    {"name": "Hawierzow", "cc": "CZ", "lat": 49.78, "lon": 18.43},
+    {"name": "Czeski Cieszyn", "cc": "CZ", "lat": 49.75, "lon": 18.63},
+    {"name": "Frydek-Mistek", "cc": "CZ", "lat": 49.68, "lon": 18.35},
+    {"name": "Trzyniec", "cc": "CZ", "lat": 49.68, "lon": 18.67},
+    {"name": "Jablunkov", "cc": "CZ", "lat": 49.58, "lon": 18.76},
+    {"name": "Nowy Jiczyn", "cc": "CZ", "lat": 49.59, "lon": 18.01},
+    {"name": "Olomuniec", "cc": "CZ", "lat": 49.59, "lon": 17.25},
+    {"name": "Przerow", "cc": "CZ", "lat": 49.46, "lon": 17.45},
+    {"name": "Zlin", "cc": "CZ", "lat": 49.23, "lon": 17.67},
+    {"name": "Brno", "cc": "CZ", "lat": 49.19, "lon": 16.61},
+
+    # Słowacja (SK) - 40 stacji
+    {"name": "Czadca", "cc": "SK", "lat": 49.44, "lon": 18.79},
+    {"name": "Turzovka", "cc": "SK", "lat": 49.40, "lon": 18.62},
+    {"name": "Kysucke Nove Mesto", "cc": "SK", "lat": 49.30, "lon": 18.78},
+    {"name": "Żylina", "cc": "SK", "lat": 49.22, "lon": 18.74},
+    {"name": "Bytca", "cc": "SK", "lat": 49.22, "lon": 18.56},
+    {"name": "Powaska Bystrzyca", "cc": "SK", "lat": 49.12, "lon": 18.45},
+    {"name": "Puchov", "cc": "SK", "lat": 49.12, "lon": 18.33},
+    {"name": "Ilava", "cc": "SK", "lat": 48.99, "lon": 18.23},
+    {"name": "Trenczyn", "cc": "SK", "lat": 48.89, "lon": 18.04},
+    {"name": "Martin", "cc": "SK", "lat": 49.07, "lon": 18.92},
+    {"name": "Namiestow", "cc": "SK", "lat": 49.40, "lon": 19.48},
+    {"name": "Trstena", "cc": "SK", "lat": 49.36, "lon": 19.61},
+    {"name": "Tvrdosin", "cc": "SK", "lat": 49.33, "lon": 19.56},
+    {"name": "Dolny Kubin", "cc": "SK", "lat": 49.21, "lon": 19.30},
+    {"name": "Ruzomberk", "cc": "SK", "lat": 49.08, "lon": 19.31},
+    {"name": "Liptowski Mikulasz", "cc": "SK", "lat": 49.08, "lon": 19.61},
+    {"name": "Liptovsky Hradok", "cc": "SK", "lat": 49.04, "lon": 19.72},
+    {"name": "Strbske Pleso", "cc": "SK", "lat": 49.12, "lon": 20.06},
+    {"name": "Poprad", "cc": "SK", "lat": 49.06, "lon": 20.30},
+    {"name": "Kiezmark", "cc": "SK", "lat": 49.14, "lon": 20.43},
+    {"name": "Spiska Bela", "cc": "SK", "lat": 49.19, "lon": 20.46},
+    {"name": "Stara Lubowla", "cc": "SK", "lat": 49.30, "lon": 20.69},
+    {"name": "Podolinec", "cc": "SK", "lat": 49.26, "lon": 20.52},
+    {"name": "Bardejow", "cc": "SK", "lat": 49.29, "lon": 21.27},
+    {"name": "Swidnik", "cc": "SK", "lat": 49.30, "lon": 21.57},
+    {"name": "Stropkov", "cc": "SK", "lat": 49.20, "lon": 21.65},
+    {"name": "Medzilaborce", "cc": "SK", "lat": 49.27, "lon": 21.90},
+    {"name": "Snina", "cc": "SK", "lat": 48.99, "lon": 22.15},
+    {"name": "Humenne", "cc": "SK", "lat": 48.94, "lon": 21.91},
+    {"name": "Michalovce", "cc": "SK", "lat": 48.75, "lon": 21.92},
+    {"name": "Vranov nad Toplou", "cc": "SK", "lat": 48.89, "lon": 21.68},
+    {"name": "Preszow", "cc": "SK", "lat": 49.00, "lon": 21.24},
+    {"name": "Sabinov", "cc": "SK", "lat": 49.10, "lon": 21.10},
+    {"name": "Lipany", "cc": "SK", "lat": 49.15, "lon": 20.96},
+    {"name": "Lewocza", "cc": "SK", "lat": 49.03, "lon": 20.59},
+    {"name": "Spiska Nowa Wies", "cc": "SK", "lat": 48.94, "lon": 20.57},
+    {"name": "Koszyce", "cc": "SK", "lat": 48.72, "lon": 21.26},
+    {"name": "Trebisov", "cc": "SK", "lat": 48.63, "lon": 21.72},
+    {"name": "Banska Bystrzyca", "cc": "SK", "lat": 48.74, "lon": 19.15},
+    {"name": "Bratyslawa", "cc": "SK", "lat": 48.15, "lon": 17.11},
+
+    # Ukraina (UA) - 35 stacji
+    {"name": "Lwow", "cc": "UA", "lat": 49.84, "lon": 24.03},
+    {"name": "Rawa Ruska", "cc": "UA", "lat": 50.25, "lon": 23.63},
+    {"name": "Zolkiew", "cc": "UA", "lat": 50.06, "lon": 23.97},
+    {"name": "Jaworow", "cc": "UA", "lat": 49.94, "lon": 23.39},
+    {"name": "Nowojaworowsk", "cc": "UA", "lat": 49.93, "lon": 23.57},
+    {"name": "Mosciska", "cc": "UA", "lat": 49.80, "lon": 23.15},
+    {"name": "Sadowa Wisznia", "cc": "UA", "lat": 49.79, "lon": 23.37},
+    {"name": "Grodek", "cc": "UA", "lat": 49.78, "lon": 23.65},
+    {"name": "Sambor", "cc": "UA", "lat": 49.52, "lon": 23.20},
+    {"name": "Stary Sambor", "cc": "UA", "lat": 49.44, "lon": 23.00},
+    {"name": "Turka", "cc": "UA", "lat": 49.15, "lon": 23.03},
+    {"name": "Drohobycz", "cc": "UA", "lat": 49.35, "lon": 23.51},
+    {"name": "Boryslaw", "cc": "UA", "lat": 49.29, "lon": 23.42},
+    {"name": "Truskawiec", "cc": "UA", "lat": 49.28, "lon": 23.51},
+    {"name": "Stryj", "cc": "UA", "lat": 49.26, "lon": 23.86},
+    {"name": "Morszyn", "cc": "UA", "lat": 49.15, "lon": 23.87},
+    {"name": "Skole", "cc": "UA", "lat": 49.03, "lon": 23.51},
+    {"name": "Slawsko", "cc": "UA", "lat": 48.85, "lon": 23.45},
+    {"name": "Mikolajow", "cc": "UA", "lat": 49.52, "lon": 23.98},
+    {"name": "Zydaczow", "cc": "UA", "lat": 49.39, "lon": 24.14},
+    {"name": "Chodorow", "cc": "UA", "lat": 49.41, "lon": 24.31},
+    {"name": "Kamionka Strumilowa", "cc": "UA", "lat": 50.11, "lon": 24.34},
+    {"name": "Czerwonogrod", "cc": "UA", "lat": 50.42, "lon": 24.23},
+    {"name": "Sokal", "cc": "UA", "lat": 50.48, "lon": 24.28},
+    {"name": "Nowowolynsk", "cc": "UA", "lat": 50.73, "lon": 24.16},
+    {"name": "Wlodzimierz", "cc": "UA", "lat": 50.75, "lon": 24.32},
+    {"name": "Kowel", "cc": "UA", "lat": 51.22, "lon": 24.71},
+    {"name": "Kamien Koszyrski", "cc": "UA", "lat": 51.62, "lon": 24.96},
+    {"name": "Luboml", "cc": "UA", "lat": 51.23, "lon": 24.04},
+    {"name": "Szack", "cc": "UA", "lat": 51.49, "lon": 23.93},
+    {"name": "Luck", "cc": "UA", "lat": 50.74, "lon": 25.34},
+    {"name": "Rozyszcze", "cc": "UA", "lat": 50.91, "lon": 25.27},
+    {"name": "Rowne", "cc": "UA", "lat": 50.62, "lon": 26.25},
+    {"name": "Dubno", "cc": "UA", "lat": 50.42, "lon": 25.74},
+    {"name": "Iwano-Frankiwsk", "cc": "UA", "lat": 48.92, "lon": 24.71},
+
+    # Białoruś (BY) - 20 stacji
+    {"name": "Brzesc", "cc": "BY", "lat": 52.10, "lon": 23.69},
+    {"name": "Zabinka", "cc": "BY", "lat": 52.20, "lon": 24.02},
+    {"name": "Kobryn", "cc": "BY", "lat": 52.21, "lon": 24.36},
+    {"name": "Maloryta", "cc": "BY", "lat": 51.79, "lon": 24.08},
+    {"name": "Wysokie", "cc": "BY", "lat": 52.37, "lon": 23.38},
+    {"name": "Kamieniec", "cc": "BY", "lat": 52.40, "lon": 23.82},
+    {"name": "Pruzana", "cc": "BY", "lat": 52.56, "lon": 24.47},
+    {"name": "Bereza", "cc": "BY", "lat": 52.53, "lon": 24.98},
+    {"name": "Bielooziorsk", "cc": "BY", "lat": 52.47, "lon": 25.18},
+    {"name": "Iwanowo", "cc": "BY", "lat": 52.14, "lon": 25.54},
+    {"name": "Pinsk", "cc": "BY", "lat": 52.12, "lon": 26.10},
+    {"name": "Swislocz", "cc": "BY", "lat": 53.03, "lon": 24.10},
+    {"name": "Wolkowysk", "cc": "BY", "lat": 53.16, "lon": 24.45},
+    {"name": "Zelwa", "cc": "BY", "lat": 53.15, "lon": 24.81},
+    {"name": "Slonim", "cc": "BY", "lat": 53.09, "lon": 25.32},
+    {"name": "Mosty", "cc": "BY", "lat": 53.41, "lon": 24.54},
+    {"name": "Grodno", "cc": "BY", "lat": 53.68, "lon": 23.83},
+    {"name": "Skidel", "cc": "BY", "lat": 53.59, "lon": 24.25},
+    {"name": "Szczuczyn", "cc": "BY", "lat": 53.60, "lon": 24.74},
+    {"name": "Lida", "cc": "BY", "lat": 53.89, "lon": 25.30},
+
+    # Litwa (LT) - 20 stacji
+    {"name": "Druskieniki", "cc": "LT", "lat": 54.01, "lon": 23.97},
+    {"name": "Wiejsieje", "cc": "LT", "lat": 54.10, "lon": 23.70},
+    {"name": "Lozdzieje", "cc": "LT", "lat": 54.23, "lon": 23.51},
+    {"name": "Simnas", "cc": "LT", "lat": 54.38, "lon": 23.64},
+    {"name": "Olita (Alytus)", "cc": "LT", "lat": 54.40, "lon": 24.04},
+    {"name": "Orany (Varena)", "cc": "LT", "lat": 54.21, "lon": 24.57},
+    {"name": "Soleczniki", "cc": "LT", "lat": 54.31, "lon": 25.38},
+    {"name": "Wilno", "cc": "LT", "lat": 54.69, "lon": 25.28},
+    {"name": "Troki", "cc": "LT", "lat": 54.64, "lon": 24.93},
+    {"name": "Elektreny", "cc": "LT", "lat": 54.79, "lon": 24.66},
+    {"name": "Koszedary", "cc": "LT", "lat": 54.86, "lon": 24.45},
+    {"name": "Kowno", "cc": "LT", "lat": 54.90, "lon": 23.90},
+    {"name": "Preny (Prienai)", "cc": "LT", "lat": 54.63, "lon": 23.94},
+    {"name": "Mariampol", "cc": "LT", "lat": 54.56, "lon": 23.35},
+    {"name": "Wylkowyszki", "cc": "LT", "lat": 54.65, "lon": 23.03},
+    {"name": "Kibarty", "cc": "LT", "lat": 54.64, "lon": 22.76},
+    {"name": "Szaki (Sakiai)", "cc": "LT", "lat": 54.95, "lon": 23.05},
+    {"name": "Jurbork (Jurbarkas)", "cc": "LT", "lat": 55.08, "lon": 22.77},
+    {"name": "Taurogi (Taurage)", "cc": "LT", "lat": 55.25, "lon": 22.29},
+    {"name": "Klajpeda", "cc": "LT", "lat": 55.71, "lon": 21.14},
+
+    # Obwód Królewiecki (RU) - 15 stacji
+    {"name": "Krolewiec", "cc": "RU", "lat": 54.71, "lon": 20.51},
+    {"name": "Baltijsk", "cc": "RU", "lat": 54.65, "lon": 19.89},
+    {"name": "Swietlyj", "cc": "RU", "lat": 54.67, "lon": 20.13},
+    {"name": "Jantarnyj", "cc": "RU", "lat": 54.87, "lon": 19.94},
+    {"name": "Pionierski", "cc": "RU", "lat": 54.95, "lon": 20.23},
+    {"name": "Zielenogradsk", "cc": "RU", "lat": 54.96, "lon": 20.47},
+    {"name": "Gurjewsk", "cc": "RU", "lat": 54.77, "lon": 20.61},
+    {"name": "Mamonowo", "cc": "RU", "lat": 54.46, "lon": 19.95},
+    {"name": "Bagrationowsk", "cc": "RU", "lat": 54.38, "lon": 20.63},
+    {"name": "Prawdinsk", "cc": "RU", "lat": 54.45, "lon": 21.01},
+    {"name": "Gwardiejsk", "cc": "RU", "lat": 54.65, "lon": 21.07},
+    {"name": "Polessk", "cc": "RU", "lat": 54.86, "lon": 21.10},
+    {"name": "Czerniachowsk", "cc": "RU", "lat": 54.64, "lon": 21.81},
+    {"name": "Gusiew", "cc": "RU", "lat": 54.60, "lon": 22.20},
+    {"name": "Sowieck", "cc": "RU", "lat": 55.08, "lon": 21.88}
+];
 
         let foreignLiveCache = null;
         let foreignLiveCacheTime = 0;
@@ -2090,7 +2261,22 @@ window.initMapa = function() {
             
             let data = null;
             
-            if (okres === 'now') {
+                        if (zmienna.startsWith('snieg')) {
+                if (loadingEl) {
+                    loadingEl.style.display = 'flex';
+                    loadingEl.innerHTML = '<i data-lucide="loader" class="spin"></i> Pobieranie biuletynu pokrywy śnieżnej IMGW...';
+                }
+                try {
+                    if (window.getSnowData) {
+                        const snowDataObj = await window.getSnowData();
+                        data = snowDataObj[zmienna];
+                    }
+                } catch (e) {
+                    console.error("Błąd pobierania danych śniegu:", e);
+                } finally {
+                    if (loadingEl) loadingEl.style.display = 'none';
+                }
+            } else if (okres === 'now') {
                 const liveDataObj = await getIMGWLiveData();
                 if(liveDataObj) {
                     data = liveDataObj[zmienna];
@@ -2286,12 +2472,13 @@ window.initMapa = function() {
                     }
                 }
 
-                const hasForeignActive = showForeign && data.pt_foreign && data.pt_foreign.some(f => f);
+                const isSnowVar = zmienna.startsWith('snieg');
+                const hasForeignActive = !isSnowVar && showForeign && data.pt_foreign && data.pt_foreign.some(f => f);
                 const geoBounds = hasForeignActive 
-                    ? { minLat: 47.5, maxLat: 56.5, minLon: 11.5, maxLon: 27.0 }
+                    ? { minLat: 47.0, maxLat: 56.5, minLon: 11.0, maxLon: 27.5 }
                     : { minLat: 48.5, maxLat: 55.5, minLon: 13.5, maxLon: 24.5 };
                 const bounds = hasForeignActive
-                    ? [[47.5, 11.5], [56.5, 27.0]]
+                    ? [[47.0, 11.0], [56.5, 27.5]]
                     : [[48.5, 13.5], [55.5, 24.5]];
                 const clipToPoland = !hasForeignActive;
 
