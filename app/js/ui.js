@@ -42,9 +42,9 @@ async function ensureMapDependencies() {
         loadScript('js/kreator.js'),
         loadScript('js/cmm-map.js'),
         loadScript('js/burze.js'),
-        loadScript('js/snow.js')
+        loadScript('js/snow.js?v=21')
     ]);
-    await loadScript('js/mapa.js');
+    await loadScript('js/mapa.js?v=21');
     window._mapDepsLoaded = true;
 }
 
@@ -101,7 +101,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (src && !activeView.hasAttribute('data-loaded')) {
                 activeView.setAttribute('data-loaded', 'true');
                 try {
-                    const res = await fetch(src);
+                    const fetchUrl = src + (src.includes('?') ? '&' : '?') + 'v=21';
+                    const res = await fetch(fetchUrl);
                     if (!res.ok) throw new Error('Błąd HTTP: ' + res.status);
                     const html = await res.text();
                     activeView.innerHTML = html;
