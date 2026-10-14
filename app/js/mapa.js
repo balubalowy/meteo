@@ -2016,6 +2016,9 @@ window.initMapa = function() {
 
         async function getIMGWLiveData() {
             const chkModel = document.getElementById('chk-source-model');
+            const providerRR = document.getElementById('provider-rr');
+            const isRR = providerRR ? providerRR.checked : false;
+
             let dataMode = 'stations';
             if (chkModel) {
                 dataMode = chkModel.checked ? 'hybrid' : 'stations';
@@ -2023,28 +2026,36 @@ window.initMapa = function() {
                 const modeSelect = document.getElementById('imgw-data-mode');
                 dataMode = modeSelect ? modeSelect.value : 'stations';
             }
+            const cacheKey = `${dataMode}_${isRR ? 'rr' : 'imgw'}`;
             const now = Date.now();
             
-            if (imgwLiveCacheByMode[dataMode] && (now - imgwLiveCacheByMode[dataMode].time < 60000)) {
-                return imgwLiveCacheByMode[dataMode].data;
+            if (imgwLiveCacheByMode[cacheKey] && (now - imgwLiveCacheByMode[cacheKey].time < 60000)) {
+                return imgwLiveCacheByMode[cacheKey].data;
             }
             
             const loadingEl = document.getElementById('imgw-loading');
             if (loadingEl) {
                 loadingEl.style.display = 'flex';
-                loadingEl.innerHTML = '<i data-lucide="loader" class="spin"></i> Pobieranie danych meteorologicznych...';
+                loadingEl.innerHTML = isRR
+                    ? '<i data-lucide="loader" class="spin"></i> Pobieranie danych 10m (R.R.)...'
+                    : '<i data-lucide="loader" class="spin"></i> Pobieranie danych meteorologicznych...';
             }
             
             try {
                 // Równoległe pobieranie wymaganych źródeł w zależności od trybu
                 let reqMeteo = Promise.resolve([]);
+                let reqRR = Promise.resolve([]);
                 let reqSynop = Promise.resolve([]);
                 let reqAsos = Promise.resolve([]);
                 let reqSnow = Promise.resolve(null);
                 let reqModel = Promise.resolve({ pl: [], foreign: [] });
 
                 if (dataMode === 'stations' || dataMode === 'hybrid') {
-                    reqMeteo = fetch('https://danepubliczne.imgw.pl/api/data/meteo/').then(r => r.ok ? r.json() : []).catch(() => []);
+                    if (isRR) {
+                        reqRR = fetch('https://rafalraczynski.com.pl/imgw/maps-2/getJSON.php?type=maps').then(r => r.ok ? r.json() : []).catch(() => []);
+                    } else {
+                        reqMeteo = fetch('https://danepubliczne.imgw.pl/api/data/meteo/').then(r => r.ok ? r.json() : []).catch(() => []);
+                    }
                     reqSynop = fetch('https://danepubliczne.imgw.pl/api/data/synop').then(r => r.ok ? r.json() : []).catch(() => []);
                     reqAsos = fetchForeignASOSData();
                     if (window.getSnowData) {
@@ -2055,8 +2066,9 @@ window.initMapa = function() {
                     reqModel = fetchIconModelData();
                 }
 
-                const [rawData, synopData, asosData, snowData, modelData] = await Promise.all([
+                const [rawData, rrData, synopData, asosData, snowData, modelData] = await Promise.all([
                     reqMeteo,
+                    reqRR,
                     reqSynop,
                     reqAsos,
                     reqSnow,
@@ -2132,8 +2144,106 @@ window.initMapa = function() {
                     }
                 }
 
-                // 2. STACJE METEO IMGW (Polska - automatyczne stacje telemetryczne)
-                if (Array.isArray(rawData) && dataMode !== 'model') {
+                // 2. STACJE METEO (Polska - automatyczne stacje telemetryczne)
+                if (isRR && Array.isArray(rrData) && dataMode !== 'model') {
+                    const COMPASS_TO_DEG = {
+                        'N': 0, 'NNE': 22.5, 'NE': 45, 'ENE': 67.5,
+                        'E': 90, 'ESE': 112.5, 'SE': 135, 'SSE': 157.5,
+                        'S': 180, 'SSW': 202.5, 'SW': 225, 'WSW': 247.5,
+                        'W': 270, 'WNW': 292.5, 'NW': 315, 'NNW': 337.5
+                    };
+
+                    const isDataValidRR = (dateStr) => {
+                        if (!dateStr) return false;
+                        const parts = String(dateStr).split(/[- :]/);
+                        if (parts.length < 5) return false;
+                        const dataDate = new Date(Date.UTC(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5] || 0));
+                        const diffHours = (Date.now() - dataDate.getTime()) / (1000 * 60 * 60);
+                        return diffHours <= 3.5 && diffHours >= -1;
+                    };
+
+                    const formatTimeRR = (dateStr) => {
+                        if (!dateStr) return '';
+                        const parts = String(dateStr).split(/[- :]/);
+                        if (parts.length >= 5) {
+                            const utcDate = new Date(Date.UTC(parts[0], parts[1]-1, parts[2], parts[3], parts[4], parts[5] || 0));
+                            const localTime = utcDate.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+                            return ` <span style="font-size:0.75rem; color:#a1a1aa;">(${localTime})</span>`;
+                        }
+                        return '';
+                    };
+
+                    for (const st of rrData) {
+                        if (st.isModel) continue;
+
+                        const lat = parseFloat(st.lat);
+                        const lon = parseFloat(st.lng !== undefined ? st.lng : st.lon);
+                        if (isNaN(lat) || isNaN(lon)) continue;
+
+                        const nazwa = st.statName || 'Stacja IMGW';
+                        const kod = String(st.statId || '');
+                        if (kod) {
+                            window._stationMetaMap = window._stationMetaMap || {};
+                            window._stationMetaMap[kod] = { lat, lon, nazwa };
+                        }
+
+                        const timeStr = st.tempLastTime || st.strTime;
+                        const temp = (st.temp !== null && st.temp !== undefined) ? parseFloat(st.temp) : NaN;
+                        const wilg = (st.wilgBezw !== null && st.wilgBezw !== undefined) ? parseFloat(st.wilgBezw) : NaN;
+                        const wiatr_sr = (st.predWiatru !== null && st.predWiatru !== undefined) ? parseFloat(st.predWiatru) : NaN;
+                        const wiatr_max10 = (st.predWiatruMax10min !== null && st.predWiatruMax10min !== undefined) ? parseFloat(st.predWiatruMax10min) : NaN;
+
+                        let wiatr_poryw = NaN;
+                        if (!isNaN(wiatr_max10) && !isNaN(wiatr_sr)) {
+                            wiatr_poryw = Math.max(wiatr_max10, wiatr_sr);
+                        } else if (!isNaN(wiatr_max10)) {
+                            wiatr_poryw = wiatr_max10;
+                        } else if (!isNaN(wiatr_sr)) {
+                            wiatr_poryw = wiatr_sr;
+                        }
+
+                        let wiatr_kier = null;
+                        if (typeof st.kierWiatru === 'string' && COMPASS_TO_DEG[st.kierWiatru.trim().toUpperCase()] !== undefined) {
+                            wiatr_kier = COMPASS_TO_DEG[st.kierWiatru.trim().toUpperCase()];
+                        } else if (typeof st.kierWiatru === 'number' || (st.kierWiatru && !isNaN(parseFloat(st.kierWiatru)))) {
+                            wiatr_kier = parseFloat(st.kierWiatru);
+                        }
+
+                        const dewPoint = calculateDewPoint(temp, wilg);
+                        let lcl_m = NaN;
+                        if (!isNaN(temp) && dewPoint !== null && !isNaN(dewPoint)) {
+                            lcl_m = Math.round(125 * Math.max(0, temp - dewPoint));
+                        }
+
+                        const addDataRR = (zmienna, val, txt, hov, dir) => {
+                            if (isNaN(val) || !isDataValidRR(timeStr)) return;
+                            dataObj[zmienna].pt_lats.push(lat);
+                            dataObj[zmienna].pt_lons.push(lon);
+                            dataObj[zmienna].pt_vals.push(val);
+                            dataObj[zmienna].pt_dirs.push(dir !== undefined ? dir : null);
+                            dataObj[zmienna].pt_txts.push(txt);
+                            dataObj[zmienna].pt_hov.push(
+                                `<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">` +
+                                `<b style="font-size:0.85rem;">${nazwa}</b>` +
+                                `<span class="badge-odczyt" style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4);">R.R. 10m</span>` +
+                                `</div>` +
+                                `${hov}`
+                            );
+                            dataObj[zmienna].pt_foreign.push(false);
+                            dataObj[zmienna].pt_types.push('ODCZYT');
+
+                            realCoords[zmienna].lats.push(lat);
+                            realCoords[zmienna].lons.push(lon);
+                        };
+
+                        addDataRR('temp', temp, temp?.toFixed(1) + '°', `Temperatura: ${temp?.toFixed(1)}°C${formatTimeRR(timeStr)}`, undefined);
+                        addDataRR('wilg', wilg, wilg?.toFixed(0) + '%', `Wilgotność: ${wilg?.toFixed(0)}%${formatTimeRR(timeStr)}`, undefined);
+                        addDataRR('rosy', dewPoint, dewPoint?.toFixed(1) + '°', `Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTimeRR(timeStr)}`, undefined);
+                        addDataRR('lcl', lcl_m, !isNaN(lcl_m) ? (lcl_m + 'm') : '', `Podstawa Chmur (LCL): <b>${lcl_m} m n.p.g.</b><br>Temperatura: ${temp?.toFixed(1)}°C, Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTimeRR(timeStr)}`, undefined);
+                        addDataRR('wiatr', wiatr_poryw, wiatr_poryw?.toFixed(0), `Poryw Wiatru (10m): ${wiatr_poryw?.toFixed(0)} km/h${formatTimeRR(timeStr)}`, wiatr_kier);
+                        addDataRR('wiatr_sr', wiatr_sr, wiatr_sr?.toFixed(0), `Wiatr (Śr): ${wiatr_sr?.toFixed(0)} km/h${formatTimeRR(timeStr)}`, wiatr_kier);
+                    }
+                } else if (!isRR && Array.isArray(rawData) && dataMode !== 'model') {
                     for (const st of rawData) {
                         const lat = parseFloat(st.lat);
                         const lon = parseFloat(st.lon);
@@ -2221,8 +2331,6 @@ window.initMapa = function() {
                         addData('lcl', lcl_m, !isNaN(lcl_m) ? (lcl_m + 'm') : '', `Podstawa Chmur (LCL): <b>${lcl_m} m n.p.g.</b><br>Temperatura: ${temp?.toFixed(1)}°C, Punkt Rosy: ${dewPoint?.toFixed(1)}°C${formatTime(temp_t)}`, undefined, temp_t);
                         addData('wiatr', wiatr_poryw_kmh, wiatr_poryw_kmh?.toFixed(0), `Poryw Wiatru: ${wiatr_poryw_kmh?.toFixed(0)} km/h${formatTime(wiatr_por_t)}`, wiatr_kier, wiatr_por_t);
                         addData('wiatr_sr', wiatr_sr_kmh, wiatr_sr_kmh?.toFixed(0), `Wiatr (Śr): ${wiatr_sr_kmh?.toFixed(0)} km/h${formatTime(wiatr_sr_t)}`, wiatr_kier, wiatr_sr_t);
-                        
-
                     }
                 }
 
@@ -2414,7 +2522,7 @@ window.initMapa = function() {
                     }
                 }
                 
-                imgwLiveCacheByMode[dataMode] = {
+                imgwLiveCacheByMode[cacheKey] = {
                     data: dataObj,
                     time: now
                 };
@@ -2680,12 +2788,18 @@ window.initMapa = function() {
                 return;
             }
 
-            if(!data || !data.pt_lats || !data.pt_lats.length) return;
-
-            imgwLayerGroup.clearLayers();
-            if(idwOverlay) {
-                map.removeLayer(idwOverlay);
-                idwOverlay = null;
+            if(!data || !data.pt_lats || !data.pt_lats.length) {
+                imgwLayerGroup.clearLayers();
+                if(idwOverlay) {
+                    map.removeLayer(idwOverlay);
+                    idwOverlay = null;
+                }
+                if (loadingEl) {
+                    loadingEl.style.display = 'flex';
+                    loadingEl.innerHTML = '<span style="color:var(--text-secondary); font-size:0.85rem;">Brak danych pomiarowych dla wybranego parametru w tym źródle.</span>';
+                    setTimeout(() => { if (loadingEl) loadingEl.style.display = 'none'; }, 3000);
+                }
+                return;
             }
             
             // ZInfo setup - pełna zgodność z oficjalnymi skalami IMGW
