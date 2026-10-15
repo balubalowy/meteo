@@ -20,7 +20,7 @@
     }
 
     function emptyResult() {
-        return { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [] };
+        return { pt_lats: [], pt_lons: [], pt_vals: [], pt_dirs: [], pt_txts: [], pt_hov: [], pt_meta: [] };
     }
 
     function getStationVal(st, zmienna) {
@@ -93,6 +93,13 @@
             `Zmiana w ${ctx.dtHours.toFixed(1)}h: ${dZnak}${delta.toFixed(1)} ${ctx.zi.unit} ` +
             `(z ${vPast} o ${ctx.pTime} do ${vNow} o ${ctx.nTime})`
         );
+        result.pt_meta.push({
+            id: meta.kod || meta.id || '',
+            nazwa: meta.nazwa || '',
+            czas: ctx.nTimeIso || '',
+            zrodlo: 'IMGW',
+            typ: 'TREND'
+        });
     }
 
     // Tempo zmian na godzine miedzy najnowszym snapshotem a snapshotem sprzed N godzin
@@ -115,8 +122,20 @@
 
         const pastMap = new Map((pastSnap.stacje || []).map(s => [String(s.kod), s]));
         const zi = window.BMapaApi.DEFAULT_ZMIENNE[zmienna] || window.BMapaApi.DEFAULT_ZMIENNE['temp'];
-        const ctx = { zi, dtHours, pTime: formatHm(pastDt), nTime: formatHm(latestDt) };
+        const ctx = {
+            zi,
+            dtHours,
+            pTime: formatHm(pastDt),
+            nTime: formatHm(latestDt),
+            pTimeIso: pastDt.toISOString(),
+            nTimeIso: latestDt.toISOString()
+        };
         const result = emptyResult();
+        result.horyzont = okres;
+        result.typ_danych = 'TREND';
+        result.czas_od_utc = pastDt.toISOString();
+        result.czas_do_utc = latestDt.toISOString();
+        result.latestTimeMs = latestDt.getTime();
 
         for (const st of (latestSnap.stacje || [])) {
             const kod = String(st.kod);
@@ -133,13 +152,15 @@
     function collectStationHistory(snapshots, zmienna) {
         const history = new Map();
         for (const snap of snapshots) {
-            const sTime = formatHm(snapTime(snap));
+            const sDt = snapTime(snap);
+            const sTime = formatHm(sDt);
+            const sIso = sDt.toISOString();
             for (const st of (snap.stacje || [])) {
                 const val = getStationVal(st, zmienna);
                 if (val === null) continue;
                 const kod = String(st.kod);
                 if (!history.has(kod)) history.set(kod, []);
-                history.get(kod).push({ val, time: sTime, dir: st.kierunek ?? st.wiatr_kierunek });
+                history.get(kod).push({ val, time: sTime, iso: sIso, dir: st.kierunek ?? st.wiatr_kierunek });
             }
         }
         return history;
@@ -150,7 +171,14 @@
         if (!snapshots.length) return { error: 'Brak snapshotów w historii Firebase.' };
         const isMax = okres.startsWith('max');
         const zi = window.BMapaApi.DEFAULT_ZMIENNE[zmienna] || window.BMapaApi.DEFAULT_ZMIENNE['temp'];
+        const pastDt = snapTime(snapshots[0]);
+        const latestDt = snapTime(snapshots[snapshots.length - 1]);
         const result = emptyResult();
+        result.horyzont = okres;
+        result.typ_danych = isMax ? 'MAKSIMUM' : 'MINIMUM';
+        result.czas_od_utc = pastDt.toISOString();
+        result.czas_do_utc = latestDt.toISOString();
+        result.latestTimeMs = latestDt.getTime();
 
         collectStationHistory(snapshots, zmienna).forEach((entries, kod) => {
             const meta = window._stationMetaMap ? window._stationMetaMap[kod] : null;
@@ -162,6 +190,13 @@
             result.pt_dirs.push(best.dir ?? null);
             result.pt_txts.push(`${best.val.toFixed(1)}`);
             result.pt_hov.push(`<b>${meta.nazwa}</b><br>${isMax ? 'Maksimum' : 'Minimum'} ${zi.nazwa}: <b>${best.val.toFixed(1)} ${zi.unit}</b> (${best.time})`);
+            result.pt_meta.push({
+                id: kod,
+                nazwa: meta.nazwa || '',
+                czas: best.iso || latestDt.toISOString(),
+                zrodlo: 'IMGW',
+                typ: isMax ? 'MAKSIMUM' : 'MINIMUM'
+            });
         });
         return result;
     }
