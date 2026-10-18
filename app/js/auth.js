@@ -90,14 +90,8 @@ if (isConfigured) {
                         headerUserEmail.title = user.email;
                     }
                     
-                    if (window.updateBandwidthUI) window.updateBandwidthUI();
-
-                    // Rozgłoś zdarzenie autoryzacji dla modułów (np. mapy i stacji)
+                    // Rozgłoś zdarzenie autoryzacji dla modułów portalu
                     window.dispatchEvent(new CustomEvent('bmeteo-authenticated', { detail: { user } }));
-                    
-                    setTimeout(() => {
-                        if (window.premiumMap) window.premiumMap.invalidateSize();
-                    }, 200);
                 } else {
                     // Zalogowano kontem spoza białej listy
                     window.firebaseUser = null;
@@ -137,65 +131,6 @@ if (isConfigured) {
             }
         });
     });
-
-    // ----------------------------------------------------
-    // ŚLEDZENIE ZUŻYCIA LIMITU POBIERANIA (BANDWIDTH TRACKER)
-    // ----------------------------------------------------
-    const BASELINE_MONTH_MB = { "2026-09": 171.98 };
-    const BASELINE_TODAY_MB = { "2026-09-14": 9.54 };
-
-    window.trackFirebaseDownload = function(bytes) {
-        if (!bytes || isNaN(bytes)) return;
-        const today = new Date().toISOString().slice(0, 10);
-        const month = new Date().toISOString().slice(0, 7);
-        
-        let totalBytes = parseInt(localStorage.getItem('bmeteo_fb_bytes_' + month) || '0', 10);
-        const baseMonthBytes = Math.round((BASELINE_MONTH_MB[month] || 0) * 1024 * 1024);
-        if (totalBytes < baseMonthBytes) totalBytes = baseMonthBytes;
-        totalBytes += bytes;
-        localStorage.setItem('bmeteo_fb_bytes_' + month, totalBytes);
-        
-        let dayBytes = parseInt(localStorage.getItem('bmeteo_fb_bytes_' + today) || '0', 10);
-        const baseDayBytes = Math.round((BASELINE_TODAY_MB[today] || 0) * 1024 * 1024);
-        if (dayBytes < baseDayBytes) dayBytes = baseDayBytes;
-        dayBytes += bytes;
-        localStorage.setItem('bmeteo_fb_bytes_' + today, dayBytes);
-        
-        if (window.updateBandwidthUI) window.updateBandwidthUI();
-    };
-
-    window.updateBandwidthUI = function() {
-        const month = new Date().toISOString().slice(0, 7);
-        const today = new Date().toISOString().slice(0, 10);
-        let totalBytes = parseInt(localStorage.getItem('bmeteo_fb_bytes_' + month) || '0', 10);
-        let dayBytes = parseInt(localStorage.getItem('bmeteo_fb_bytes_' + today) || '0', 10);
-
-        const baseMonthBytes = Math.round((BASELINE_MONTH_MB[month] || 0) * 1024 * 1024);
-        if (totalBytes < baseMonthBytes) {
-            totalBytes = baseMonthBytes;
-            localStorage.setItem('bmeteo_fb_bytes_' + month, totalBytes);
-        }
-
-        const baseDayBytes = Math.round((BASELINE_TODAY_MB[today] || 0) * 1024 * 1024);
-        if (dayBytes < baseDayBytes) {
-            dayBytes = baseDayBytes;
-            localStorage.setItem('bmeteo_fb_bytes_' + today, dayBytes);
-        }
-        
-        const mbToday = (dayBytes / (1024 * 1024)).toFixed(2);
-        const mbMonth = (totalBytes / (1024 * 1024)).toFixed(2);
-        const pctMonth = ((totalBytes / (10 * 1024 * 1024 * 1024)) * 100).toFixed(2);
-        
-        const el = document.getElementById('firebase-bandwidth-display');
-        if (el) {
-            el.innerHTML = `
-                <a href="https://console.firebase.google.com/project/meteo-bbe28/database/meteo-bbe28-default-rtdb/usage" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 4px;" title="Konsola Firebase: ${mbMonth} MB / 10 GB limitu darmowego. Kliknij, aby otworzyć statystyki.">
-                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
-                    <span>Transfer FB: <b>${mbToday} MB</b> dziś (${mbMonth} MB / 10 GB msc — ${pctMonth}%)</span>
-                </a>
-            `;
-        }
-    };
 } else {
     document.addEventListener('DOMContentLoaded', () => {
         const lockError = document.getElementById('lockscreen-error');
