@@ -18,19 +18,12 @@
   <script src="js/cloud-identifier.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   
-  <!-- Leaflet CSS -->
-  
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <!-- SortableJS -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-
-    <!-- Kreator Map -->
-    
-    
-    
 
 <link rel="stylesheet" href="css/styles.css">
     
@@ -113,7 +106,7 @@
       <div class="top-stats">
           <nav class="nav-links" aria-label="Główna nawigacja portalu">
           <a href="#" class="nav-link btn btn-ghost tab-btn active" data-tab="tab-overview"><i data-lucide="layout-dashboard"></i> Pulpit</a>
-          <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-mapa" style="color: var(--accent-primary);"><i data-lucide="map"></i> Mapy</a>
+          <a href="https://balubalowy.github.io/meteo-mapa/" target="_blank" class="nav-link btn btn-ghost" style="color: var(--accent-primary);" title="Otwórz B-Mapa w nowej karcie"><i data-lucide="map"></i> B-Mapa</a>
           <a href="#" class="nav-link btn btn-ghost tab-btn" data-tab="tab-calculators"><i data-lucide="calculator"></i> Kalkulatory</a>
           <a href="https://balubalowy.github.io/system/" target="_blank" class="nav-link btn btn-ghost" style="opacity: 0.75; font-size: 0.85rem;" title="Otwórz System B-Core"><i data-lucide="command" style="width: 14px; height: 14px; color: var(--accent-primary);"></i> B-Core</a>
         </nav>
@@ -215,12 +208,6 @@
 
 
 
-      <!-- TAB 6: MAPY -->
-      <div id="tab-mapa" class="tab-view dynamic-tab" data-src="partials/tab-mapa.html" style="height: calc(100vh - 70px); padding: 0;">
-        <div style="padding: 2rem; text-align: center; color: var(--text-secondary);">
-          <i data-lucide="loader" class="spin"></i> Ładowanie mapy...
-        </div>
-      </div>
 
       <!-- TAB CLOUD IDENTIFIER -->
       <div id="tab-cloud-identifier" class="tab-view dynamic-tab" data-src="partials/tab-cloud-identifier.html">

@@ -23,32 +23,6 @@ function loadScript(src) {
     });
 }
 
-async function ensureMapDependencies() {
-    if (window._mapDepsLoaded) return;
-    // 1. Leaflet Core + CSS
-    await Promise.all([
-        loadStyle('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'),
-        loadStyle('https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css'),
-        loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js')
-    ]);
-    // 2. Leaflet Plugins
-    await Promise.all([
-        loadScript('https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.min.js'),
-        loadScript('https://unpkg.com/leaflet-polylinedecorator/dist/leaflet.polylineDecorator.js'),
-        loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js')
-    ]);
-    // 3. Moduły aplikacyjne mapy
-    await Promise.all([
-        loadScript('js/kreator.js'),
-        loadScript('js/cmm-map.js'),
-        loadScript('js/burze.js'),
-        loadScript('js/snow.js?v=22'),
-        loadScript('js/history.js?v=22'),
-        loadScript('js/export.js?v=22')
-    ]);
-    await loadScript('js/mapa.js?v=22');
-    window._mapDepsLoaded = true;
-}
 
 async function ensureCloudsDependencies() {
     if (window._cloudsDepsLoaded) return;
@@ -92,9 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
             activeView.classList.add('active');
             
             // Dynamiczne doładowywanie zależności pod konkretne zakładki
-            if (targetTab === 'tab-mapa') {
-                await ensureMapDependencies();
-            } else if (targetTab === 'tab-cloud-identifier') {
+            if (targetTab === 'tab-cloud-identifier') {
                 await ensureCloudsDependencies();
             }
             
@@ -113,25 +85,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.Alpine.initTree(activeView);
                     }
                     if (typeof lucide !== 'undefined') lucide.createIcons();
-                    
-                    if (targetTab === 'tab-mapa' && typeof window.initMapa === 'function') {
-                        setTimeout(() => {
-                            window.initMapa();
-                            if (window.premiumMap) window.premiumMap.invalidateSize();
-                        }, 100);
-                    }
                 } catch (err) {
                     activeView.innerHTML = `<div style="padding: 2rem; color: var(--accent-danger); text-align: center;">Nie udało się załadować widoku: ${err.message}</div>`;
                     activeView.removeAttribute('data-loaded');
                 }
             } else {
                 if (typeof lucide !== 'undefined') lucide.createIcons();
-                if (targetTab === 'tab-mapa' && typeof window.initMapa === 'function') {
-                    setTimeout(() => {
-                        window.initMapa();
-                        if (window.premiumMap) window.premiumMap.invalidateSize();
-                    }, 100);
-                }
             }
 
             window.dispatchEvent(new Event('resize'));
